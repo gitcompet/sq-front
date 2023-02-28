@@ -1,0 +1,144 @@
+<header class="header-container" >
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+      <div class="container-fluid">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-mdb-toggle="collapse"
+          data-mdb-target="#navbarExample01"
+          aria-controls="navbarExample01"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarExample01">
+          <a>
+            <picture>
+              <img src="assets/images/Fichier-1.svg" class="img-fluid" alt="Responsive image">
+              <img src="asset/images/Fichier-1.svg" class="img-fluid" alt="Responsive image">
+              <!-- <div class="bg-image hover-overlay ripple">
+                <img src="asset/images/Fichier-1.svg" class="img-fluid" />
+                <a href="#!">
+                  <div class="mask" style="background-color: rgba(57, 192, 237, 0.2);"></div>
+                </a>
+              </div> -->
+            </picture>
+          </a>
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item active">
+              <a class="nav-link" aria-current="page" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/user/profiles" routerLinkActive="active" ariaCurrentWhenActive="page">Users</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Questions</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-0 col-xl-2 align-center">
+
+        <!-- <div *ngIf="!this.isAuthenticated">  -->
+<div class="dropdown">
+  <button class="btn btn- dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+   
+    Login
+    
+  </button>
+  <ul class="dropdown-menu" >
+    <app-login></app-login>
+     </ul>
+</div>
+      </div>
+      <div class="col-0 col-xl-2">
+        <button type="button" class="btn btn-danger" (click)="onLogout()">
+         Logout
+        </button>
+      </div>
+
+      <div class="col-4 col-xl-1 order-3 justify-content-end justify-content-xl-center"> 
+        <div class="dropdown">
+            <!-- <a href="#" title="FR" class="c-link dropdown-toggle" data-toggle=dropdown>FR</a> -->
+            <button class="btn btn- dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+   
+              FR
+              
+            </button>
+            <div class="dropdown-menu">
+                <a href="/" title="Français" class="c-link dropdown-item active" ><i class="icon icon-flag-france"></i>Français</a>
+                <a href="/en" title="Anglais" class="c-link dropdown-item active" ><i class="icon icon-flag-france"></i> Anglais</a>
+                <a href="/de" title="Allemand" class="c-link dropdown-item active" ><i class="icon icon-flag-france"></i>Allemand</a>
+            </div>
+    
+        </div>  
+    </div>
+    </nav>
+    <!-- Navbar -->
+ 
+
+<div class="dropdown">
+    <a class="dropdown-toggle" href="#" id="Dropdown" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+        <i class="flag-united-kingdom flag m-0"></i>
+    </a>
+
+    <ul class="dropdown-menu" aria-labelledby="Dropdown">
+        <li>
+            <a class="dropdown-item" href="#"><i class="flag-united-kingdom flag"></i>English <i class="fa fa-check text-success ms-2"></i></a>
+        </li>
+        <li><hr class="dropdown-divider" /></li>
+        <li>
+            <a class="dropdown-item" href="#"><i class="flag-poland flag"></i>Polski</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#"><i class="flag-china flag"></i>中文</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#"><i class="flag-japan flag"></i>日本語</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#"><i class="flag-germany flag"></i>Deutsch</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#"><i class="flag-france flag"></i>Français</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#"><i class="flag-spain flag"></i>Español</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#"><i class="flag-russia flag"></i>Русский</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#"><i class="flag-portugal flag"></i>Português</a>
+        </li>
+    </ul>
+</div>
+    <!-- Background image -->
+    <div
+      class="p-5 text-center bg-image"
+      style="
+        background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/041.webp');
+        height: 400px;
+        margin-top: 58px;
+      "
+    >
+      <!-- <div class="mask" style="background-color: rgba(0, 0, 0, 0.6);">
+        <div class="d-flex justify-content-center align-items-center h-100">
+          <div class="text-white">
+            <h1 class="mb-3">Heading</h1>
+            <h4 class="mb-3">Subheading</h4>
+            <a class="btn btn-outline-light btn-lg" href="#!" role="button"
+            >Call to action</a
+            >
+          </div>
+        </div>
+      </div> -->
+    </div>
+    <!-- Background image -->
+    
+  </header>

@@ -1,0 +1,30 @@
+<p>regisration works!</p>
+
+
+<form [formGroup]="service.formModel" autocomplete="off" (submit)="onsubmit()">
+    <div class="form-group">
+        <label class="form-label">UserName</label>
+        <input class="form-control" type="email" class="form-control" 
+        formControlName="UserName">
+      </div>
+    <div class="form-group">
+      <label class="form-label">Email address</label>
+      <input type="email" class="form-control" formControlName="Email" id="exampleInputEmail1" aria-describedby="emailHelp">
+      <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+    </div>
+    <!-- <div formGroupName="PassWords" > -->
+    <div class="form-group">
+      <label  class="form-label">Password</label>
+      <input type="password" class="form-control" formControlName="Password">
+    </div>
+    <div class="form-group">
+      <label  class="form-label">Confirme Password</label>
+      <input type="password" class="form-control" formControlName="ConfirmedPassword">
+    </div>
+    <!-- </div> -->
+    <!-- <div class="form-group form-check">
+      <input type="checkbox" class="form-check-input">
+      <label class="form-check-label" for="exampleCheck1">Check me out</label>
+    </div> -->
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
