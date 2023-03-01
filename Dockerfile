@@ -6,4 +6,4 @@ RUN npm run build --prod
 
 
 FROM nginx:alpine as deploy
-COPY --from=build /app /usr/share/nginx/html
+COPY --from=build /app/dist/skillquizwepapp /usr/share/nginx/html
