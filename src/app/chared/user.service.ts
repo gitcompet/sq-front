@@ -6,6 +6,7 @@ import { User } from './user.model';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment.development';
 // import {JwHelperService} from '@auth0/angular-jwt'
 
 @Injectable({
@@ -15,7 +16,7 @@ export class UserService {
   jwthelper: any;
 
   constructor(private fb:FormBuilder, private http:HttpClient , private router:Router) { }
-  readonly BaseURI='http://localhost:5812/api';
+
   list:User[] =[]
   formModel= this.fb.group({
     UserName:[''],
@@ -57,11 +58,11 @@ ConfirmedPassword:['']
   };
   console.log("formmodel"+ JSON.stringify( this.formModel.value));
   console.log("body"+ JSON.stringify( body));
- return  this.http.post(this.BaseURI + '/ApplicationUser/register', body);
+ return  this.http.post(`${environment.baseUrl}${environment.basePath}/ApplicationUser/register`, body);
 }
 login(formData:FormData)
 {
-return this.http.post(this.BaseURI+'/ApplicationUser/register', formData);
+return this.http.post(`${environment.baseUrl}${environment.basePath}/ApplicationUser/register`, formData);
 }
 dologout()
 {
@@ -107,6 +108,6 @@ GetProfiles()
 GetProfiles1():Observable<any>
 { let body:any={}
 const options={responseType:'blob'}
-  return this.http.get(this.BaseURI + '/ApplicationUser/GetUsers/', {'headers':this.headers});
+  return this.http.get(`${environment.baseUrl}${environment.basePath}/ApplicationUser/GetUsers/`, {'headers':this.headers});
 }
 }
