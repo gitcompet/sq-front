@@ -1,24 +1,26 @@
-<p>nav</p>
+<ng-template *ngIf="false">
+  <p>logo</p>
+  <ul>
+    <li>
+      <a  routerLink="/home" aria-current="page">Home</a>
+    </li>
+    <li >
+      <a  routerLink="/profiles" routerLinkActive="active"  ariaCurrentWhenActive="page">Users</a>
+    </li>
+    <li >
+      <a  routerLink="/login" routerLinkActive="active"   ariaCurrentWhenActive="page">Login</a>
+    </li>
+    <li >
+      <a  routerLink="/signup" routerLinkActive="active"  ariaCurrentWhenActive="page">Register</a>
+    </li>
+    <li >
+      <a   routerLink="/quiz" routerLinkActive="active"  ariaCurrentWhenActive="page" >Questions</a>
+    </li>
+    <li >
+      <a  routerLink="/profiles/1" routerLinkActive="active"   ariaCurrentWhenActive="page">About</a>
+    </li>
 
-<ul>
-  <li>
-    <a  routerLink="/home" aria-current="page">Home</a>
-  </li>
-  <li >
-    <a  routerLink="/profiles" routerLinkActive="active"  ariaCurrentWhenActive="page">Users</a>
-  </li>
-  <li >
-    <a  routerLink="/login" routerLinkActive="active"   ariaCurrentWhenActive="page">Login</a>
-  </li>
-  <li >
-    <a  routerLink="/signup" routerLinkActive="active"  ariaCurrentWhenActive="page">Register</a>
-  </li>
-  <li >
-    <a   routerLink="/quiz" routerLinkActive="active"  ariaCurrentWhenActive="page" >Questions</a>
-  </li>
-  <li >
-    <a  routerLink="/profiles/1" routerLinkActive="active"   ariaCurrentWhenActive="page">About</a>
-  </li>
+  </ul>
 
-</ul>
 
+</ng-template>

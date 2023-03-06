@@ -18,7 +18,7 @@ export class AuthService {
 
   isLoggedin: boolean = false;
 
-  register(payload: User) {
+  signUp(payload: User) {
     return this.http.post<User>(
       `${environment.baseUrl}${environment.basePath}${environment.authPath}`,
       payload

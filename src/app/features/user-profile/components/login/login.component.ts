@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { User } from 'src/app/core/models/user.model';
+import { Login } from 'src/app/core/models/login.model';
 import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
@@ -10,41 +10,30 @@ import { AuthService } from 'src/app/shared/services/auth.service';
   styles: [],
 })
 export class LoginComponent implements OnInit {
-  formModel = {
-    UserName: '',
-    Password: '',
-  };
   isLoggedin: boolean = false;
-  users: User[] = [];
   isAuthenticated: boolean = false;
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private _formBuilder: FormBuilder
+  ) {}
+  loginForm: FormGroup = this._formBuilder.group({
+    username: new FormControl('',[Validators.minLength(3)]),
+    password: new FormControl('',[Validators.pattern(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/g)])
+  } as unknown as Login,{validators: [Validators.required]});
+
   ngOnInit(): void {
-    console.log('form Model:', this.formModel.UserName);
-    if (localStorage.getItem('token') != null) this.router.navigate(['/home']);
-    {
-    }
-    this.isLoggedIn();
+
   }
+  onLogin() {
+    if (!this.loginForm.valid) return;
+    if(this.loginForm.valid) console.log("Yes");
+    return;
 
-  onSubmit(form: NgForm) {
-    this.authService.login(form.value).subscribe({
-      next: (res: any) => {
-        localStorage.setItem('token', res.token);
-
-        this.router.navigateByUrl('/home');
-        // login successful if there's a jwt token in the response
-        if (res && res.token) {
-          // store user details and jwt token in local storage to keep user logged in between page refreshes
-          localStorage.setItem('currentUser', JSON.stringify(res.user));
-          this.isLoggedin = true;
-        }
-      },
-
-      error: (err) => console.log(err),
-      complete: () => console.log('completed'),
+    this.authService.login(this.loginForm.value).subscribe(() => {
+      console.log('Logged in');
     });
   }
-
   isLoggedIn() {
     this.isAuthenticated = this.authService.isLoggedIn();
   }
