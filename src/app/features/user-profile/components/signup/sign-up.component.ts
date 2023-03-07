@@ -5,7 +5,7 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { passwordMatching } from 'src/app/core/constants/settings';
+import { passwordMatchingValidator } from 'src/app/core/constants/settings';
 import { SignUp } from 'src/app/core/models/signup.model';
 import { AuthService } from 'src/app/shared/services/auth.service';
 
@@ -24,17 +24,18 @@ export class SignUpComponent {
     email: new FormControl('',[Validators.email]),
     fullName: new FormControl('',[Validators.minLength(3)]),
     password: new FormControl('',[
-      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})$/)
+      Validators.pattern(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/),
+      passwordMatchingValidator('confirmPassword',true)
     ]),
     confirmPassword: new FormControl('',[
-      Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})$/),
+      Validators.pattern(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/),
+      passwordMatchingValidator('password')
     ]),
-  } as unknown as SignUp,{validators: [Validators.required,passwordMatching]});
-  ngOnInit() {}
+  } as unknown as SignUp,{validators: [Validators.required]});
+  ngOnInit() {
+   }
   onSignUp() {
     if (!this.signUpForm.valid) return;
-    if(this.signUpForm.valid) console.log("Yes");
-    return;
     this.authService.signUp(this.signUpForm.value).subscribe((res) => {
       console.log('Signed up');
     });

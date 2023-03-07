@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
 import { RouterModule } from '@angular/router';
+import { JwtHelperService, JwtModule } from '@auth0/angular-jwt';
 
 
 
@@ -10,7 +11,9 @@ import { RouterModule } from '@angular/router';
   declarations: [PageNotFoundComponent,NavMenuComponent],
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    JwtModule.forRoot({ // for JwtHelperService
+    })
   ],
   exports: [PageNotFoundComponent,NavMenuComponent],
 })

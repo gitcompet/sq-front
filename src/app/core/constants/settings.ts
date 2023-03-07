@@ -3,15 +3,33 @@ import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn } from '@angu
 
 export const headers = new HttpHeaders()
   .set('content-type', 'application/json')
-  // .set('Access-Control-Allow-Origin', '*')
-  // .set('Access-Control-Allow-Origin', 'http://localhost:4200')
   .append('content-type', 'text/plain; charset=utf-8')
   .append('content-type', 'application/x-www-form-urlencoded');
-
 export function passwordMatching(formGroup: FormGroup): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
      const password = formGroup.controls['password'].value;
      const confirmPassword = formGroup.controls['confirmPassword'].value;
      return password === confirmPassword ? null : {passwordNotMatch : true};
   }
+}
+export function passwordMatchingValidator(
+  matchTo: string,
+  reverse?: boolean
+): ValidatorFn {
+  return (control: AbstractControl):
+  ValidationErrors | null => {
+    if (control.parent && reverse) {
+      const c = (control.parent?.controls as any)[matchTo] as AbstractControl;
+      if (c) {
+        c.updateValueAndValidity();
+      }
+      return null;
+    }
+    return !!control.parent &&
+      !!control.parent.value &&
+      control.value ===
+      (control.parent?.controls as any)[matchTo].value
+      ? null
+      : { matching: true };
+  };
 }

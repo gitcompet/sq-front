@@ -4,16 +4,16 @@ import { Router } from '@angular/router';
 import { Login } from 'src/app/core/models/login.model';
 import { User } from 'src/app/core/models/user.model';
 import { environment } from 'src/environments/environment.development';
+import { JWTHelperService } from './jwt-helper.service';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuthService {
-  jwthelper: any;
-
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private jwtService: JWTHelperService
   ) {}
 
   isLoggedin: boolean = false;
@@ -31,18 +31,22 @@ export class AuthService {
     );
   }
   logout() {
-    let removeToken = localStorage.removeItem('token');
+    let removeToken = this.getToken();
     if (removeToken == null) {
-      this.router.navigateByUrl('/login');
       this.isLoggedin = false;
+      this.router.navigateByUrl('/login');
     }
   }
-   isLoggedIn() {
-    if (localStorage.getItem('token') == null) {
-      this.isLoggedin = false;
+  isLoggedIn() {
+    const token = this.getToken();
+    if (token == null && this.jwtService.hasTokenExpired(token)) {
+      //REFRESH TOKEN INSTEAD
       return this.isLoggedin;
     } else {
       return true;
     }
+  }
+  getToken(){
+    return localStorage.getItem('token') as string;
   }
 }

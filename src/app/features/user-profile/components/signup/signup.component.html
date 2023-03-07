@@ -1,11 +1,11 @@
-<div class="flex gap-2 mx-2 justify-center  h-screen">
+<div class="flex gap-2 mx-2 justify-center h-screen">
   <img
     class="w-1/2"
     src="../../../../assets/images/Fichier-1.svg"
     alt="Login Screen"
   />
   <div class="bg-primary w-1/2 flex items-center justify-center">
-    <div class="bg-white drop-shadow-md  rounded mx-4 w-full">
+    <div class="bg-white drop-shadow-md rounded mx-4 w-full flex-1">
       <form [formGroup]="signUpForm" (submit)="onSignUp()">
         <h2 class="text-center py-2 font-bold text-2xl">Sign Up</h2>
         <div class="mb-2 p-3">
@@ -23,19 +23,18 @@
             formControlName="username"
           />
           <ng-container
-          *ngIf="
-          signUpForm.controls['username']?.invalid &&
-            (signUpForm.controls['username']?.dirty ||
-            signUpForm.controls['username']?.touched)
-          "
-        >
-          <div
-            class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 mt-2 text-red-700"
+            *ngIf="
+              signUpForm.controls['username']?.invalid &&
+              (signUpForm.controls['username']?.dirty ||
+                signUpForm.controls['username']?.touched)
+            "
           >
-            <p>
-              Wrong username.
-            </p>
-          </div></ng-container>
+            <div
+              class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 mt-2 text-red-700"
+            >
+              <p>Wrong username.</p>
+            </div></ng-container
+          >
         </div>
         <div class="mb-2 p-3">
           <label
@@ -67,19 +66,18 @@
             formControlName="email"
           />
           <ng-container
-          *ngIf="
-          signUpForm.controls['email']?.invalid &&
-            (signUpForm.controls['email']?.dirty ||
-            signUpForm.controls['email']?.touched)
-          "
-        >
-          <div
-            class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 mt-2 text-red-700"
+            *ngIf="
+              signUpForm.controls['email']?.invalid &&
+              (signUpForm.controls['email']?.dirty ||
+                signUpForm.controls['email']?.touched)
+            "
           >
-            <p>
-              Wrong email.
-            </p>
-          </div></ng-container>
+            <div
+              class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 mt-2 text-red-700"
+            >
+              <p>Wrong email.</p>
+            </div></ng-container
+          >
         </div>
         <div class="mb-4 p-3">
           <label
@@ -96,20 +94,21 @@
             formControlName="password"
           />
           <ng-container
-          *ngIf="
-          signUpForm.controls['password']?.invalid &&
-            (signUpForm.controls['password']?.dirty ||
-            signUpForm.controls['password']?.touched)
-          "
-        >
-          <div
-            class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 mt-2 text-red-700"
+            *ngIf="
+              signUpForm.controls['password']?.invalid &&
+              (signUpForm.controls['password']?.dirty ||
+                signUpForm.controls['password']?.touched)
+            "
           >
-            <p>
-              Password needs to have at least one uppercase & special
-              character & one number.
-            </p>
-          </div></ng-container>
+            <div
+              class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 mt-2 text-red-700"
+            >
+              <p>
+                Password needs to have at least one uppercase & special
+                character & one number.
+              </p>
+            </div></ng-container
+          >
         </div>
         <div class="mb-4 p-3">
           <label
@@ -126,19 +125,19 @@
             formControlName="confirmPassword"
           />
           <ng-container
-          *ngIf="
-          signUpForm.controls['confirmPassword']?.invalid &&
-            (signUpForm.controls['confirmPassword']?.dirty ||
-            signUpForm.controls['confirmPassword']?.touched)
-          "
-        >
-          <div
-            class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 mt-2 text-red-700"
+            *ngIf="
+              signUpForm.controls['confirmPassword'].hasError('matching') &&
+              signUpForm.controls['confirmPassword']?.invalid &&
+              (signUpForm.controls['confirmPassword']?.dirty ||
+                signUpForm.controls['confirmPassword']?.touched)
+            "
           >
-            <p>
-              Passwords don't match.
-            </p>
-          </div></ng-container>
+            <div
+              class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 mt-2 text-red-700"
+            >
+              <p>Password don't match.</p>
+            </div></ng-container
+          >
         </div>
         <div class="flex items-center flex-col justify-between">
           <button
@@ -149,14 +148,13 @@
             Sign Up
           </button>
           <a
-          class="inline-block align-baseline font-semibold text-sm my-2 text-blue hover:text-blue-darker"
-          href="#"
-        >
-         Sign In
-        </a>
+            class="inline-block align-baseline font-semibold text-sm my-2 text-blue hover:text-blue-darker"
+            href="#"
+          >
+            Sign In
+          </a>
         </div>
       </form>
     </div>
   </div>
 </div>
-
