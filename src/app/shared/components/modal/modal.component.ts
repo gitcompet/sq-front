@@ -11,7 +11,7 @@ export class ModalComponent {
   @Input() id: string = '';
   @Input() data: FormGroup | any;
   @Input('showModal') showModal!: boolean;
-  @Output('close') closeModal: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output('onClose') closeModal: EventEmitter<boolean> = new EventEmitter<boolean>();
   private element: HTMLElement;
   constructor(private modalService: ModalService, private el: ElementRef,private renderer: Renderer2) {
     this.element = el.nativeElement;
@@ -29,16 +29,14 @@ export class ModalComponent {
   }
 
   // open modal
-  open(): void {
-    console.log(this.element);
+  open(): void {}
+  save(){
 
-   // this.renderer.appendChild(this.element.parentElement,this.element)
   }
 
   // close modal
   close(): void {
-   this.closeModal.emit(true);
-   this.modalService.remove(this.id);
-   //this.renderer.removeChild(this.element.parentElement,this.element)
+   this.closeModal.emit(!this.showModal)
   }
+
 }

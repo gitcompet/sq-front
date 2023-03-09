@@ -10,6 +10,7 @@ import { TestComponent } from './components/test/test.component';
 import { QuizComponent } from './components/test/quiz/quiz.component';
 import { QuestionComponent } from './components/test/quiz/question/question.component';
 import { SharedModule } from '../../shared/shared.module';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,6 @@ import { SharedModule } from '../../shared/shared.module';
     QuizComponent,
     QuestionComponent,
   ],
-  imports: [CommonModule, UserAdminRoutingModule, SharedModule],
+  imports: [CommonModule, UserAdminRoutingModule, SharedModule,ReactiveFormsModule],
 })
 export class UserAdminModule {}
