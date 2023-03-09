@@ -8,6 +8,10 @@ module.exports = {
         primary: "#E0311E",
         secondary: "#F8F9FA"
       },
+      textColor: {
+        primary: "#E0311E",
+        secondary: "#F8F9FA"
+      },
       colors: {
         "button-color": {
           700: "#FF6622",
@@ -15,5 +19,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("tw-elements/dist/plugin")],
 };

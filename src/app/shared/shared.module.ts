@@ -3,18 +3,23 @@ import { CommonModule } from '@angular/common';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
 import { RouterModule } from '@angular/router';
-import { JwtHelperService, JwtModule } from '@auth0/angular-jwt';
+import {  JwtModule } from '@auth0/angular-jwt';
+import { TableComponent } from './components/table/table.component';
+import { ModalComponent } from './components/modal/modal.component';
 
 
 
 @NgModule({
-  declarations: [PageNotFoundComponent,NavMenuComponent],
-  imports: [
-    CommonModule,
-    RouterModule,
-    JwtModule.forRoot({ // for JwtHelperService
-    })
-  ],
-  exports: [PageNotFoundComponent,NavMenuComponent],
+    declarations: [PageNotFoundComponent, NavMenuComponent, TableComponent, ModalComponent],
+    exports: [PageNotFoundComponent, NavMenuComponent, TableComponent,ModalComponent],
+    imports: [
+        CommonModule,
+        RouterModule,
+        JwtModule.forRoot({
+            config: {
+                tokenGetter: undefined
+            },
+        }),
+    ]
 })
 export class SharedModule { }

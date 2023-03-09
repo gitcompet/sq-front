@@ -5,6 +5,8 @@ import { ProfileComponent } from './components/profiles/profile/profile.componen
 import { AuthGuard } from 'src/app/core/guards/auth.guard';
 import { HomeComponent } from './components/home/home.component';
 import { MainContentComponent } from './components/home/main-content/main-content.component';
+import { TestComponent } from './components/test/test.component';
+import { QuizComponent } from './components/test/quiz/quiz.component';
 
 const routes: Routes = [
   {
@@ -22,6 +24,16 @@ const routes: Routes = [
         component: ProfilesComponent,
         canActivate: [AuthGuard],
         children: [{ path: ':id', component: ProfileComponent }],
+      },
+      {
+        path: 'tests',
+        component: TestComponent,
+        canActivate: [AuthGuard],
+      },
+      {
+        path: 'quizzes',
+        component: QuizComponent,
+        canActivate: [AuthGuard],
       },
     ],
   },

@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
   }
   onLogin() {
     if (!this.loginForm.valid) return;
-       this.authService.login(this.loginForm.value).subscribe(() => {
+       this.authService.login(this.loginForm.value).subscribe((res) => {
       console.log('Logged in');
     });
   }
