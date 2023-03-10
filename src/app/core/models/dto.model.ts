@@ -1,0 +1,4 @@
+//INTERFACE FOR INTERCOMMUNICATION BETWEEN COMPONENTS
+export interface DTO {
+  data:unknown;
+}

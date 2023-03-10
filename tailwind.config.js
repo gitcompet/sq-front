@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{html,ts}"],
+  content: ["./src/**/*.{html,ts}", "./node_modules/tw-elements/dist/js/**/*.js"],
   theme: {
     extend: {
       backgroundColor: {
