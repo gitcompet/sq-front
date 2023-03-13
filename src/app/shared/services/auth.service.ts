@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import { Login } from 'src/app/core/models/login.model';
 import { TokenResponse } from 'src/app/core/models/token-response.model';
 import { User } from 'src/app/core/models/user.model';
@@ -19,13 +20,13 @@ export class AuthService {
 
   isLoggedin: boolean = false;
 
-  signUp(payload: User) {
+  signUp(payload: User):Observable<User> {
     return this.http.post<User>(
       `${environment.baseUrl}${environment.basePath}${environment.registrationPath}`,
       payload
     );
   }
-  login(payload: Login) {
+  login(payload: Login): Observable<TokenResponse> {
     return this.http.post<TokenResponse>(
       `${environment.baseUrl}${environment.basePath}${environment.authPath}`,
       payload
@@ -38,7 +39,7 @@ export class AuthService {
       this.router.navigateByUrl('/login');
     }
   }
-  isLoggedIn() {
+  isLoggedIn():boolean {
     const token = this.getToken();
     if (token == null && this.jwtService.hasTokenExpired(token)) {
       //REFRESH TOKEN INSTEAD
@@ -47,14 +48,20 @@ export class AuthService {
       return true;
     }
   }
-  getToken(){
+  getToken():string{
     return localStorage.getItem('token') as string;
   }
-  getRefreshToken(){
+  getRefreshToken():string{
     return localStorage.getItem('refresh') as string;
   }
   setToken(response:TokenResponse){
     localStorage.setItem('token',response.accessToken);
     localStorage.setItem('refresh',response.refreshToken);
+  }
+  isAdmin():boolean{
+    const decodedToken: any = this.jwtService.decode(this.getToken())
+    const roles = decodedToken['roles'] as string[];
+    if(roles.find((element)=> element === 'admin')) return true;
+    return false;
   }
 }
