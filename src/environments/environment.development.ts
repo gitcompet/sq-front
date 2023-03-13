@@ -1,6 +1,7 @@
 export const environment = {
-  baseUrl:"http://145.239.0.38:5812",
+  baseUrl:"http://localhost:63869",
   basePath:"/api",
-  authPath : "/ApplicationUser/register",
-  usersPath: "/ApplicationUser/GetUsers"
+  authPath : "/Auth/login",
+  registrationPath : "/Auth/register",
+  usersPath: "/User/GetUsers"
 };

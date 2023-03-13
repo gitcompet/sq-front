@@ -5,7 +5,9 @@ import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
 import { RouterModule } from '@angular/router';
 import { JwtHelperService, JwtModule } from '@auth0/angular-jwt';
 
-
+export function tokenGetter() {
+  return localStorage.getItem("access_token");
+}
 
 @NgModule({
   declarations: [PageNotFoundComponent,NavMenuComponent],
@@ -13,6 +15,7 @@ import { JwtHelperService, JwtModule } from '@auth0/angular-jwt';
     CommonModule,
     RouterModule,
     JwtModule.forRoot({ // for JwtHelperService
+      config: {tokenGetter:tokenGetter}
     })
   ],
   exports: [PageNotFoundComponent,NavMenuComponent],

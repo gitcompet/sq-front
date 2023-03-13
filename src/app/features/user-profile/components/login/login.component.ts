@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Login } from 'src/app/core/models/login.model';
+import { TokenResponse } from 'src/app/core/models/token-response.model';
 import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
@@ -27,8 +28,9 @@ export class LoginComponent implements OnInit {
   }
   onLogin() {
     if (!this.loginForm.valid) return;
-       this.authService.login(this.loginForm.value).subscribe(() => {
-      console.log('Logged in');
+       this.authService.login(this.loginForm.value).subscribe((response: TokenResponse) => {
+       this.authService.setToken(response)
+       this.router.navigate(['admin-dashboard'])
     });
   }
   isLoggedIn() {
