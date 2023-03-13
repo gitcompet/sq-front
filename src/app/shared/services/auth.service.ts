@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Login } from 'src/app/core/models/login.model';
+import { TokenResponse } from 'src/app/core/models/token-response.model';
 import { User } from 'src/app/core/models/user.model';
 import { environment } from 'src/environments/environment.development';
 import { JWTHelperService } from './jwt-helper.service';
@@ -20,12 +21,12 @@ export class AuthService {
 
   signUp(payload: User) {
     return this.http.post<User>(
-      `${environment.baseUrl}${environment.basePath}${environment.authPath}`,
+      `${environment.baseUrl}${environment.basePath}${environment.registrationPath}`,
       payload
     );
   }
   login(payload: Login) {
-    return this.http.post(
+    return this.http.post<TokenResponse>(
       `${environment.baseUrl}${environment.basePath}${environment.authPath}`,
       payload
     );
@@ -48,5 +49,12 @@ export class AuthService {
   }
   getToken(){
     return localStorage.getItem('token') as string;
+  }
+  getRefreshToken(){
+    return localStorage.getItem('refresh') as string;
+  }
+  setToken(response:TokenResponse){
+    localStorage.setItem('token',response.accessToken);
+    localStorage.setItem('refresh',response.refreshToken);
   }
 }

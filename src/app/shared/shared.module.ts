@@ -3,23 +3,34 @@ import { CommonModule } from '@angular/common';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
 import { RouterModule } from '@angular/router';
-import {  JwtModule } from '@auth0/angular-jwt';
+import { JwtModule } from '@auth0/angular-jwt';
 import { TableComponent } from './components/table/table.component';
 import { ModalComponent } from './components/modal/modal.component';
 
-
+export function tokenGetter() {
+  return localStorage.getItem('access_token');
+}
 
 @NgModule({
-    declarations: [PageNotFoundComponent, NavMenuComponent, TableComponent, ModalComponent],
-    exports: [PageNotFoundComponent, NavMenuComponent, TableComponent,ModalComponent],
-    imports: [
-        CommonModule,
-        RouterModule,
-        JwtModule.forRoot({
-            config: {
-                tokenGetter: undefined
-            },
-        }),
-    ]
+  declarations: [
+    PageNotFoundComponent,
+    NavMenuComponent,
+    TableComponent,
+    ModalComponent,
+  ],
+  exports: [
+    PageNotFoundComponent,
+    NavMenuComponent,
+    TableComponent,
+    ModalComponent,
+  ],
+  imports: [
+    CommonModule,
+    RouterModule,
+    JwtModule.forRoot({
+      // for JwtHelperService
+      config: { tokenGetter: tokenGetter },
+    }),
+  ],
 })
-export class SharedModule { }
+export class SharedModule {}
