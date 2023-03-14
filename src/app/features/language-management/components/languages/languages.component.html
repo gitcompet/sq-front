@@ -1,0 +1,18 @@
+<p>All languages should display</p>
+
+<div class="flex gap-2 mx-2 justify-center h-screen text-center">
+  <div class="w-1/2">
+    <form *ngFor="let language of languages" action="./languages/{{language.title}}" class="text-center my-4">
+      <input type="submit" value="{{language.title}}" />
+    </form>
+  </div>
+  <div class="w-1/2 bg-primary flex items-center justify-center">
+    <div class="bg-white shadow-lg rounded mx-4 w-full">
+
+      <router-outlet></router-outlet>
+
+    </div>
+  </div>
+</div>
+
+
