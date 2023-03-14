@@ -21,6 +21,7 @@ yarn-error.log
 *.sublime-workspace
 
 # Visual Studio Code
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -42,3 +43,5 @@ testem.log
 Thumbs.db
 
 .fake
+/.vs/tsttst/FileContentIndex
+/.vs/slnx.sqlite
