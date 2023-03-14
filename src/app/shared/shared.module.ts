@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { JwtModule } from '@auth0/angular-jwt';
 import { TableComponent } from './components/table/table.component';
 import { ModalComponent } from './components/modal/modal.component';
+import { NavbarSettingsComponent } from './components/navbar-settings/navbar-settings.component';
 
 export function tokenGetter() {
   return localStorage.getItem('access_token');
@@ -17,12 +18,14 @@ export function tokenGetter() {
     NavMenuComponent,
     TableComponent,
     ModalComponent,
+    NavbarSettingsComponent,
   ],
   exports: [
     PageNotFoundComponent,
     NavMenuComponent,
     TableComponent,
     ModalComponent,
+    NavbarSettingsComponent
   ],
   imports: [
     CommonModule,

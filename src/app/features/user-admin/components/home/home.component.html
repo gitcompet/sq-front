@@ -8,83 +8,9 @@
 
   <!-- RIGHT COLUMN -->
   <div class="col-span-4">
-    <div
-      class="flex items-center  mt-2 grow sm:mt-4 sm:mr-6 md:mr-4 lg:flex lg:basis-auto"
-    >
-      <div class="flex items-center md:ml-auto md:pr-4">
-        <div
-          class="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease-soft"
-        >
-          <span
-            class="text-sm ease-soft leading-5.6 absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-2.5 text-center font-normal text-slate-500 transition-all"
-          >
-            <i class="fas fa-search" aria-hidden="true"></i>
-          </span>
-          <input
-            type="text"
-            class="pl-10 text-sm focus:shadow-soft-primary-outline ease-soft w-1/100 leading-5.6 relative -ml-px block min-w-0 flex-auto rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 pr-3 text-gray-700 transition-all placeholder:text-gray-500 focus:border-fuchsia-300 focus:outline-none focus:transition-shadow"
-            placeholder="Type here..."
-          />
-        </div>
-      </div>
-      <ul class="flex flex-row justify-end pl-0 mb-0 list-none md-max:w-full">
-        <li class="flex items-center">
-          <a
-            href="#"
-            class="block px-0 py-2 font-semibold transition-all ease-nav-brand text-sm text-slate-500"
-          >
-            <i class="fa fa-user sm:mr-1" aria-hidden="true"></i>
-            <span class="hidden sm:inline">Sign In</span>
-          </a>
-        </li>
-        <li class="flex items-center pl-4 xl:hidden">
-          <a
-            href="javascript:;"
-            class="block p-0 transition-all ease-nav-brand text-sm text-slate-500"
-            sidenav-trigger=""
-          >
-            <div class="w-4.5 overflow-hidden">
-              <i
-                class="ease-soft mb-0.75 relative block h-0.5 rounded-sm bg-slate-500 transition-all"
-              ></i>
-              <i
-                class="ease-soft mb-0.75 relative block h-0.5 rounded-sm bg-slate-500 transition-all"
-              ></i>
-              <i
-                class="ease-soft relative block h-0.5 rounded-sm bg-slate-500 transition-all"
-              ></i>
-            </div>
-          </a>
-        </li>
-        <li class="flex items-center px-4">
-          <a
-            href="javascript:;"
-            class="p-0 transition-all text-sm ease-nav-brand text-slate-500"
-          >
-            <i
-              fixed-plugin-button-nav=""
-              class="cursor-pointer fa fa-cog"
-              aria-hidden="true"
-            ></i>
-          </a>
-        </li>
-
-        <li class="relative flex items-center pr-2">
-          <p class="hidden transform-dropdown-show"></p>
-          <a
-            href="javascript:;"
-            class="block p-0 transition-all text-sm ease-nav-brand text-slate-500"
-            dropdown-trigger=""
-            aria-expanded="false"
-          >
-            <i class="cursor-pointer fa fa-bell" aria-hidden="true"></i>
-          </a>
-        </li>
-      </ul>
-    </div>
+     <app-navbar-settings [data]="data"></app-navbar-settings>
     <div class="flex mx-10  my-16 justify-start items-start">
       <router-outlet></router-outlet>
     </div>
-
   </div>
 </div>

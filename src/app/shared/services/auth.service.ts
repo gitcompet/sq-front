@@ -59,9 +59,18 @@ export class AuthService {
     localStorage.setItem('refresh',response.refreshToken);
   }
   isAdmin():boolean{
-    const decodedToken: any = this.jwtService.decode(this.getToken())
-    const roles = decodedToken['roles'] as string[];
-    if(roles.find((element)=> element === 'admin')) return true;
+    const decodedToken: any = this.jwtService.decode(this.getToken());
+    console.log(decodedToken);
+
+    const roles = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string[];
+    console.log(roles);
+
+    if(roles.find((element)=> element.toUpperCase() === 'admin'.toUpperCase())) return true;
     return false;
+  }
+  getUsername():string{
+    const decodedToken: any = this.jwtService.decode(this.getToken())
+    const username = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] as string;
+    return username;
   }
 }

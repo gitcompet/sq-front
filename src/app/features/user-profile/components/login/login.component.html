@@ -20,14 +20,14 @@
             id="username"
             type="text"
             placeholder="Username"
-            formControlName="username"
+            formControlName="login"
             required
           />
           <ng-container
           *ngIf="
-            loginForm.controls['username']?.invalid &&
-            (loginForm.controls['username']?.dirty ||
-              loginForm.controls['username']?.touched)
+            loginForm.controls['login']?.invalid &&
+            (loginForm.controls['login']?.dirty ||
+              loginForm.controls['login']?.touched)
           "
         >
           <div
