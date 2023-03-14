@@ -11,6 +11,7 @@ import { SharedModule } from './shared/shared.module';
 import { UserDashboardModule } from './features/user-dashboard/user-dashboard.module';
 import { UserAdminModule } from './features/user-admin/user-admin.module';
 import { UserModule } from './features/user-profile/user.module';
+import { LanguageManagementModule } from './features/language-management/language-management.module';
 
 @NgModule({
     declarations: [
@@ -31,6 +32,8 @@ import { UserModule } from './features/user-profile/user.module';
         UserDashboardModule,
         UserAdminModule,
         UserModule,
+        LanguageManagementModule,
+
         //LEAVE IT AT THE END OF THE ROUTES
         AppRoutingModule
     ]
