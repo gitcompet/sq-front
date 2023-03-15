@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment.development';
 import { JWTHelperService } from './jwt-helper.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   constructor(
@@ -20,7 +20,7 @@ export class AuthService {
 
   isLoggedin: boolean = false;
 
-  signUp(payload: User):Observable<User> {
+  signUp(payload: User): Observable<User> {
     return this.http.post<User>(
       `${environment.baseUrl}${environment.basePath}${environment.registrationPath}`,
       payload
@@ -33,44 +33,48 @@ export class AuthService {
     );
   }
   logout() {
-    let removeToken = this.getToken();
-    if (removeToken == null) {
-      this.isLoggedin = false;
-      this.router.navigateByUrl('/login');
-    }
+    this.removeToken();
+    this.isLoggedin = false;
+    this.router.navigateByUrl('/');
   }
-  isLoggedIn():boolean {
+  isLoggedIn(): boolean {
     const token = this.getToken();
     if (token == null && this.jwtService.hasTokenExpired(token)) {
       //REFRESH TOKEN INSTEAD
       return this.isLoggedin;
-    } else {
-      return true;
     }
+    return true;
   }
-  getToken():string{
+  getToken(): string {
     return localStorage.getItem('token') as string;
   }
-  getRefreshToken():string{
+  getRefreshToken(): string {
     return localStorage.getItem('refresh') as string;
   }
-  setToken(response:TokenResponse){
-    localStorage.setItem('token',response.accessToken);
-    localStorage.setItem('refresh',response.refreshToken);
+  setToken(response: TokenResponse) {
+    localStorage.setItem('token', response.accessToken);
+    localStorage.setItem('refresh', response.refreshToken);
   }
-  isAdmin():boolean{
+  removeToken() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refresh');
+  }
+  isAdmin(): boolean {
     const decodedToken: any = this.jwtService.decode(this.getToken());
-    console.log(decodedToken);
-
-    const roles = decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string[];
-    console.log(roles);
-
-    if(roles.find((element)=> element.toUpperCase() === 'admin'.toUpperCase())) return true;
+    const roles = decodedToken[
+      'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+    ] as string[];
+    if (
+      roles.find((element) => element.toUpperCase() === 'admin'.toUpperCase())
+    )
+      return true;
     return false;
   }
-  getUsername():string{
-    const decodedToken: any = this.jwtService.decode(this.getToken())
-    const username = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] as string;
+  getUsername(): string {
+    const decodedToken: any = this.jwtService.decode(this.getToken());
+    const username = decodedToken[
+      'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'
+    ] as string;
     return username;
   }
 }

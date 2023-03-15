@@ -13,6 +13,9 @@ export class NavbarSettingsComponent implements OnInit {
  ngOnInit(){
  }
  toggleProfileMenu(){
-
+   this.isOpen = !this.isOpen;
+ }
+ onLogout(){
+  this.authService.logout();
  }
 }

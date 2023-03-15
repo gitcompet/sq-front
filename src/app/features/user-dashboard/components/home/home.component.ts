@@ -8,10 +8,10 @@ import { AuthService } from 'src/app/shared/services/auth.service';
   styles: [],
 })
 export class HomeComponent {
-  username: string = "";
+  data: any = {};
   constructor(private authService: AuthService,private router: Router){}
   ngOnInit() {
-    this.username = this.authService.getUsername();
+    this.data.username = this.authService.getUsername();
   }
   onLogout() {
     localStorage.removeItem('token');
