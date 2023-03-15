@@ -11,8 +11,6 @@ import { User } from 'src/app/core/models/user.model';
 export class UserService {
   constructor(private http: HttpClient) {}
 
-  isLoggedin: boolean = false;
-
   getProfiles(): Observable<User[]> {
     return this.http.get<User[]>(
       `${environment.baseUrl}${environment.basePath}${environment.usersPath}`,

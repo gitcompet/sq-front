@@ -1,7 +1,11 @@
 export interface SignUp {
-  username:string ;
+  login:string ;
   email:string ;
-  fullName:string ;
+  firstName:string ;
+  lastName:string ;
   password:string;
-  confirmPassword:string;
+  confirmPassword?:string;
+  comment?: string
+  languageId?: string
+  typeUserId?: string
 }
