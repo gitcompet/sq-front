@@ -19,9 +19,9 @@ export class LoginComponent implements OnInit {
     private _formBuilder: FormBuilder
   ) {}
   loginForm: FormGroup = this._formBuilder.group({
-    username: new FormControl('',[Validators.minLength(3)]),
-    password: new FormControl('',[Validators.pattern(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/g)])
-  } as unknown as Login,{validators: [Validators.required]});
+    login: new FormControl('',[Validators.minLength(3),Validators.required]),
+    password: new FormControl('',[Validators.pattern(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/g),Validators.required])
+  } as unknown as Login);
 
   ngOnInit(): void {
 
@@ -29,8 +29,9 @@ export class LoginComponent implements OnInit {
   onLogin() {
     if (!this.loginForm.valid) return;
        this.authService.login(this.loginForm.value).subscribe((response: TokenResponse) => {
-       this.authService.setToken(response)
-       this.router.navigate(['admin-dashboard'])
+       this.authService.setToken(response);
+       this.authService.isAdmin() ? this.router.navigateByUrl('/admin') : this.router.navigateByUrl('/home')
+
     });
   }
   isLoggedIn() {

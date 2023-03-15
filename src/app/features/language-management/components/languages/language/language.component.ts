@@ -1,3 +1,5 @@
+/////////////////DEPRECATED
+
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LanguageService } from '../../../services/lngMgmt.service';
@@ -20,7 +22,7 @@ export class LanguageComponent implements OnInit{
   ngOnInit() {
     this.route.params.subscribe(params => {
       const languageTitle = params['language'];
-      this.language = this.dbConnector.getLanguageFake();
+      //this.language = this.dbConnector.getLanguage();
       this.language.title = languageTitle;
     })
   }

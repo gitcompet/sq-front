@@ -1,0 +1,16 @@
+<div
+  class="bg-secondary grid grid-cols-5 grid-flow-col gap-2 h-full"
+>
+  <!-- LEFT COLUMN -->
+  <div class="col-span-1">
+    <app-sidebar-menu></app-sidebar-menu>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="col-span-4">
+     <app-navbar-settings [data]="data"></app-navbar-settings>
+    <div class="flex mx-10  my-16 justify-start items-start">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

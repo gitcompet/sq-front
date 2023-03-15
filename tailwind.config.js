@@ -6,6 +6,11 @@ module.exports = {
     extend: {
       backgroundColor: {
         primary: "#E0311E",
+        secondary: "#F8F9FA"
+      },
+      textColor: {
+        primary: "#E0311E",
+        secondary: "#F8F9FA"
       },
       colors: {
         "button-color": {

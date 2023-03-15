@@ -20,24 +20,28 @@ export class SignUpComponent {
     private _formBuilder: FormBuilder
   ) {}
   signUpForm: FormGroup = this._formBuilder.group({
-    username: new FormControl('',[Validators.minLength(3)]),
-    email: new FormControl('',[Validators.email]),
-    fullName: new FormControl('',[Validators.minLength(3)]),
+    login: new FormControl('',[Validators.minLength(3),Validators.required]),
+    email: new FormControl('',[Validators.email,Validators.required]),
+    firstName: new FormControl('',[Validators.minLength(3),Validators.required]),
+    lastName: new FormControl('',[Validators.minLength(3),Validators.required]),
     password: new FormControl('',[
       Validators.pattern(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/),
-      passwordMatchingValidator('confirmPassword',true)
+      passwordMatchingValidator('confirmPassword',true),
+      Validators.required
     ]),
     confirmPassword: new FormControl('',[
       Validators.pattern(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/),
-      passwordMatchingValidator('password')
+      passwordMatchingValidator('password'),
+      Validators.required
     ]),
-  } as unknown as SignUp,{validators: [Validators.required]});
+  } as unknown as SignUp);
   ngOnInit() {
    }
   onSignUp() {
     if (!this.signUpForm.valid) return;
     this.authService.signUp(this.signUpForm.value).subscribe((res) => {
-      console.log('Signed up');
+      this.signUpForm.reset();
+      console.log(res);
     });
   }
 }

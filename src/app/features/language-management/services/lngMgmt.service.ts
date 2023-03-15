@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
 import { headers } from 'src/app/core/constants/settings';
 import { Language } from 'src/app/core/models/language.model';
+import { IdResponse } from '../../../core/models/id-response';
 
 @Injectable({
   providedIn: 'root',
@@ -23,38 +24,36 @@ export class LanguageService {
       }
     );
   }
-
-  getLanguagesFake() {
-    const temp: Language = {
-      title: "French",
-      code: "FR",
-      display: true
-    };
-    const temp2: Language = {
-      title: "English",
-      code: "En",
-      display: true
-    };
-    const temp3: Language = {
-      title: "Turk",
-      code: "TR",
-      display: true
-    };
-    const temp4: Language = {
-      title: "Mongols",
-      code: "MG",
-      display: true
-    };
-    let list: Array<Language> = [temp, temp2, temp3, temp4]
-    return list
+  getLanguage(): Observable<Language> {
+    return this.http.get<Language>(
+      `${environment.baseUrl}${environment.basePath}${environment.languagePath}`,
+      {
+        headers: headers,
+      }
+    );
   }
-
-  getLanguageFake() {
-    const temp: Language = {
-      title: "",
-      code: "",
-      display: true
-    };
-    return temp
+  removeLanguages(payload: IdResponse): Observable<IdResponse> {
+    return this.http.post<IdResponse>(
+      `${environment.baseUrl}${environment.basePath}${environment.languageRemovePath}`,
+      {
+        headers: headers,
+      }
+    );
+  }
+  postLanguages(payload: IdResponse): Observable<IdResponse> {
+    return this.http.get<IdResponse>(
+      `${environment.baseUrl}${environment.basePath}${environment.languagePostPath}`,
+      {
+        headers: headers,
+      }
+    );
+  }
+  updateLanguages(payload: IdResponse/*Languages?*/): Observable<IdResponse> {
+    return this.http.get<IdResponse>(
+      `${environment.baseUrl}${environment.basePath}${environment.languageUpdatePath}`,
+      {
+        headers: headers,
+      }
+    );
   }
 }

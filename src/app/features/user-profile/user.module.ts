@@ -4,6 +4,7 @@ import { LoginComponent } from './components/login/login.component';
 import { SignUpComponent } from './components/signup/sign-up.component';
 import { UserRoutingModule } from './user-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 
 
@@ -12,7 +13,9 @@ import { ReactiveFormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     UserRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SharedModule
+
   ],
   exports: [LoginComponent,SignUpComponent],
 })
