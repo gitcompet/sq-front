@@ -1,5 +1,6 @@
 export const environment = {
-  baseUrl:"http://145.239.0.38:5812",
+  production: true,
+  baseUrl:`http://${process.env['URL_API']}:${process.env['PORT_API']}`,
   basePath:"/api",
   authPath : "/Auth/login",
   registrationPath : "/User/postUser",
