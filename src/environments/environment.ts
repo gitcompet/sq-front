@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  baseUrl:`http://${process.env['URL_API']}:${process.env['PORT_API']}`,
+  baseUrl:`http://${process.env['URL_API']}:${process.env['PORT_API']}n`,
   basePath:"/api",
   authPath : "/Auth/login",
   registrationPath : "/User/postUser",
