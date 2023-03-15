@@ -4,9 +4,9 @@ export const environment = {
   authPath : "/Auth/login",
   registrationPath : "/User/postUser",
   usersPath: "/User/GetUsers",
-  languagesPath: "/Languages/getLanguagess",
-  languagePath: "/Languages/getLanguages",
-  languagePostPath: "/Languages/postLanguages",
+  languagesPath: "/Languages/getLanguages",
+  languagePath: "/Languages/getLanguage",
+  languagePostPath: "/Languages/postLanguage",
   languageRemovePath: "/Languages/removeLanguage",
   languageUpdatePath: "/Languages/updateLanguage",
 };

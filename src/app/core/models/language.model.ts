@@ -1,5 +1,5 @@
 export interface Language {
-  languagesId:string ;
+  languageId:string ;
   title:string ;
   shortCode: string;
   isActive: boolean;
