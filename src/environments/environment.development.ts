@@ -3,7 +3,7 @@ export const environment = {
   basePath:"/api",
   authPath : "/Auth/login",
   registrationPath : "/User/postUser",
-  usersPath: "/User/GetUsers"
+  usersPath: "/User/GetUsers",
   languagesPath: "/Languages/getLanguagess",
   languagePath: "/Languages/getLanguages",
   languagePostPath: "/Languages/postLanguages",

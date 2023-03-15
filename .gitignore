@@ -43,5 +43,5 @@ testem.log
 Thumbs.db
 
 .fake
-/.vs/tsttst/FileContentIndex
-/.vs/slnx.sqlite
+.vs
+/.vs

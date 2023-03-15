@@ -7,7 +7,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit{
-  data : any;
+  data : any= {};
   constructor(private authService: AuthService){}
  ngOnInit(){
   this.data.username = this.authService.getUsername();

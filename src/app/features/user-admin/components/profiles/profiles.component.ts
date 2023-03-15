@@ -7,13 +7,15 @@ import { User } from 'src/app/core/models/user.model';
   styles: [],
 })
 export class ProfilesComponent {
-  list: User[] = [];
-  constructor(private service: UserService) {}
+  users: User[] = [];
+  headers: string[] = ['First Name','Last Name','Email','Username'];
+  constructor(private userService: UserService) {}
 
   ngOnInit() {
-    // this.service.getProfiles().subscribe((res) => {
-    //   this.list = res;
-    //   console.log('profiles1 :' + JSON.stringify(this.list));
-    // });
+    this.userService.getProfiles().subscribe((res) => {
+     this.users = res;
+     console.log(res);
+
+    });
   }
 }
