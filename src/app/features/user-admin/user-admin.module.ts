@@ -11,6 +11,8 @@ import { QuizComponent } from './components/test/quiz/quiz.component';
 import { QuestionComponent } from './components/test/quiz/question/question.component';
 import { SharedModule } from '../../shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
+import { LanguageComponent } from './components/languages/language/language.component';
+import { LanguagesComponent } from './components/languages/languages.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     TestComponent,
     QuizComponent,
     QuestionComponent,
+    LanguagesComponent,
+    LanguageComponent,
   ],
   exports: [
     ProfileComponent,
@@ -32,6 +36,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     TestComponent,
     QuizComponent,
     QuestionComponent,
+    LanguagesComponent,
+    LanguageComponent,
   ],
   imports: [CommonModule, UserAdminRoutingModule, SharedModule,ReactiveFormsModule],
 })

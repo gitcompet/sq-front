@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { LanguageService } from '../../services/lngMgmt.service';
 import { ActivatedRoute } from '@angular/router';
 import { Language } from 'src/app/core/models/language.model';
+import { LanguageService } from '../../services/lngMgmt.service';
 
 @Component({
   selector: 'app-languagesManagement-language',
@@ -11,7 +11,7 @@ import { Language } from 'src/app/core/models/language.model';
 })
 export class LanguagesComponent implements OnInit {
   languages: Language[] = [];
-  libelle: String[] = ["Nom de la langue","code pays en 2 lettres"];
+  libelle: String[] = ["Nom de la langue","Code pays en 2 lettres"];
   headers: string[] = ['Title', 'Domain', 'Subdomain', 'Action'];
   public show:boolean[] = [];
   public buttonName:any = 'Show';
@@ -49,5 +49,5 @@ export class LanguagesComponent implements OnInit {
   {
 	//this.dbConnector.addLanguages(new IdResponse())
   }
-  
+
 }

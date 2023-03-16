@@ -7,33 +7,42 @@ import { HomeComponent } from './components/home/home.component';
 import { MainContentComponent } from './components/home/main-content/main-content.component';
 import { TestComponent } from './components/test/test.component';
 import { QuizComponent } from './components/test/quiz/quiz.component';
+import { LanguageComponent } from './components/languages/language/language.component';
+import { LanguagesComponent } from './components/languages/languages.component';
 
 const routes: Routes = [
   {
     path: 'admin',
     component: HomeComponent,
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'dashboard',
         component: MainContentComponent,
-        canActivate: [AuthGuard],
       },
       {
         path: 'profiles',
         component: ProfilesComponent,
-        canActivate: [AuthGuard],
+        canActivateChild: [AuthGuard],
         children: [{ path: ':id', component: ProfileComponent }],
       },
       {
         path: 'tests',
         component: TestComponent,
-        canActivate: [AuthGuard],
       },
       {
         path: 'quizzes',
         component: QuizComponent,
-        canActivate: [AuthGuard],
+      },
+      {
+        path: 'languages',
+        component: LanguagesComponent,
+        canActivateChild: [AuthGuard],
+        children: [{
+          path: ':id',
+          component: LanguageComponent
+        }]
       },
     ],
   },

@@ -32,6 +32,12 @@ export class AuthService {
       payload
     );
   }
+  refreshToken(refreshToken: string): Observable<TokenResponse> {
+    return this.http.post<TokenResponse>(
+      `${environment.baseUrl}${environment.basePath}${environment.refreshPath}`,
+      refreshToken
+    );
+  }
   logout() {
     this.removeToken();
     this.isLoggedin = false;
@@ -41,6 +47,10 @@ export class AuthService {
     const token = this.getToken();
     if (token == null && this.jwtService.hasTokenExpired(token)) {
       //REFRESH TOKEN INSTEAD
+      // this.refreshToken(this.getRefreshToken()).subscribe((response)=>{
+      //    this.setToken(response);
+      //    this.isLoggedin = true;
+      // });
       return this.isLoggedin;
     }
     return true;
