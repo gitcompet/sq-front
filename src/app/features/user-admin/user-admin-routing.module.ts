@@ -20,31 +20,62 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component: MainContentComponent,
+        data: {
+          roles: ['ADMIN'],
+        },
       },
       {
         path: 'profiles',
         component: ProfilesComponent,
         canActivateChild: [AuthGuard],
-        children: [{ path: ':id', component: ProfileComponent }],
+        children: [
+          {
+            path: ':id',
+            component: ProfileComponent,
+            data: {
+              roles: ['ADMIN'],
+            },
+          },
+        ],
+        data: {
+          roles: ['ADMIN'],
+        },
       },
       {
         path: 'tests',
         component: TestComponent,
+        data: {
+          roles: ['ADMIN'],
+        },
       },
       {
         path: 'quizzes',
         component: QuizComponent,
+        data: {
+          roles: ['ADMIN'],
+        },
       },
       {
         path: 'languages',
         component: LanguagesComponent,
         canActivateChild: [AuthGuard],
-        children: [{
-          path: ':id',
-          component: LanguageComponent
-        }]
+        children: [
+          {
+            path: ':id',
+            component: LanguageComponent,
+            data: {
+              roles: ['ADMIN'],
+            },
+          },
+        ],
+        data: {
+          roles: ['ADMIN'],
+        },
       },
     ],
+    data: {
+      roles: ['ADMIN'],
+    },
   },
 ];
 

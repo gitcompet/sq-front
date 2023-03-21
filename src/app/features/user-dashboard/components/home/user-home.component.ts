@@ -4,10 +4,10 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-home',
-  templateUrl: './home.component.html',
+  templateUrl: './user-home.component.html',
   styles: [],
 })
-export class HomeComponent {
+export class UserHomeComponent {
   data: any = {};
   constructor(private authService: AuthService,private router: Router){}
   ngOnInit() {

@@ -13,6 +13,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LanguageComponent } from './components/languages/language/language.component';
 import { LanguagesComponent } from './components/languages/languages.component';
+import { UserModule } from '../user-profile/user.module';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,6 @@ import { LanguagesComponent } from './components/languages/languages.component';
     LanguagesComponent,
     LanguageComponent,
   ],
-  imports: [CommonModule, UserAdminRoutingModule, SharedModule,ReactiveFormsModule],
+  imports: [CommonModule, UserAdminRoutingModule, SharedModule,UserModule,ReactiveFormsModule],
 })
 export class UserAdminModule {}

@@ -30,8 +30,7 @@ export class LoginComponent implements OnInit {
     if (!this.loginForm.valid) return;
        this.authService.login(this.loginForm.value).subscribe((response: TokenResponse) => {
        this.authService.setToken(response);
-       this.authService.isAdmin() ? this.router.navigateByUrl('/admin') : this.router.navigateByUrl('/home')
-
+       this.router.navigateByUrl('/admin');
     });
   }
   isLoggedIn() {

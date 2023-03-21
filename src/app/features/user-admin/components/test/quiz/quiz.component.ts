@@ -6,9 +6,12 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { Question } from 'src/app/core/models/question.model';
+import { Observable, Subscription, switchMap } from 'rxjs';
+import { IQuestion } from 'src/app/core/models/question.model';
+import { IQuiz } from 'src/app/core/models/quiz.model';
+import { CheckBoxComponent } from 'src/app/shared/components/checkbox/checkbox.component';
 import { ModalService } from 'src/app/shared/services/modal.service';
+import { QuizService } from '../../../services/quiz.service';
 
 @Component({
   selector: 'app-quiz',
@@ -18,30 +21,47 @@ import { ModalService } from 'src/app/shared/services/modal.service';
 export class QuizComponent implements OnInit, OnDestroy {
   quizForm: FormGroup;
   showModal: boolean = false;
-  quizQuestions: Question[] = [];
-  categories: string[] = ['JAVA','DOTNET','PHP'];
-  _subscriptions: Subscription[] = [];
+  quizzes: IQuiz[] = [];
+  quizQuestions: IQuestion[] = [];
   headers: string[] = ['Title', 'Domain', 'Subdomain', 'Action'];
+  questionActions: unknown[] = [
+    { actionName: 'select', componentName: CheckBoxComponent },
+  ];
+  categories: string[] = ['JAVA', 'DOTNET', 'PHP'];
+  _subscriptions: Subscription[] = [];
   constructor(
     private _formBuilder: FormBuilder,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private quizService: QuizService
   ) {
     this.quizForm = this._formBuilder.group({
-      title: this._formBuilder.control(''),
-      description: this._formBuilder.control(''),
-      role:this._formBuilder.control(''),
-      categories: this._formBuilder.control(''),
+      title: this._formBuilder.control('', [Validators.required]),
+      description: this._formBuilder.control('', [Validators.required]),
+      role: this._formBuilder.control('', [Validators.required]),
+      weight: this._formBuilder.control(0, [Validators.required]),
+      categories: this._formBuilder.control('', [Validators.required]),
       questions: this._formBuilder.array([]),
     });
   }
   ngOnInit(): void {
+    this._subscriptions.push(this.modalService.getDataExchange().subscribe());
     this._subscriptions.push(
-      this.modalService.getDataExchange().subscribe((result: any) => {
-        if (result) {
-          this.quizQuestions = result.data as Question[];
-          console.log(this.quizQuestions);
-        }
-      })
+      this.quizService
+        .getAvailableQuestion()
+        .pipe(
+          switchMap((questions: IQuestion[]) => {
+            if (questions && questions.length > 0) {
+              this.quizQuestions = questions;
+              this.modalService.updateData(this.quizQuestions);
+            }
+            return this.quizService.getAvailableQuizzes();
+          })
+        )
+        .subscribe((quizzes: IQuiz[]) => {
+          if (quizzes && quizzes.length > 0) {
+            this.quizzes = quizzes;
+          }
+        })
     );
   }
   ngOnDestroy(): void {
@@ -54,12 +74,27 @@ export class QuizComponent implements OnInit, OnDestroy {
   onCloseQuiz() {
     this.quizForm.reset({ questions: this._formBuilder.array([]) });
   }
-  createQuiz() {
-    console.log(this.quizForm);
+  onChecked(event: any) {
+    console.log(event);
+  }
+  createQuiz(form: FormGroup) {
+    const newQuiz = {
+      title: form.get('title')?.value,
+      subDomainId: '1',
+      domainId: '1',
+      weight: form.get('weight')?.value,
+      comment: form.get('description')?.value,
+    } as IQuiz;
 
+    this.quizService.addQuiz(newQuiz).subscribe((response) => {
+      this.quizzes = [...this.quizzes, response];
+      this.modalService.closeModal({
+        id: 'quizModal',
+        isShown: this.showModal,
+      });
+    });
   }
-  onReceivedData(data: any){
-  }
+  onReceivedData(data: any) {}
   createQuestion(): FormGroup {
     return this._formBuilder.group({
       question: ['', Validators.required],

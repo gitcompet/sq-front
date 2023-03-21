@@ -19,18 +19,16 @@ import { ModalService } from '../../services/modal.service';
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.css'],
 })
-export class ModalComponent implements OnInit,OnDestroy {
+export class ModalComponent implements OnInit, OnDestroy {
   @Input() id: string = '';
+  isValidForm: boolean = false;
   //DYNAMIC DATA COMING FROM THE CALLING PARENT
   @Input() data: FormGroup | any;
-  @Output() dataEmitter: EventEmitter<unknown> = new EventEmitter<unknown>()
+  @Output('onSave') dataEmitter: EventEmitter<any> = new EventEmitter<any>();
   @Input('showModal') showModal!: boolean;
   private element: HTMLElement;
   private _data: unknown;
-  constructor(
-    private modalService: ModalService,
-    private el: ElementRef,
-  ) {
+  constructor(private modalService: ModalService, private el: ElementRef) {
     this.element = el.nativeElement;
   }
   ngOnInit(): void {
@@ -51,16 +49,19 @@ export class ModalComponent implements OnInit,OnDestroy {
     this.showModal = true;
   }
   save() {
-     if(this.data instanceof FormGroup ){
-        const controls = this.data.controls;
-        this.dataEmitter.emit(controls);
-     }
+    if (this.data instanceof FormGroup) {
+      if (this.data.valid) {
+        this.isValidForm = this.data.valid;
+        this.dataEmitter.emit(this.data);
+      }
+    }
   }
 
   // close modal
   close(): void {
     this.showModal = false;
-    if(this._data)
-      this.modalService.updateData({data: this._data} as DTO);
+    if (this._data) {
+      this.modalService.updateData({ data: this._data } as DTO);
+    }
   }
 }

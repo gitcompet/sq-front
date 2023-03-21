@@ -18,7 +18,7 @@ export class LanguageService {
 
   getLanguages(): Observable<Language[]> {
     return this.http.get<Language[]>(
-      `${environment.baseUrl}${environment.basePath}${environment.languagesPath}`,
+      `${environment.baseUrl}${environment.apiVersion}${environment.languagesPath}`,
       {
         headers: headers,
       }
@@ -26,7 +26,7 @@ export class LanguageService {
   }
   getLanguage(): Observable<Language> {
     return this.http.get<Language>(
-      `${environment.baseUrl}${environment.basePath}${environment.languagePath}`,
+      `${environment.baseUrl}${environment.apiVersion}${environment.languagePath}`,
       {
         headers: headers,
       }
@@ -34,7 +34,7 @@ export class LanguageService {
   }
   removeLanguages(payload: IdResponse): Observable<IdResponse> {
     return this.http.post<IdResponse>(
-      `${environment.baseUrl}${environment.basePath}${environment.languageRemovePath}`,
+      `${environment.baseUrl}${environment.apiVersion}${environment.languageRemovePath}`,
       {
         headers: headers,
       }
@@ -42,7 +42,7 @@ export class LanguageService {
   }
   postLanguages(payload: IdResponse): Observable<IdResponse> {
     return this.http.get<IdResponse>(
-      `${environment.baseUrl}${environment.basePath}${environment.languagePostPath}`,
+      `${environment.baseUrl}${environment.apiVersion}${environment.languagePostPath}`,
       {
         headers: headers,
       }
@@ -50,7 +50,7 @@ export class LanguageService {
   }
   updateLanguages(payload: IdResponse/*Languages?*/): Observable<IdResponse> {
     return this.http.get<IdResponse>(
-      `${environment.baseUrl}${environment.basePath}${environment.languageUpdatePath}`,
+      `${environment.baseUrl}${environment.apiVersion}${environment.languageUpdatePath}`,
       {
         headers: headers,
       }

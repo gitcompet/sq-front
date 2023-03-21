@@ -2,9 +2,9 @@ import { HttpHeaders } from '@angular/common/http';
 import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 export const headers = new HttpHeaders()
-  .set('content-type', 'application/json')
-  .append('content-type', 'text/plain; charset=utf-8')
-  .append('content-type', 'application/x-www-form-urlencoded');
+  .append('Content-Type', 'application/json')
+  //.append('content-type', 'text/plain; charset=utf-8')
+  //.append('content-type', 'application/x-www-form-urlencoded');
 export function passwordMatching(formGroup: FormGroup): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
      const password = formGroup.controls['password'].value;

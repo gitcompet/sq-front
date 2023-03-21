@@ -33,17 +33,19 @@ export class AuthGuard implements CanActivate, CanActivateChild{
     return this.canActivate(childRoute,state);
   }
 
-  checkUserLogin(router:ActivatedRouteSnapshot,url: any): boolean{
+  checkUserLogin(route:ActivatedRouteSnapshot,url: any): boolean{
     const isLoggedIn = this._authService.isLoggedIn();
     if(isLoggedIn){
-      const isAdmin = this._authService.isAdmin();
-      if (!isAdmin) {
+      const roles = this._authService.getRoles();
+      const activeRoles: string [] = route.data['roles']
+      const hasRequiredRoles = activeRoles &&  roles.some((role)=> activeRoles.indexOf(role) >=0);
+      if(!hasRequiredRoles){
         this._router.navigate(['/home']);
         return false;
       }
-      return true;
+     return hasRequiredRoles;
     }
-    this._router.navigate(['/']);
+    this._router.navigate(['/login']);
     return false;
   }
 

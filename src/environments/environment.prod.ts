@@ -1,6 +1,9 @@
+export interface IMapping {
+  [propertyName: string]: string;
+}
 export const environment = {
   production: true,
-  baseUrl:`http://145.239.0.38:9999`,
+  baseUrl:`${window["env" as keyof Window]["URL_API"]}:${window["env" as keyof Window]['PORT_API']}` || 'default',
   basePath:"/api",
   authPath : "/Auth/login",
   refreshPath : "/Auth/refresh",

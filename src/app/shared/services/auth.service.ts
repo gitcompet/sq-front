@@ -22,19 +22,19 @@ export class AuthService {
 
   signUp(payload: User): Observable<User> {
     return this.http.post<User>(
-      `${environment.baseUrl}${environment.basePath}${environment.registrationPath}`,
+      `${environment.baseUrl}${environment.apiVersion}${environment.userPaths.base}`,
       payload
     );
   }
   login(payload: Login): Observable<TokenResponse> {
     return this.http.post<TokenResponse>(
-      `${environment.baseUrl}${environment.basePath}${environment.authPath}`,
+      `${environment.baseUrl}${environment.apiVersion}${environment.authPaths.base}${environment.authPaths.login}`,
       payload
     );
   }
   refreshToken(refreshToken: string): Observable<TokenResponse> {
     return this.http.post<TokenResponse>(
-      `${environment.baseUrl}${environment.basePath}${environment.refreshPath}`,
+      `${environment.baseUrl}${environment.apiVersion}${environment.authPaths.base}${environment.authPaths.refresh}`,
       refreshToken
     );
   }
@@ -69,21 +69,19 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('refresh');
   }
-  isAdmin(): boolean {
+  getRoles(): string [] {
     const decodedToken: any = this.jwtService.decode(this.getToken());
+    const properties: string[] = Object.getOwnPropertyNames(decodedToken);
+    const key: string = properties.filter((value)=> value.includes("role"))[0];
     const roles = decodedToken[
-      'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+      key
     ] as string[];
-    if (
-      roles.find((element) => element.toUpperCase() === 'admin'.toUpperCase())
-    )
-      return true;
-    return false;
+    return roles;
   }
   getUsername(): string {
     const decodedToken: any = this.jwtService.decode(this.getToken());
     const username = decodedToken[
-      'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'
+      'sub'
     ] as string;
     return username;
   }
