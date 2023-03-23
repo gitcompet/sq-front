@@ -1,0 +1,34 @@
+<p>All languages should display</p>
+
+<div class="justify-center text-center items-center flex flex-col">
+  <div class="justify-center flex flex-col w-4/5 border-2 border-black rounded border-solid h-fit m-4 p-4 text-center">
+    <div *ngFor="let language of languages; let i= index;"  (click)="toggleVisible(i)" style="cursor: pointer" class="self-center flex-col flex w-fit border-2 border-black rounded border-solid h-fit m-4 p-4 text-center">
+		<div class="flex flex-row items-center justify-between">
+			<div class="w-20 h-10 p-0 m-2 "><img src="../../../../assets/images/flag_template.svg" alt="image" class="border-2 border-black rounded border-solid w-full h-full m-0 p-0"></div>
+			<div class="my-2 p-0 mx-auto w-auto">{{language.title}}</div>
+		</div>
+		<form *ngIf="show[i]" class="text-center my-4 py-4 mx-auto px-auto border-2 border-black rounded border-solid w-fit h-fit ">
+		  <label for="lname" class="m-4 p-4">{{libelle[0]}}:</label><i class="fa fa-trash text-2xl text-black-150"></i><br>
+		  <input type="text" class="m-4 p-2 border-2 border-black rounded border-solid " id="fname" name="lname" value={{language.title}}><br>
+		  <label for="lcode" class="m-4 p-4">{{libelle[1]}}:</label><br>
+		  <input type="text"  class="m-4 p-2 border-2 border-black rounded border-solid " id="lname" name="lcode" value={{language.shortCode}}><br>
+		  <i class="fa fa-square-check text-2xl text-black-150" (click)="updateThis(language)"></i>
+		</form>
+    </div>
+    <div class="self-center flex-col flex w-fit border-2 border-black rounded border-solid h-fit m-4 p-4 text-center">
+		<div class="flex flex-row items-center justify-between">
+			<div class="w-20 h-10 p-0 m-2 "><img src="../../../../assets/images/flag_template.svg" alt="image" class="border-2 border-black rounded border-solid w-full h-full m-0 p-0"></div>
+			<div class="my-2 p-0 mx-auto w-auto">"Nouvelle Langue"</div>
+		</div>
+		<form class="text-center my-4 py-4 mx-auto px-auto border-2 border-black rounded border-solid w-fit h-fit ">
+		  <label for="lname" class="m-4 p-4">{{libelle[0]}}:</label><i class="fa fa-trash text-2xl text-black-150"></i><br>
+		  <input type="text" class="m-4 p-2 border-2 border-black rounded border-solid " id="fname" name="lname" value="Nouvelle Langue"><br>
+		  <label for="lcode" class="m-4 p-4">{{libelle[1]}}:</label><br>
+		  <input type="text"  class="m-4 p-2 border-2 border-black rounded border-solid " id="lname" name="lcode" value="Code Pays"><br>
+		  <i class="fa fa-square-check text-2xl text-black-150" (click)="addThis()"></i>
+		</form>
+    </div>
+  </div>
+</div>
+
+

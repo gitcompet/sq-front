@@ -1,0 +1,22 @@
+  <div class="flex flex-col justify-center items-start ">
+    <div class="transition mt-3 rounded-lg text-white bg-gradient-to-r from-[#808080] to-[#3FADA8] ml-3 hover:bg-indigo-50 w-full">
+      <!-- header -->
+      <div
+       (click)="toggle()"
+        class="accordion-header cursor-pointer transition flex space-x-5 px-5 items-center h-16"
+      >
+        <i class="fas fa-plus"></i>
+        <h3>{{data.comment}}</h3>
+      </div>
+      <!-- Content -->
+      <div *ngIf="isExpanded"  class="accordion-content flex flex-col justify-center items-center px-5 pt-0 overflow-y-scroll max-h-0" [class]="isExpanded ? 'max-h-40 ':''">
+        <app-quizzes></app-quizzes>
+        <button
+          class="rounded-full bg-indigo-600 text-white w-40  font-medium font-lg px-6 py-2 my-5 ml-9"
+        >
+         {{data.testId}}
+        </button>
+      </div>
+    </div>
+
+  </div>

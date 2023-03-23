@@ -1,12 +1,32 @@
 export const environment = {
   baseUrl:"http://145.239.0.38:9999",
-  basePath:"/api",
-  authPath : "/Auth/login",
-  registrationPath : "/User/postUser",
-  usersPath: "/User/GetUsers",
-  languagesPath: "/Languages/getLanguages",
-  languagePath: "/Languages/getLanguage",
-  languagePostPath: "/Languages/postLanguage",
-  languageRemovePath: "/Languages/removeLanguage",
-  languageUpdatePath: "/Languages/updateLanguage",
+  apiVersion: '/api/v1',
+  authPaths: {
+    base: '/Auth',
+    login: '/login',
+    refresh: '/refresh',
+  },
+  userPaths: {
+    base: '/User',
+    export: '/exports'
+  },
+  quizPaths: {
+    base: '/Quiz',
+  },
+  testPaths: {
+    base: '/Test',
+  },
+  testUserPaths: {
+    base: '/TestUser',
+    quizTest: '/TestCompose',
+    quizQuestion: '/QuizCompose'
+  },
+  questionPaths: {
+    base: '/Question',
+  },
+  languagesPath: '/Languages/getLanguagess',
+  languagePath: '/Languages/getLanguage',
+  languagePostPath: '/Languages/postLanguage',
+  languageRemovePath: '/Languages/removeLanguage',
+  languageUpdatePath: '/Languages/updateLanguage',
 };

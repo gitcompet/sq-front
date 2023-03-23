@@ -5,37 +5,88 @@ import { ProfileComponent } from './components/profiles/profile/profile.componen
 import { AuthGuard } from 'src/app/core/guards/auth.guard';
 import { HomeComponent } from './components/home/home.component';
 import { MainContentComponent } from './components/home/main-content/main-content.component';
-import { TestComponent } from './components/test/test.component';
-import { QuizComponent } from './components/test/quiz/quiz.component';
+import { QuizAdminComponent } from './components/test/quiz/quiz-admin.component';
+import { LanguageComponent } from './components/languages/language/language.component';
+import { LanguagesComponent } from './components/languages/languages.component';
+import { TestsAdminComponent } from './components/test/tests-admin.component';
+import { QuizComponent } from '../user-dashboard/components/tests/test/quizzes/quiz/quiz.component';
 
 const routes: Routes = [
   {
     path: 'admin',
     component: HomeComponent,
     canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     children: [
       {
         path: 'dashboard',
         component: MainContentComponent,
-        canActivate: [AuthGuard],
+        data: {
+          roles: ['ADMIN'],
+        },
       },
       {
         path: 'profiles',
         component: ProfilesComponent,
-        canActivate: [AuthGuard],
-        children: [{ path: ':id', component: ProfileComponent }],
+        canActivateChild: [AuthGuard],
+        children: [
+          {
+            path: ':id',
+            component: ProfileComponent,
+            data: {
+              roles: ['ADMIN'],
+            },
+          },
+        ],
+        data: {
+          roles: ['ADMIN'],
+        },
       },
       {
         path: 'tests',
-        component: TestComponent,
-        canActivate: [AuthGuard],
+        component: TestsAdminComponent,
+        data: {
+          roles: ['ADMIN'],
+        },
       },
       {
         path: 'quizzes',
-        component: QuizComponent,
-        canActivate: [AuthGuard],
+        component: QuizAdminComponent,
+        canActivateChild :[AuthGuard],
+        children: [
+          {
+            path: ':id',
+            component: QuizComponent,
+            data: {
+              roles: ['ADMIN'],
+            },
+          }
+        ],
+        data: {
+          roles: ['ADMIN'],
+        },
+      },
+      {
+        path: 'languages',
+        component: LanguagesComponent,
+        canActivateChild: [AuthGuard],
+        children: [
+          {
+            path: ':id',
+            component: LanguageComponent,
+            data: {
+              roles: ['ADMIN'],
+            },
+          },
+        ],
+        data: {
+          roles: ['ADMIN'],
+        },
       },
     ],
+    data: {
+      roles: ['ADMIN'],
+    },
   },
 ];
 
