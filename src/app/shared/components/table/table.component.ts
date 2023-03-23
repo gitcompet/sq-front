@@ -1,8 +1,4 @@
 import { KeyValue } from '@angular/common';
-<<<<<<< HEAD
-import { Component, Input, OnInit } from '@angular/core';
-
-=======
 import {
   AfterContentInit,
   AfterViewInit,
@@ -21,24 +17,12 @@ import { ActionHostDirective } from 'src/app/core/directives/action-host.directi
 import { IQuestion } from 'src/app/core/models/question.model';
 import { IUser } from 'src/app/core/models/user.model';
 import { ModalService } from '../../services/modal.service';
->>>>>>> developement
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.css'],
 })
 export class TableComponent implements OnInit {
-<<<<<<< HEAD
-  @Input() data: any[] = [];
-  @Input() title: string = "";
-  @Input() headers: string[] = [];
-  // Preserve original property order
-  ngOnInit(){
-  }
-  originalOrder = (a: KeyValue<number,string>, b: KeyValue<number,string>): number => {
-    return 0;
-  }
-=======
   @Input() data: IUser[] | IQuestion[] | any[] = [];
   @Input() title: string = '';
   @Input() headers: string[] = [];
@@ -80,5 +64,4 @@ export class TableComponent implements OnInit {
   ): number => {
     return 0;
   };
->>>>>>> developement
 }

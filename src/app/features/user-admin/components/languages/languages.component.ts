@@ -11,11 +11,7 @@ import { LanguageService } from '../../services/lngMgmt.service';
 })
 export class LanguagesComponent implements OnInit {
   languages: Language[] = [];
-<<<<<<< HEAD:src/app/features/language-management/components/languages/languages.component.ts
-  libelle: String[] = ["Nom de la langue","code pays en 2 lettres"];
-=======
   libelle: String[] = ["Nom de la langue","Code pays en 2 lettres"];
->>>>>>> developement:src/app/features/user-admin/components/languages/languages.component.ts
   headers: string[] = ['Title', 'Domain', 'Subdomain', 'Action'];
   public show:boolean[] = [];
   public buttonName:any = 'Show';
@@ -53,9 +49,4 @@ export class LanguagesComponent implements OnInit {
   {
 	//this.dbConnector.addLanguages(new IdResponse())
   }
-<<<<<<< HEAD:src/app/features/language-management/components/languages/languages.component.ts
-  
-=======
-
->>>>>>> developement:src/app/features/user-admin/components/languages/languages.component.ts
 }

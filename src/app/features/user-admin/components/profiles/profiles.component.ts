@@ -8,14 +8,6 @@ import { ModalService } from 'src/app/shared/services/modal.service';
   styleUrls: ['./profiles.component.css'],
 })
 export class ProfilesComponent {
-<<<<<<< HEAD
-  users: User[] = [];
-  headers: string[] = ['First Name','Last Name','Email','Username'];
-  constructor(private userService: UserService) {}
-
-  ngOnInit() {
-    this.userService.getProfiles().subscribe((res) => {
-=======
   users: IUser[] = [];
   headers: string[] = ['First Name','Last Name','Email','Username'];
   showModal: boolean = false;
@@ -24,17 +16,13 @@ export class ProfilesComponent {
 
   ngOnInit() {
     this.userService.getProfiles().subscribe((res: IUser[]) => {
->>>>>>> developement
      this.users = res;
      console.log(res);
 
     });
-<<<<<<< HEAD
-=======
   }
   onAddUser(){
     this.showModal = !this.showModal;
     this.modalService.openModal({ id: 'addUserModal', isShown: this.showModal });
->>>>>>> developement
   }
 }

@@ -1,21 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-<<<<<<< HEAD
-import { Observable } from 'rxjs';
-import { Quiz } from 'src/app/core/models/quiz.model';
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class QuizService {
-
-  constructor(private httpClient: HttpClient) { }
-
-  getAvailableQuizzes(): Observable<Quiz[]>{
-    return this.httpClient.get<Quiz[]>("");
-=======
 import { forkJoin, map, mergeMap, Observable, tap } from 'rxjs';
 import { headers } from 'src/app/core/constants/settings';
 import { IQuestion } from 'src/app/core/models/question.model';
@@ -231,6 +216,5 @@ export class QuizService {
         `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.quizTest}`
       )
       .pipe();
->>>>>>> developement
   }
 }
