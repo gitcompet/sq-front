@@ -5,7 +5,7 @@
     <i class="fas fa-plus" aria-hidden="true"> </i>&nbsp;&nbsp;Add Quiz
   </button>
 </div>
-<app-table [data]="quizzes" [headers]="headers"></app-table>
+<app-quizzes></app-quizzes>
 <app-modal (onSave)="createQuiz($event)" [data]="quizForm" [id]="'quizModal'">
   <h3 header class="text-xl font-medium text-gray-900 dark:text-white">
     New Quiz
@@ -130,7 +130,7 @@
           Select questions
         </button>
         <!-- <app-table [data]="quizQuestions" [headers]="headers" [title]="'Questions'" ></app-table> -->
-        <app-modal [id]="'questionsModal'">
+        <app-modal (onSave)="assignQuestions()" [id]="'questionsModal'">
           <h3 header class="text-xl font-medium text-gray-900 dark:text-white">
             Questions
           </h3>
@@ -141,9 +141,9 @@
             [headers]="headers"
             [title]="'Questions'"
           >
-          <label actions>
-            <input type="checkbox" value="value" (change)="onChecked($event)" class="accent-green-500">
-          </label>
+          <ng-template let-item>
+            <app-checkbox [id]="item" (change)="onChecked($event)"></app-checkbox>
+          </ng-template>
         </app-table>
         </app-modal>
       </ng-container>

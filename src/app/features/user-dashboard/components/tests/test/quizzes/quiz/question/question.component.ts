@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 
 @Component({
   selector: 'app-question',
@@ -6,9 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./question.component.css']
 })
 export class QuestionComponent implements OnInit {
-
+  @Input() data!: IQuestionResponse;
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+
   }
 
 }

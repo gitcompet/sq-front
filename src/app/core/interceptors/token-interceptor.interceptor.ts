@@ -10,9 +10,12 @@ import {
 import { catchError, Observable, throwError } from 'rxjs';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { Router } from '@angular/router';
+import { ErrorHandlerComponent } from '../exceptions/error-handler/error-handler.component';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
+  private _errorHandler: ErrorHandlerComponent = new ErrorHandlerComponent();
+
   constructor(private authService: AuthService, private router: Router) {}
 
   intercept(
@@ -32,6 +35,7 @@ export class TokenInterceptor implements HttpInterceptor {
         if (err instanceof HttpErrorResponse) {
           if (err.status === 401) this.router.navigateByUrl('/login');
         }
+        this._errorHandler.handleError(err);
         return throwError(()=>new Error(err))
       })
     );

@@ -21,7 +21,6 @@ import { ModalService } from '../../services/modal.service';
 })
 export class ModalComponent implements OnInit, OnDestroy {
   @Input() id: string = '';
-  isValidForm: boolean = false;
   //DYNAMIC DATA COMING FROM THE CALLING PARENT
   @Input() data: FormGroup | any;
   @Output('onSave') dataEmitter: EventEmitter<any> = new EventEmitter<any>();
@@ -51,9 +50,10 @@ export class ModalComponent implements OnInit, OnDestroy {
   save() {
     if (this.data instanceof FormGroup) {
       if (this.data.valid) {
-        this.isValidForm = this.data.valid;
         this.dataEmitter.emit(this.data);
       }
+    }else{
+      this.dataEmitter.emit(this.data);
     }
   }
 

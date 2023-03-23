@@ -78,6 +78,10 @@ export class AuthService {
     ] as string[];
     return roles;
   }
+  isAdmin(){
+    return this.getRoles()
+            .includes("admin".toUpperCase())
+  }
   getUsername(): string {
     const decodedToken: any = this.jwtService.decode(this.getToken());
     const username = decodedToken[

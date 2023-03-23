@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'src/app/core/guards/auth.guard';
+import { ContactComponent } from './components/contact/contact.component';
 import { UserHomeComponent } from './components/home/user-home.component';
-import { QuizzesComponent } from './components/tests/quizzes/quizzes.component';
+import { QuizzesComponent } from './components/tests/test/quizzes/quizzes.component';
+import { TestComponent } from './components/tests/test/test.component';
 import { TestsComponent } from './components/tests/tests.component';
 
 const routes: Routes = [
@@ -19,7 +21,7 @@ const routes: Routes = [
         children: [
           {
             path: ':id',
-            component: QuizzesComponent,
+            component: TestComponent,
             data: {
               roles: ['USER'],
             },
@@ -29,6 +31,13 @@ const routes: Routes = [
           roles: ['USER'],
         },
       },
+      {
+        path:'contact',
+        component: ContactComponent,
+        data: {
+          roles: ['USER'],
+        },
+      }
     ],
     data: {
       roles: ['USER'],

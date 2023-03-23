@@ -1,11 +1,11 @@
-export interface ITest {
+export interface ITestResponse {
     testId: string,
     testCategoryId:string ;
     comment: string;
     isActive?: boolean,
     isDeleted?: boolean,
 }
-export class Test implements ITest{
+export class TestResponse implements ITestResponse{
   testId: string;
   testCategoryId:string ;
   comment: string;
@@ -16,7 +16,7 @@ export class Test implements ITest{
     testCategoryId: string,
     comment: string,
     isActive: boolean,
-    isDeleted: boolean,
+    isDeleted: boolean
   ) {
     this.testId = testId;
     this.testCategoryId = testCategoryId;

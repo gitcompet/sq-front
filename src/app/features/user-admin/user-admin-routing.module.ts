@@ -5,10 +5,12 @@ import { ProfileComponent } from './components/profiles/profile/profile.componen
 import { AuthGuard } from 'src/app/core/guards/auth.guard';
 import { HomeComponent } from './components/home/home.component';
 import { MainContentComponent } from './components/home/main-content/main-content.component';
-import { TestComponent } from './components/test/test.component';
-import { QuizComponent } from './components/test/quiz/quiz.component';
+import { QuizAdminComponent } from './components/test/quiz/quiz-admin.component';
 import { LanguageComponent } from './components/languages/language/language.component';
 import { LanguagesComponent } from './components/languages/languages.component';
+import { TestsAdminComponent } from './components/test/tests-admin.component';
+import { QuizzesComponent } from '../user-dashboard/components/tests/test/quizzes/quizzes.component';
+import { QuizComponent } from '../user-dashboard/components/tests/test/quizzes/quiz/quiz.component';
 
 const routes: Routes = [
   {
@@ -43,14 +45,24 @@ const routes: Routes = [
       },
       {
         path: 'tests',
-        component: TestComponent,
+        component: TestsAdminComponent,
         data: {
           roles: ['ADMIN'],
         },
       },
       {
         path: 'quizzes',
-        component: QuizComponent,
+        component: QuizAdminComponent,
+        canActivateChild :[AuthGuard],
+        children: [
+          {
+            path: ':id',
+            component: QuizComponent,
+            data: {
+              roles: ['ADMIN'],
+            },
+          }
+        ],
         data: {
           roles: ['ADMIN'],
         },

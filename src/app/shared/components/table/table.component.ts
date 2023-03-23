@@ -3,17 +3,20 @@ import {
   AfterContentInit,
   AfterViewInit,
   Component,
+  ContentChild,
+  EventEmitter,
   Input,
   OnInit,
+  Output,
+  TemplateRef,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ActionHostDirective } from 'src/app/core/directives/action-host.directive';
-import { IQuestion, Question } from 'src/app/core/models/question.model';
+import { IQuestion } from 'src/app/core/models/question.model';
 import { IUser } from 'src/app/core/models/user.model';
 import { ModalService } from '../../services/modal.service';
-import { CheckBoxComponent } from '../checkbox/checkbox.component';
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
@@ -24,8 +27,10 @@ export class TableComponent implements OnInit {
   @Input() title: string = '';
   @Input() headers: string[] = [];
   @Input() actions: any[] = [];
+  @Output('onSave') dataEmitter: EventEmitter<any> = new EventEmitter<any>();
   _subscriptions: Subscription[] = [];
   @ViewChild(ActionHostDirective, { static: true })actionHost!: ActionHostDirective;
+  @ContentChild(TemplateRef) templateRef!: TemplateRef<any>;
   constructor(private modalService: ModalService) {}
   ngOnInit() {
     this._subscriptions.push(
@@ -47,7 +52,11 @@ export class TableComponent implements OnInit {
       //   viewContainerRef.createComponent<CheckBoxComponent>(this.actions[0].componentName);
     }
   }
+  getRowContext(row: any) {
+    const rowKey: string = Object.keys(row).find((keyName)=> keyName.match(/id/i))!;
 
+    return {$implicit: row[rowKey]};
+  }
   // Preserve original property order
   originalOrder = (
     a: KeyValue<number, string>,

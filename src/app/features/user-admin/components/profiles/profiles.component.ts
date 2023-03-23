@@ -5,7 +5,7 @@ import { ModalService } from 'src/app/shared/services/modal.service';
 @Component({
   selector: 'app-profiles',
   templateUrl: './profiles.component.html',
-  styles: [],
+  styleUrls: ['./profiles.component.css'],
 })
 export class ProfilesComponent {
   users: IUser[] = [];

@@ -1,0 +1,8 @@
+:host{
+  display: block;
+  width: 90%;
+  margin-inline: .2rem;
+}
+.accordion-content {
+  transition: max-height 0.3s ease-out, padding 0.3s ease;
+}

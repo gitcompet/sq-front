@@ -6,8 +6,10 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { Observable, Subscription, switchMap } from 'rxjs';
+import { forkJoin, Observable, Subscription, switchMap } from 'rxjs';
+import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { IQuestion } from 'src/app/core/models/question.model';
+import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
 import { IQuiz } from 'src/app/core/models/quiz.model';
 import { CheckBoxComponent } from 'src/app/shared/components/checkbox/checkbox.component';
 import { ModalService } from 'src/app/shared/services/modal.service';
@@ -15,13 +17,15 @@ import { QuizService } from '../../../services/quiz.service';
 
 @Component({
   selector: 'app-quiz',
-  templateUrl: './quiz.component.html',
-  styleUrls: ['./quiz.component.css'],
+  templateUrl: './quiz-admin.component.html',
+  styleUrls: ['./quiz-admin.component.css'],
 })
-export class QuizComponent implements OnInit, OnDestroy {
+export class QuizAdminComponent implements OnInit, OnDestroy {
   quizForm: FormGroup;
   showModal: boolean = false;
   quizzes: IQuiz[] = [];
+  questionsIds: string[] = [];
+
   quizQuestions: IQuestion[] = [];
   headers: string[] = ['Title', 'Domain', 'Subdomain', 'Action'];
   questionActions: unknown[] = [
@@ -47,9 +51,9 @@ export class QuizComponent implements OnInit, OnDestroy {
     this._subscriptions.push(this.modalService.getDataExchange().subscribe());
     this._subscriptions.push(
       this.quizService
-        .getAvailableQuestion()
+        .getAvailableQuestions()
         .pipe(
-          switchMap((questions: IQuestion[]) => {
+          switchMap((questions: IQuestionResponse[]) => {
             if (questions && questions.length > 0) {
               this.quizQuestions = questions;
               this.modalService.updateData(this.quizQuestions);
@@ -57,7 +61,7 @@ export class QuizComponent implements OnInit, OnDestroy {
             return this.quizService.getAvailableQuizzes();
           })
         )
-        .subscribe((quizzes: IQuiz[]) => {
+        .subscribe((quizzes: IQuizResponse[]) => {
           if (quizzes && quizzes.length > 0) {
             this.quizzes = quizzes;
           }
@@ -75,8 +79,9 @@ export class QuizComponent implements OnInit, OnDestroy {
     this.quizForm.reset({ questions: this._formBuilder.array([]) });
   }
   onChecked(event: any) {
-    console.log(event);
-  }
+    if (event.target.checked) {
+      this.questionsIds.push(event.target.defaultValue);
+    }}
   createQuiz(form: FormGroup) {
     const newQuiz = {
       title: form.get('title')?.value,
@@ -86,15 +91,33 @@ export class QuizComponent implements OnInit, OnDestroy {
       comment: form.get('description')?.value,
     } as IQuiz;
 
-    this.quizService.addQuiz(newQuiz).subscribe((response) => {
-      this.quizzes = [...this.quizzes, response];
+    this.quizService.addQuiz(newQuiz) .pipe(
+      switchMap((newQuiz: IQuizResponse) => {
+        this.quizzes = [...this.quizzes, newQuiz];
+        return forkJoin(
+          this.questionsIds.map((questionId) =>
+            this.quizService.assignQuesion({
+              quizId: newQuiz.quizId,
+              questionId: questionId,
+              questionLevel: 1,
+              questionWeight: 1
+            })
+          )
+        );
+      })
+    )
+    .subscribe((response) => {
+      console.log(response);
+
       this.modalService.closeModal({
         id: 'quizModal',
         isShown: this.showModal,
       });
     });
   }
-  onReceivedData(data: any) {}
+  assignQuestions() {
+    this.modalService.closeModal({ id: 'questionsModal', isShown: this.showModal });
+  }
   createQuestion(): FormGroup {
     return this._formBuilder.group({
       question: ['', Validators.required],

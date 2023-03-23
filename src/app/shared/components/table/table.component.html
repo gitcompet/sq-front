@@ -23,14 +23,16 @@
             <tbody>
               <tr *ngFor="let row of data">
                 <td *ngFor="let property of row | keyvalue : originalOrder">
-                      <p
-                        class="mb-0 text-center leading-normal text-sm p-2  bg-transparent border-b whitespace-nowrap break-words"
-                      >
-                        {{ property.value }}
-                      </p>
+                  <p
+                    class="mb-0 text-center leading-normal text-sm p-2 bg-transparent border-b whitespace-nowrap break-words"
+                  >
+                    {{ property.value }}
+                  </p>
                 </td>
-                <td *ngFor="let row of data">
-                  <ng-content select="[actions]"></ng-content>
+                <td>
+                  <ng-container
+                    *ngTemplateOutlet="templateRef; context: getRowContext(row)"
+                  ></ng-container>
                 </td>
               </tr>
             </tbody>

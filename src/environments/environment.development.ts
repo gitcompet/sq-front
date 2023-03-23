@@ -16,6 +16,11 @@ export const environment = {
   testPaths: {
     base: '/Test',
   },
+  testUserPaths: {
+    base: '/TestUser',
+    quizTest: '/TestCompose',
+    quizQuestion: '/QuizCompose'
+  },
   questionPaths: {
     base: '/Question',
   },
