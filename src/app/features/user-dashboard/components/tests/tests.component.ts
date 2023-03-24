@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { forkJoin, of, Subscription, switchMap } from 'rxjs';
+import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
+import { IQuiz } from 'src/app/core/models/quiz.model';
+import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
 import { ITestResponse } from 'src/app/core/models/test-response.model';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -24,7 +27,6 @@ export class TestsComponent implements OnInit {
     if (!this.authService.isAdmin()) {
       this._subscriptions.push(
         this.quizService.getUserTests("11").subscribe((res: ITestResponse[]) => {
-          console.log(res);
           this.tests = res;
         })
       );
@@ -32,8 +34,39 @@ export class TestsComponent implements OnInit {
       this._subscriptions.push(
         this.quizService
           .getAvailableTests()
-          .subscribe((res: ITestResponse[]) => {
-            this.tests = res;
+          .pipe(
+            switchMap((res: ITestResponse[]) => {
+              this.tests = res;
+              return this.quizService.getAsssignedTestQuizzes();
+            }),
+            switchMap((compositions: ITestQuiz[]) => {
+              const observables = [
+                of(compositions),
+                forkJoin(
+                  compositions.map((composition) =>
+                    this.quizService.getQuiz(composition.quizId)
+                  )
+                ),
+              ];
+              return forkJoin(observables);
+            })
+          )
+          .subscribe((mergedResults) => {
+            const compositions: ITestQuiz[] = mergedResults[0] as ITestQuiz[];
+            const quizzes: IQuizResponse[] = mergedResults[1] as IQuizResponse[];
+            this.tests = this.tests.map((test) => {
+              const filtredComposition = compositions
+                .filter((testQuiz) => test.testId === testQuiz.testId)
+                .map((testQuiz) => testQuiz.quizId);
+              return {
+                ...test,
+                quizzes: quizzes.filter((quiz: IQuizResponse) =>
+                  filtredComposition.find((id) => id === quiz.quizId)
+                ),
+              };
+            });
+
+
           })
       );
     }

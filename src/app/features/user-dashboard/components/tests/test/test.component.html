@@ -9,13 +9,8 @@
         <h3>{{data.comment}}</h3>
       </div>
       <!-- Content -->
-      <div *ngIf="isExpanded"  class="accordion-content flex flex-col justify-center items-center px-5 pt-0 overflow-y-scroll max-h-0" [class]="isExpanded ? 'max-h-40 ':''">
-        <app-quizzes></app-quizzes>
-        <button
-          class="rounded-full bg-indigo-600 text-white w-40  font-medium font-lg px-6 py-2 my-5 ml-9"
-        >
-         {{data.testId}}
-        </button>
+      <div *ngIf="isExpanded"  class="accordion-content flex flex-col justify-center items-center px-5 pt-0 overflow-y-scroll scroll-smooth " [class]="isExpanded ? 'max-h-40 ':''">
+        <app-quizzes [relatedTestQuizzes]="data.quizzes"></app-quizzes>
       </div>
     </div>
 

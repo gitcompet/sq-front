@@ -9,7 +9,6 @@ import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 export class QuestionComponent implements OnInit {
   @Input() data!: IQuestionResponse;
   ngOnInit(): void {
-
   }
 
 }

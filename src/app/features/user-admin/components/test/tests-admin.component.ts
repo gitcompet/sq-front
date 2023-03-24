@@ -1,6 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin, map, mergeAll, mergeMap, pairwise, startWith, Subscription, switchMap, tap } from 'rxjs';
+import {
+  forkJoin,
+  of,
+  Subscription,
+  switchMap,
+} from 'rxjs';
+import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
 import { IQuiz } from 'src/app/core/models/quiz.model';
 import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
 import { ITestResponse } from 'src/app/core/models/test-response.model';
@@ -43,24 +49,14 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
   }
   ngOnInit(): void {
     this._subscriptions.push(this.modalService.getDataExchange().subscribe());
-
     this._subscriptions.push(
       this.quizService
-        .getAvailableTests()
-        .pipe(
-          switchMap((res: ITestResponse[]) => {
-            this.tests = res;
-            return this.quizService.getAsssignedTestQuizzes();
-          }),
-          mergeMap((compositions: ITestQuiz[]) => {
-            return forkJoin(compositions.map((composition) =>
-              this.quizService.getQuiz(composition.quizId)
-            ));
-          }),
-          tap((quizzes: IQuiz[])=> this.testQuizzes = quizzes)
-        )
-        .subscribe((res) => {
-          console.log(res);
+        .getAvailableQuizzes()
+        .subscribe((quizzes: IQuizResponse[]) => {
+          if (quizzes && quizzes.length > 0) {
+            this.testQuizzes = quizzes;
+            this.modalService.updateData(this.testQuizzes);
+          }
         })
     );
   }
@@ -90,8 +86,6 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe((response) => {
-        console.log(response);
-
         this.modalService.closeModal({
           id: 'testModal',
           isShown: this.showModal,

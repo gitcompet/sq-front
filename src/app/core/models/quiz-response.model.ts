@@ -1,4 +1,5 @@
-import { Question } from "./question.model";
+import { IQuestionResponse } from "./question-response.model";
+import { IQuestion } from "./question.model";
 
 export interface IQuizResponse {
     quizId: string,
@@ -9,7 +10,7 @@ export interface IQuizResponse {
     comment: string;
     isActive: boolean,
     isDeleted: boolean,
-    questions? : Question[]
+    questions? : IQuestionResponse[]
 }
 export class QuizResponse implements IQuizResponse{
   quizId: string;
@@ -20,6 +21,7 @@ export class QuizResponse implements IQuizResponse{
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
+  questions? : IQuestionResponse[]
   constructor(
     quizId: string,
     title: string,
@@ -28,7 +30,8 @@ export class QuizResponse implements IQuizResponse{
     comment: string,
     isActive: boolean,
     isDeleted: boolean,
-    weight: number
+    weight: number,
+    questions? : IQuestionResponse[]
 
   ) {
     this.quizId = quizId;
@@ -39,5 +42,6 @@ export class QuizResponse implements IQuizResponse{
     this.isActive = isActive;
     this.isDeleted = isDeleted;
     this.weight = weight;
+    this.questions = questions
   }
 }

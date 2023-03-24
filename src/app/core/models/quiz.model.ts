@@ -1,3 +1,4 @@
+import { IQuestionResponse } from "./question-response.model";
 import { Question } from "./question.model";
 
 export interface IQuiz {
@@ -9,7 +10,7 @@ export interface IQuiz {
     comment: string;
     isActive: boolean,
     isDeleted: boolean,
-    questions? : Question[]
+    questions? : IQuestionResponse[]
 }
 export class Quiz implements IQuiz{
   quizId: string;
