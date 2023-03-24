@@ -26,9 +26,11 @@ export class TestsComponent implements OnInit {
 
     if (!this.authService.isAdmin()) {
       this._subscriptions.push(
-        this.quizService.getUserTests("11").subscribe((res: ITestResponse[]) => {
-          this.tests = res;
-        })
+        this.quizService
+          .getUserTests('11')
+          .subscribe((res: ITestResponse[]) => {
+            this.tests = res;
+          })
       );
     } else {
       this._subscriptions.push(
@@ -40,11 +42,16 @@ export class TestsComponent implements OnInit {
               return this.quizService.getAsssignedTestQuizzes();
             }),
             switchMap((compositions: ITestQuiz[]) => {
+              const filtredComposition = compositions
+                .map((testQuiz) => testQuiz.quizId)
+                .filter((item, pos, self) => self.indexOf(item) == pos);
+
+
               const observables = [
                 of(compositions),
                 forkJoin(
-                  compositions.map((composition) =>
-                    this.quizService.getQuiz(composition.quizId)
+                  filtredComposition.map((quizId) =>
+                    this.quizService.getQuiz(quizId)
                   )
                 ),
               ];
@@ -53,7 +60,8 @@ export class TestsComponent implements OnInit {
           )
           .subscribe((mergedResults) => {
             const compositions: ITestQuiz[] = mergedResults[0] as ITestQuiz[];
-            const quizzes: IQuizResponse[] = mergedResults[1] as IQuizResponse[];
+            const quizzes: IQuizResponse[] =
+              mergedResults[1] as IQuizResponse[];
             this.tests = this.tests.map((test) => {
               const filtredComposition = compositions
                 .filter((testQuiz) => test.testId === testQuiz.testId)
@@ -61,12 +69,10 @@ export class TestsComponent implements OnInit {
               return {
                 ...test,
                 quizzes: quizzes.filter((quiz: IQuizResponse) =>
-                  filtredComposition.find((id) => id === quiz.quizId)
+                  filtredComposition.includes(quiz.quizId)
                 ),
               };
             });
-
-
           })
       );
     }

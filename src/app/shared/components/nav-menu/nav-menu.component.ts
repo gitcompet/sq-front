@@ -15,7 +15,6 @@ export class NavMenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('isauthen:' + this.isAuthenticated);
   }
   onLogout() {
     localStorage.removeItem('token');

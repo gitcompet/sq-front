@@ -63,9 +63,7 @@ export class QuizService {
           let testIds = userTests.map(
             (userTest: ITestUserResponse) => userTest.testId
           );
-          return forkJoin(testIds.map((id: string) => this.getTest(id))).pipe(
-            tap((value) => console.log(value))
-          );
+          return forkJoin(testIds.map((id: string) => this.getTest(id)))
         })
       );
   }

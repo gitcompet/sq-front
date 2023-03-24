@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -41,7 +41,6 @@ export class SignUpComponent {
     if (!this.signUpForm.valid) return;
     this.authService.signUp(this.signUpForm.value).subscribe((res) => {
       this.signUpForm.reset();
-      console.log(res);
     });
   }
 }

@@ -44,7 +44,6 @@ export class TableComponent implements OnInit {
   }
   loadComponents() {
     if (this.actions && this.actions.length > 0) {
-      console.log(this.actionHost);
 
       // const viewContainerRef = this.actionHost.viewContainerRef;
       // viewContainerRef.clear();
