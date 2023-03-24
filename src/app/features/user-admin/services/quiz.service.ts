@@ -203,10 +203,17 @@ export class QuizService {
         })
       );
   }
-  getQuiz(quizId: string): Observable<IQuiz> {
+  getQuiz(quizId: string): Observable<IQuizResponse> {
     return this.httpClient
-      .get<IQuiz>(
+      .get<IQuizResponse>(
         `${environment.baseUrl}${environment.apiVersion}${environment.quizPaths.base}/${quizId}`
+      )
+      .pipe();
+  }
+  getQuestion(questionId: string): Observable<IQuestionResponse> {
+    return this.httpClient
+      .get<IQuestionResponse>(
+        `${environment.baseUrl}${environment.apiVersion}${environment.questionPaths.base}/${questionId}`
       )
       .pipe();
   }
@@ -214,6 +221,13 @@ export class QuizService {
     return this.httpClient
       .get<ITestQuiz[]>(
         `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.quizTest}`
+      )
+      .pipe();
+  }
+  getAsssignedQuizQuestions(): Observable<IQuizQuestion[]> {
+    return this.httpClient
+      .get<IQuizQuestion[]>(
+        `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.quizQuestion}`
       )
       .pipe();
   }

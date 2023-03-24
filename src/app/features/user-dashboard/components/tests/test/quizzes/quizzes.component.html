@@ -1,3 +1,4 @@
-<div class="flex flex-col gap-3  px-2 py-3 justify-center items-start">
-  <app-quiz (click)="quizDetails(quiz.quizId)" *ngFor="let quiz of quizzes" [data]="quiz" [isAdmin]="isAdmin"></app-quiz>
+<div *ngIf="quizzes.length > 0" class="grid grid-cols-2 gap-2  px-2 py-3 justify-center items-start">
+
+  <app-quiz (click)="quizDetails(quiz.quizId)" *ngFor="let quiz of quizzes" [relatedQuizQuestions]="quiz.questions" [data]="quiz" [isAdmin]="isAdmin"></app-quiz>
 </div>
