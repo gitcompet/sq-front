@@ -2,26 +2,32 @@ import { IQuiz } from "./quiz.model";
 
 export interface ITestResponse {
     testId: string,
-    testCategoryId:string ;
+    testCategoryId:string[] ;
     comment: string;
-    isActive?: boolean,
-    isDeleted?: boolean,
-    quizzes?: IQuiz[]
+    isActive?: boolean;
+    isDeleted?: boolean;
+    quizzes?: IQuiz[];
+    title?: string;
+    label?: string;
 }
 export class TestResponse implements ITestResponse{
   testId: string;
-  testCategoryId:string ;
+  testCategoryId:string [];
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
-  quizzes?: IQuiz[]
+  quizzes?: IQuiz[];
+  title?: string;
+  label?: string;
   constructor(
     testId: string,
-    testCategoryId: string,
+    testCategoryId: string[],
     comment: string,
     isActive: boolean,
     isDeleted: boolean,
-    quizzes?: IQuiz[]
+    quizzes?: IQuiz[],
+    title?: string,
+    label?: string
   ) {
     this.testId = testId;
     this.testCategoryId = testCategoryId;
@@ -29,5 +35,7 @@ export class TestResponse implements ITestResponse{
     this.isActive = isActive;
     this.isDeleted = isDeleted;
     this.quizzes = quizzes;
+    this.title = title;
+    this.label = label;
   }
 }

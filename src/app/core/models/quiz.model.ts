@@ -1,39 +1,42 @@
 import { IQuestionResponse } from "./question-response.model";
-import { Question } from "./question.model";
 
 export interface IQuiz {
     quizId: string,
-    title:string ;
-    domainId:string;
-    subDomainId:string ;
+    domainId:string[];
+    subDomainId:string[] ;
     weight: number ;
     comment: string;
     isActive: boolean,
     isDeleted: boolean,
-    questions? : IQuestionResponse[]
+    questions? : IQuestionResponse[],
+    title?: string;
+    label?: string;
 }
 export class Quiz implements IQuiz{
   quizId: string;
-  title: string;
-  domainId: string;
+  domainId: string[];
   weight: number ;
-  subDomainId: string;
+  subDomainId: string[];
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
+  title?: string;
+  label?: string;
   constructor(
     quizId: string,
-    title: string,
-    domainId: string,
-    subDomainId: string,
+    domainId: string[],
+    subDomainId: string[],
     comment: string,
     isActive: boolean,
     isDeleted: boolean,
-    weight: number
+    weight: number,
+    title?: string,
+    label?: string
 
   ) {
     this.quizId = quizId;
     this.title = title;
+    this.label = label;
     this.domainId = domainId;
     this.subDomainId = subDomainId;
     this.comment = comment;

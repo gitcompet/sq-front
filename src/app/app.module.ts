@@ -14,7 +14,7 @@ import { UserModule } from './features/user-profile/user.module';
 
 @NgModule({
     declarations: [
-    AppComponent
+    AppComponent,
     ],
     bootstrap: [AppComponent],
     imports: [

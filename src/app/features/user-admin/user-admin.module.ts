@@ -15,6 +15,7 @@ import { UserModule } from '../user-profile/user.module';
 import { CoreModule } from 'src/app/core/core.module';
 import { TestsAdminComponent } from './components/test/tests-admin.component';
 import { UserDashboardModule } from "../user-dashboard/user-dashboard.module";
+import { QuestionAdminComponent } from './components/test/quiz/question/question-admin.component';
 
 @NgModule({
     declarations: [
@@ -27,6 +28,7 @@ import { UserDashboardModule } from "../user-dashboard/user-dashboard.module";
         QuizAdminComponent,
         LanguagesComponent,
         LanguageComponent,
+        QuestionAdminComponent,
     ],
     exports: [
         ProfileComponent,
@@ -36,6 +38,7 @@ import { UserDashboardModule } from "../user-dashboard/user-dashboard.module";
         MainContentComponent,
         TestsAdminComponent,
         QuizAdminComponent,
+        QuestionAdminComponent,
         LanguagesComponent,
         LanguageComponent,
     ],

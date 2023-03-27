@@ -61,6 +61,16 @@ export class AuthService {
   getRefreshToken(): string {
     return localStorage.getItem('refresh') as string;
   }
+
+  getId(): string {
+    const decodedToken: any = this.jwtService.decode(this.getToken());
+    const properties: string[] = Object.getOwnPropertyNames(decodedToken);
+    const key: string = properties.filter((value)=> value.includes("id"))[0];
+    const id = decodedToken[
+      key
+    ] as string;
+    return id;
+  }
   setToken(response: TokenResponse) {
     localStorage.setItem('token', response.accessToken);
     localStorage.setItem('refresh', response.refreshToken);

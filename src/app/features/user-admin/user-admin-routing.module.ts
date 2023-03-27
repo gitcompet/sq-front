@@ -11,6 +11,7 @@ import { LanguagesComponent } from './components/languages/languages.component';
 import { TestsAdminComponent } from './components/test/tests-admin.component';
 import { QuizzesComponent } from '../user-dashboard/components/tests/test/quizzes/quizzes.component';
 import { QuizComponent } from '../user-dashboard/components/tests/test/quizzes/quiz/quiz.component';
+import { QuestionAdminComponent } from './components/test/quiz/question/question-admin.component';
 
 const routes: Routes = [
   {
@@ -63,6 +64,15 @@ const routes: Routes = [
             },
           }
         ],
+        data: {
+          roles: ['ADMIN'],
+        },
+      },
+      {
+        path: 'questions',
+        component: QuestionAdminComponent,
+        canActivateChild :[AuthGuard],
+        children: [],
         data: {
           roles: ['ADMIN'],
         },

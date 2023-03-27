@@ -1,34 +1,38 @@
 export interface IQuestionResponse {
   questionId: string;
-  title: string;
   comment: string;
   domainId: string;
   subDomainId: string;
   level: number;
   isActive: boolean;
   isDeleted: boolean;
+  title?: string;
+  label?: string;
 }
 export class QuestionResponse implements IQuestionResponse {
   questionId: string;
-  title: string;
   comment: string;
   domainId: string;
   subDomainId: string;
   level: number;
   isActive: boolean;
   isDeleted: boolean;
+  title?: string;
+  label?: string;
   constructor(
     questionId: string,
-    title: string,
     domainId: string,
     subDomainId: string,
     level: number,
     isActive: boolean,
     isDeleted: boolean,
-    comment: string
+    comment: string,
+    title?: string,
+    label?: string
   ){
     this.questionId = questionId;
     this.title = title;
+    this.label = label;
     this.level = level;
     this.domainId = domainId;
     this.subDomainId = subDomainId;

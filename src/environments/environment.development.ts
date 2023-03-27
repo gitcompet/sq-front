@@ -24,9 +24,10 @@ export const environment = {
   questionPaths: {
     base: '/Question',
   },
-  languagesPath: '/Languages/getLanguagess',
-  languagePath: '/Languages/getLanguage',
-  languagePostPath: '/Languages/postLanguage',
-  languageRemovePath: '/Languages/removeLanguage',
-  languageUpdatePath: '/Languages/updateLanguage',
+  categoryPaths: {
+    base: '/Domain',
+  },
+  languagesPaths: {
+    base: '/Language'
+  }
 };
