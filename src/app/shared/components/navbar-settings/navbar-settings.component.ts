@@ -44,7 +44,7 @@ export class NavbarSettingsComponent implements OnInit, OnDestroy {
           })
         )
         .subscribe((res) => {
-          this.languages = res.filter((lang) => lang.languageId !== langId);
+          this.languages = [...res];
         })
     );
   }
@@ -60,7 +60,6 @@ export class NavbarSettingsComponent implements OnInit, OnDestroy {
         } as unknown as Patch,
       ])
       .subscribe((res) => {
-        console.log(res);
       });
   }
   toggleProfileMenu() {

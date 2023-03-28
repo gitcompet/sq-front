@@ -23,11 +23,7 @@
         class="relative border-b-4 border-transparent py-3"
         [class]="
           isOpen ? 'border-indigo-700 transform transition duration-300 ' : ''
-        "
-        x-transition:enter-end="transform opacity-100 scale-100"
-        x-transition:leave="transition ease-in duration-75"
-        x-transition:leave-start="transform opacity-100 scale-100"
-      >
+        ">
         <div class="flex justify-center items-center space-x-3 cursor-pointer">
           <div class="font-semibold dark:text-white text-gray-900 text-lg">
             <div class="cursor-pointer">{{ data.username }}</div>
@@ -46,14 +42,7 @@
         </div>
         <div
           *ngIf="isOpen"
-          x-show="open"
-          x-transition:enter="transition ease-out duration-100"
-          x-transition:enter-start="transform opacity-0 scale-95"
-          x-transition:enter-end="transform opacity-100 scale-100"
-          x-transition:leave="transition ease-in duration-75"
-          x-transition:leave-start="transform opacity-100 scale-100"
-          x-transition:leave-end="transform opacity-0 scale-95"
-          class="absolute w-60 px-5 py-3 dark:bg-gray-800 bg-white rounded-lg shadow border dark:border-transparent mt-5"
+           class="absolute w-60 px-5 py-3 dark:bg-gray-800 bg-white rounded-lg shadow border dark:border-transparent mt-5"
         >
           <ul class="space-y-3 dark:text-white">
             <li class="font-medium">
@@ -144,11 +133,12 @@
           (change)="onLanguageChange($event)"
           formControlName="language"
           id="language"
-          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          class="bg-gray-50 border  border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         >
           <option
             *ngFor="let language of languages"
             [value]="language.languageId"
+            [selected]="selectedLanguage.title"
           >
             {{ language.title }}
           </option>
