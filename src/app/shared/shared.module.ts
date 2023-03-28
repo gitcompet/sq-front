@@ -9,6 +9,7 @@ import { ModalComponent } from './components/modal/modal.component';
 import { NavbarSettingsComponent } from './components/navbar-settings/navbar-settings.component';
 import { CheckBoxComponent } from './components/checkbox/checkbox.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ConfirmationModalComponent } from './components/modal/confirmation-modal/confirmation-modal.component';
 
 export function tokenGetter() {
   return localStorage.getItem('access_token');
@@ -22,12 +23,14 @@ export function tokenGetter() {
     ModalComponent,
     NavbarSettingsComponent,
     CheckBoxComponent,
+    ConfirmationModalComponent,
   ],
   exports: [
     PageNotFoundComponent,
     NavMenuComponent,
     TableComponent,
     ModalComponent,
+    ConfirmationModalComponent,
     NavbarSettingsComponent,
     CheckBoxComponent
   ],

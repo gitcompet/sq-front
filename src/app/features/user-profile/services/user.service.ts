@@ -18,27 +18,43 @@ export class UserService {
       .pipe(
          map(users=> users.map((user)=> {
               const modifiedUser ={} as IUser
+              modifiedUser.loginId = user.loginId;
               modifiedUser.email = user.email
-              modifiedUser.firsName = user.firsName;
+              modifiedUser.firstName = user.firstName;
               modifiedUser.lastName = user.lastName;
               modifiedUser.login = user.login;
               return modifiedUser;
          }))
       );
   }
-  updateUser(payload: User): Observable<User> {
-    return this.http.put<User>(
-      `${environment.baseUrl}${environment.apiVersion}${environment.userPaths.base}`,
+  updateUser(payload: IUser): Observable<IUser> {
+    return this.http.put<IUser>(
+      `${environment.baseUrl}${environment.apiVersion}${environment.userPaths.base}/${payload.loginId}`,
       payload
     );
   }
-  patchUser(payload: Patch[]): Observable<User> {
-    return this.http.patch<User>(
-      `${environment.baseUrl}${environment.apiVersion}${environment.userPaths.base}/20`,
+  patchUser(id:string,payload: Patch[]): Observable<IUser> {
+    return this.http.patch<IUser>(
+      `${environment.baseUrl}${environment.apiVersion}${environment.userPaths.base}/${id}`,
       payload,
       {
         headers: patchHeaders
       }
+    ).pipe(
+      map((user)=> {
+           const modifiedUser ={} as IUser
+           modifiedUser.loginId = user.loginId;
+           modifiedUser.email = user.email
+           modifiedUser.firstName = user.firstName;
+           modifiedUser.lastName = user.lastName;
+           modifiedUser.login = user.login;
+           return modifiedUser;
+      })
+   );
+  }
+  deleteUser(id: string): Observable<IUser> {
+    return this.http.delete<IUser>(
+      `${environment.baseUrl}${environment.apiVersion}${environment.userPaths.base}/${id}`,
     );
   }
 }

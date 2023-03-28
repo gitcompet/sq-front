@@ -34,29 +34,34 @@ export class NavbarSettingsComponent implements OnInit, OnDestroy {
   }
   ngOnInit() {
     const langId = this.languageManagerService.getCurrentLanguageId();
-   this._subscriptions.push(this.languagesService
-      .getLanguage(langId)
-      .pipe(
-        switchMap((res) => {
-          this.selectedLanguage = res;
-          return this.languagesService.getLanguages();
+    this._subscriptions.push(
+      this.languagesService
+        .getLanguage(langId)
+        .pipe(
+          switchMap((res) => {
+            this.selectedLanguage = res;
+            return this.languagesService.getLanguages();
+          })
+        )
+        .subscribe((res) => {
+          this.languages = res.filter((lang) => lang.languageId !== langId);
         })
-      )
-      .subscribe((res) => {
-        this.languages = res.filter((lang) => lang.languageId !== langId);
-      }));
+    );
   }
-  onLanguageChange(event: Event){
-    const target = event.target as   HTMLTextAreaElement;
+  onLanguageChange(event: Event) {
+    const target = event.target as HTMLTextAreaElement;
     const languageId: string = target.value;
-      this.userService.patchUser([{
-        op: OperationType.REPLACE,
-        path: '/languageId',
-        value: languageId
-      } as unknown as Patch]).subscribe((res)=>{
+    this.userService
+      .patchUser(this.authService.getId(), [
+        {
+          op: OperationType.REPLACE,
+          path: '/languageId',
+          value: languageId,
+        } as unknown as Patch,
+      ])
+      .subscribe((res) => {
         console.log(res);
-
-      })
+      });
   }
   toggleProfileMenu() {
     this.isOpen = !this.isOpen;
@@ -65,6 +70,6 @@ export class NavbarSettingsComponent implements OnInit, OnDestroy {
     this.authService.logout();
   }
   ngOnDestroy(): void {
-    this._subscriptions.map((sub)=> sub.unsubscribe());
+    this._subscriptions.map((sub) => sub.unsubscribe());
   }
 }
