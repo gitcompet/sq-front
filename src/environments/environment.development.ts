@@ -15,6 +15,7 @@ export const environment = {
   },
   testPaths: {
     base: '/Test',
+    testCategories: '/TestCategoryCompose',
   },
   testUserPaths: {
     base: '/TestUser',
@@ -26,8 +27,9 @@ export const environment = {
   },
   categoryPaths: {
     base: '/Domain',
+    domainCompose: '/DomainCompose'
   },
   languagesPaths: {
     base: '/Language'
-  }
+  },
 };

@@ -3,7 +3,9 @@ import { IQuestionResponse } from "./question-response.model";
 export interface IQuizResponse {
     quizId: string,
     domainId:string[];
+    domainNames:string[];
     subDomainId:string[];
+    subDomainNames:string[];
     weight: number ;
     comment: string;
     isActive: boolean;
@@ -16,7 +18,9 @@ export class QuizResponse implements IQuizResponse{
   quizId: string;
   domainId: string[];
   weight: number ;
-  subDomainId: string[];
+  domainNames:string[];
+  subDomainId:string[];
+  subDomainNames:string[];
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
@@ -31,9 +35,11 @@ export class QuizResponse implements IQuizResponse{
     isActive: boolean,
     isDeleted: boolean,
     weight: number,
+    domainNames:string[],
+    subDomainNames:string[],
     questions? : IQuestionResponse[],
     title?: string,
-    label?: string
+    label?: string,
 
   ) {
     this.quizId = quizId;
@@ -45,6 +51,8 @@ export class QuizResponse implements IQuizResponse{
     this.isActive = isActive;
     this.isDeleted = isDeleted;
     this.weight = weight;
-    this.questions = questions
+    this.questions = questions;
+    this.domainNames = domainNames;
+    this.subDomainNames = subDomainNames;
   }
 }

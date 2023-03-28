@@ -27,7 +27,7 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
   quizzes: IQuizResponse[] = [];
   questionsIds: string[] = [];
 
-  quizQuestions: IQuestion[] = [];
+  quizQuestions: IQuestionResponse[] = [];
   headers: string[] = ['Title', 'Domain', 'Subdomain', 'Action'];
   questionActions: unknown[] = [
     { actionName: 'select', componentName: CheckBoxComponent },

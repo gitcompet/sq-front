@@ -2,7 +2,9 @@ export interface IQuestionResponse {
   questionId: string;
   comment: string;
   domainId: string;
-  subDomainId: string;
+  domainNames:string[];
+  subDomainId:string[];
+  subDomainNames:string[];
   level: number;
   isActive: boolean;
   isDeleted: boolean;
@@ -13,7 +15,9 @@ export class QuestionResponse implements IQuestionResponse {
   questionId: string;
   comment: string;
   domainId: string;
-  subDomainId: string;
+  domainNames:string[];
+  subDomainId:string[];
+  subDomainNames:string[];
   level: number;
   isActive: boolean;
   isDeleted: boolean;
@@ -22,11 +26,13 @@ export class QuestionResponse implements IQuestionResponse {
   constructor(
     questionId: string,
     domainId: string,
-    subDomainId: string,
+    subDomainId: string[],
     level: number,
     isActive: boolean,
     isDeleted: boolean,
     comment: string,
+    domainNames:string[],
+    subDomainNames:string[],
     title?: string,
     label?: string
   ){
@@ -38,6 +44,8 @@ export class QuestionResponse implements IQuestionResponse {
     this.subDomainId = subDomainId;
     this.comment = comment;
     this.isActive = isActive;
-    this.isDeleted = isDeleted
+    this.isDeleted = isDeleted;
+    this.domainNames = domainNames;
+    this.subDomainNames = subDomainNames;
   };
 }

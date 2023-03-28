@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { forkJoin, map, mergeMap, Observable, tap } from 'rxjs';
+import { forkJoin, map, mergeMap, Observable, of, switchMap, tap } from 'rxjs';
 import { headers } from 'src/app/core/constants/settings';
 import { IQuestion } from 'src/app/core/models/question.model';
 import { IQuiz } from 'src/app/core/models/quiz.model';
@@ -13,7 +13,7 @@ import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { ITestUserResponse } from 'src/app/core/models/test-user-response.model';
 import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
 import { IQuizQuestion } from 'src/app/core/models/quiz-question-assign.model copy';
-import { IDomain } from 'src/app/core/models/domain.model';
+import { ElementTypes, IDomain } from 'src/app/core/models/domain.model';
 
 @Injectable({
   providedIn: 'root',
@@ -21,26 +21,54 @@ import { IDomain } from 'src/app/core/models/domain.model';
 export class QuizService {
   constructor(private httpClient: HttpClient) {}
 
-
   // TESTS SECTION
-  getAvailableTests(): Observable<ITestResponse[]> {
+  getAvailableTests(): Observable<any[]> {
     return this.httpClient
-      .get<ITestResponse[]>(
+      .get<any[]>(
         `${environment.baseUrl}${environment.apiVersion}${environment.testPaths.base}`
       )
       .pipe(
-        map((quizzes: ITestResponse[]) => {
-          return quizzes.map((test) => {
+        map((tests: ITestResponse[]) => {
+          return tests.map((test) => {
             const modifiedTest = {} as ITestResponse;
             modifiedTest.testId = test.testId;
             modifiedTest.testCategoryId = test.testCategoryId;
+            modifiedTest.categoryNames = test.categoryNames;
             modifiedTest.comment = test.comment;
             modifiedTest.title = test.title;
             modifiedTest.label = test.label;
             return modifiedTest;
           });
+        }),
+        switchMap((newTests: ITestResponse[]) => {
+          const testsObervables: Observable<ITestResponse>[] = newTests.map(
+            (newTest: ITestResponse) => this.getTestCategories(newTest.testId)
+          );
+          const observables = [of(newTests), forkJoin(testsObervables)];
+          return forkJoin(observables);
+        }),
+
+        map((compositions) => {
+          const tests: ITestResponse[] = compositions[0] as ITestResponse[];
+          const categories = compositions[1] as ITestResponse[];
+
+          return tests.map((test) => {
+            const testCatgories: any = categories.filter(
+              (category: any) => category.testId === test.testId
+            )[0];
+            return {
+              ...test,
+              categoryNames: [...testCatgories.categoryNames],
+              testCategoryId: [...testCatgories.testCategoryId],
+            };
+          });
         })
       );
+  }
+  private getTestCategories(testId: string): Observable<ITestResponse> {
+    return this.httpClient.get<ITestResponse>(
+      `${environment.baseUrl}${environment.apiVersion}${environment.testPaths.testCategories}/${testId}`
+    );
   }
   getTest(testId: string): Observable<ITestResponse> {
     return this.httpClient
@@ -166,6 +194,34 @@ export class QuizService {
             modifiedQuiz.comment = quiz.comment;
             return modifiedQuiz;
           });
+        }),
+
+        switchMap((newQuizzes: IQuizResponse[]) => {
+          const quizzesDomainsObervables: Observable<any>[] = newQuizzes.map(
+            (newQuiz: IQuizResponse) =>
+              this.getElementDomain({ id: newQuiz.quizId }, ElementTypes.QUIZ)
+          );
+          const observables = [
+            of(newQuizzes),
+            forkJoin(quizzesDomainsObervables),
+          ];
+
+          return forkJoin(observables);
+        }),
+        map((compositions) => {
+          const quizzes: IQuizResponse[] = compositions[0] as IQuizResponse[];
+          const domains = compositions[1] as any[];
+
+          return quizzes.map((quiz) => {
+            const quizDomains: any = domains.filter(
+              (domain: any) => domain.elementId === quiz.quizId
+            )[0];
+            return {
+              ...quiz,
+              domainNames: [...quizDomains.domainNames],
+              // subDomainNames:[...quizDomains.subDomainNames]
+            };
+          });
         })
       );
   }
@@ -265,6 +321,38 @@ export class QuizService {
             modifiedQuestion.comment = question.comment;
             return modifiedQuestion;
           });
+        }),
+
+        switchMap((newQuestions: IQuestionResponse[]) => {
+          const quizzesDomainsObervables: Observable<any>[] = newQuestions.map(
+            (newQuestion: IQuestionResponse) =>
+              this.getElementDomain(
+                { id: newQuestion.questionId },
+                ElementTypes.QUESTION
+              )
+          );
+          const observables = [
+            of(newQuestions),
+            forkJoin(quizzesDomainsObervables),
+          ];
+
+          return forkJoin(observables);
+        }),
+        map((compositions) => {
+          const questions: IQuestionResponse[] =
+            compositions[0] as IQuestionResponse[];
+          const domains = compositions[1] as any[];
+
+          return questions.map((question) => {
+            const questionDomains: any = domains.filter(
+              (domain: any) => domain.elementId === question.questionId
+            )[0];
+            return {
+              ...question,
+              domainNames: [...questionDomains.domainNames],
+              // subDomainNames:[...quizDomains.subDomainNames]
+            };
+          });
         })
       );
   }
@@ -327,5 +415,13 @@ export class QuizService {
         `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.base}`
       )
       .pipe(tap((res) => console.log(res)));
+  }
+  getElementDomain(element: any, type: string): Observable<any[]> {
+    return this.httpClient
+      .get<any[]>(
+        `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}/${element.id}`,
+        { params: new HttpParams().set('type', type) }
+      )
+      .pipe();
   }
 }

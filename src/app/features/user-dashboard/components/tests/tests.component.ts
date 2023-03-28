@@ -27,7 +27,7 @@ export class TestsComponent implements OnInit {
     if (!this.authService.isAdmin()) {
       this._subscriptions.push(
         this.quizService
-          .getUserTests('11')
+          .getUserTests(this.authService.getId())
           .subscribe((res: ITestResponse[]) => {
             this.tests = res;
           })
@@ -45,8 +45,6 @@ export class TestsComponent implements OnInit {
               const filtredComposition = compositions
                 .map((testQuiz) => testQuiz.quizId)
                 .filter((item, pos, self) => self.indexOf(item) == pos);
-
-
               const observables = [
                 of(compositions),
                 forkJoin(

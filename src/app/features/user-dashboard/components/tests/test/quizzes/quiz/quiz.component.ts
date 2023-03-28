@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { extractName } from 'src/app/core/constants/settings';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
@@ -23,6 +24,7 @@ export class QuizComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() relatedQuizQuestions!: IQuestionResponse[] | undefined;
   questions: IQuestionResponse[] = [];
   _subscriptions: Subscription[] = [];
+  extractName = extractName;
   constructor(
     private quizService: QuizService,
     private router: Router,
