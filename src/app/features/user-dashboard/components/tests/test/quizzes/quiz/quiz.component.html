@@ -15,9 +15,10 @@
       <i *ngFor="let programCategory of data.domainNames" [ngClass]="[('devicon-'+extractName(programCategory)+'-plain colored')]"></i>
       <ng-container *ngIf="!isAdmin">
         <button
+          (click)="takeQuiz(data)"
           class="rounded-full bg-indigo-600 text-white w-40 font-medium font-lg px-6 py-2 my-5 ml-9"
         >
-          Start
+          Take Quiz
         </button>
       </ng-container>
     </div>

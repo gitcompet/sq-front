@@ -6,6 +6,7 @@ export interface IQuestionResponse {
   subDomainId:string[];
   subDomainNames:string[];
   level: number;
+  answers: string[],
   isActive: boolean;
   isDeleted: boolean;
   title?: string;
@@ -19,6 +20,7 @@ export class QuestionResponse implements IQuestionResponse {
   subDomainId:string[];
   subDomainNames:string[];
   level: number;
+  answers: string[];
   isActive: boolean;
   isDeleted: boolean;
   title?: string;
@@ -28,6 +30,7 @@ export class QuestionResponse implements IQuestionResponse {
     domainId: string,
     subDomainId: string[],
     level: number,
+    answers: string[],
     isActive: boolean,
     isDeleted: boolean,
     comment: string,
@@ -47,5 +50,6 @@ export class QuestionResponse implements IQuestionResponse {
     this.isDeleted = isDeleted;
     this.domainNames = domainNames;
     this.subDomainNames = subDomainNames;
+    this.answers = answers;
   };
 }

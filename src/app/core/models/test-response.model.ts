@@ -1,5 +1,4 @@
 import { IQuizResponse } from "./quiz-response.model";
-import { IQuiz } from "./quiz.model";
 
 export interface ITestResponse {
     testId: string,

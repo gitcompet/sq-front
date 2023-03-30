@@ -28,11 +28,10 @@ export class QuizzesComponent implements OnInit {
   ngOnInit(): void {
     this.isAdmin = this.authService.isAdmin();
     this._subscriptions.push(this.modalService.getDataExchange().subscribe());
-    if (this.router.url.includes('/admin/tests') && this.relatedTestQuizzes) {
-      this.quizzes = this.relatedTestQuizzes;
-    } else {
+    if (!this.relatedTestQuizzes && this.isAdmin) {
       this._subscriptions.push(
         this.quizService
+
           .getAvailableQuizzes()
           .pipe(
             switchMap((res: IQuizResponse[]) => {
@@ -60,6 +59,7 @@ export class QuizzesComponent implements OnInit {
               mergedResults[0] as IQuizQuestion[];
             const questions: IQuestionResponse[] =
               mergedResults[1] as IQuestionResponse[];
+
             this.quizzes = this.quizzes.map((quiz) => {
               return {
                 ...quiz,
@@ -74,6 +74,8 @@ export class QuizzesComponent implements OnInit {
             });
           })
       );
+    } else if(this.relatedTestQuizzes){
+      this.quizzes = this.relatedTestQuizzes;
     }
   }
   quizDetails(quizId: any) {

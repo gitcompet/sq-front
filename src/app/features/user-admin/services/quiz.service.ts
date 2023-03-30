@@ -94,11 +94,46 @@ export class QuizService {
         `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.base}/${userId}`
       )
       .pipe(
-        mergeMap((userTests: ITestUserResponse[]) => {
-          let testIds = userTests.map(
+        switchMap((userTests: ITestUserResponse[]) => {
+          const testIds = userTests.map(
             (userTest: ITestUserResponse) => userTest.testId
           );
+
           return forkJoin(testIds.map((id: string) => this.getTest(id)));
+        }),
+        switchMap((tests) => {
+          const observables = [of(tests), this.getAsssignedTestQuizzes()];
+          return forkJoin(observables);
+        }),
+        switchMap((result) => {
+          const testQuizzes: ITestQuiz[] = result[1] as ITestQuiz[];
+          const quizIds = testQuizzes
+            .map((testQuiz) => testQuiz.quizId)
+            .filter((item, pos, self) => self.indexOf(item) == pos);
+          const observables = [
+            of(result),
+            forkJoin(quizIds.map((quizId) => this.getQuiz(quizId))),
+          ];
+          return forkJoin(observables);
+        }),
+        map((result) => {
+          const tests: ITestResponse[] =
+            result[0][0] as unknown as ITestResponse[];
+          const testQuiz: ITestQuiz[] = result[0][1] as unknown as ITestQuiz[];
+          const quizzes: IQuizResponse[] =
+            result[1] as unknown as IQuizResponse[];
+          const testsWithQuizzes = tests.map((test) => {
+            const filtredComposition = testQuiz
+              .filter((testQuiz) => test.testId === testQuiz.testId)
+              .map((testQuiz) => testQuiz.quizId);
+            return {
+              ...test,
+              quizzes: quizzes.filter((quiz: IQuizResponse) =>
+                filtredComposition.includes(quiz.quizId)
+              ),
+            };
+          });
+          return testsWithQuizzes;
         })
       );
   }
@@ -174,6 +209,13 @@ export class QuizService {
     return this.httpClient
       .get<ITestQuiz[]>(
         `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.quizTest}`
+      )
+      .pipe();
+  }
+  getAsssignedQuizzes(testId: string): Observable<IQuizResponse[]> {
+    return this.httpClient
+      .get<IQuizResponse[]>(
+        `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.quizTest}/${testId}`
       )
       .pipe();
   }

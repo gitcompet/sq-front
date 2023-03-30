@@ -17,7 +17,7 @@ import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
   templateUrl: './quiz.component.html',
   styleUrls: ['./quiz.component.css'],
 })
-export class QuizComponent implements OnInit, OnDestroy, AfterViewInit {
+export class QuizComponent implements OnInit, OnDestroy {
   isExpanded: boolean = false;
   @Input() isAdmin!: boolean;
   @Input() data!: IQuizResponse;
@@ -30,11 +30,9 @@ export class QuizComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private route: ActivatedRoute
   ) {}
-  ngAfterViewInit(): void {}
-  toggle() {
-    this.isExpanded = !this.isExpanded;
-  }
   ngOnInit(): void {
+    console.log(this.data);
+
     if (this.isAdmin) {
       this.route.fragment.subscribe((f) => {
         const element = document.querySelector('#el-' + f);
@@ -58,6 +56,17 @@ export class QuizComponent implements OnInit, OnDestroy, AfterViewInit {
     ) {
       this.questions = this.relatedQuizQuestions;
     }
+
+  }
+
+  toggle() {
+    this.isExpanded = !this.isExpanded;
+  }
+  takeQuiz(selectedQuiz: IQuizResponse){
+    const selectedQuizUrl = this.router.createUrlTree(['../..','quiz', selectedQuiz.quizId], {
+      relativeTo: this.route,
+    });
+    this.router.navigateByUrl(selectedQuizUrl,{state:selectedQuiz});
   }
   ngOnDestroy(): void {
     this._subscriptions.forEach((sub) => sub.unsubscribe());

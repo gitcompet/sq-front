@@ -9,12 +9,13 @@ import { TestComponent } from './components/tests/test/test.component';
 import { QuizComponent } from './components/tests/test/quizzes/quiz/quiz.component';
 import { QuestionComponent } from './components/tests/test/quizzes/quiz/question/question.component';
 import { ContactComponent } from './components/contact/contact.component';
+import { TakeQuizComponent } from './components/tests/test/quizzes/take-quiz/take-quiz.component';
 
 
 
 @NgModule({
-    declarations: [UserHomeComponent, TestsComponent, QuizzesComponent, TestComponent, QuizComponent,QuestionComponent, ContactComponent],
-    exports: [UserHomeComponent,TestsComponent,QuizzesComponent,TestComponent,QuestionComponent,ContactComponent],
+    declarations: [UserHomeComponent, TestsComponent, QuizzesComponent, TestComponent, QuizComponent,QuestionComponent, ContactComponent, TakeQuizComponent],
+    exports: [UserHomeComponent,TestsComponent,QuizzesComponent,TestComponent,QuestionComponent,ContactComponent,TakeQuizComponent],
     imports: [
         CommonModule,
         UserDashboardRoutingModule,

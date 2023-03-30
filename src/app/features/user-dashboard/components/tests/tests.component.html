@@ -1,1 +1,6 @@
-<app-test *ngFor="let test of tests " [data]="test"></app-test>
+<ng-container *ngIf="tests.length > 0; else noTests ">
+  <app-test *ngFor="let test of tests " [data]="test"></app-test>
+</ng-container>
+<ng-template #noTests>
+  <p class="text-center font-bold text-xl my-6">Currently no tests are available.</p>
+</ng-template>

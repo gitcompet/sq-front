@@ -65,7 +65,7 @@ export class AuthService {
   getId(): string {
     const decodedToken: any = this.jwtService.decode(this.getToken());
     const properties: string[] = Object.getOwnPropertyNames(decodedToken);
-    const key: string = properties.filter((value)=> value.includes("id"))[0];
+    const key: string = properties.filter((value)=> value.includes("identifier"))[0];
     const id = decodedToken[
       key
     ] as string;

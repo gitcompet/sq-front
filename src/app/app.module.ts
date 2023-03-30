@@ -1,5 +1,7 @@
 import {  NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { AppRoutingModule } from './app-routing.module';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,6 +13,7 @@ import { SharedModule } from './shared/shared.module';
 import { UserDashboardModule } from './features/user-dashboard/user-dashboard.module';
 import { UserAdminModule } from './features/user-admin/user-admin.module';
 import { UserModule } from './features/user-profile/user.module';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
     declarations: [
@@ -23,6 +26,8 @@ import { UserModule } from './features/user-profile/user.module';
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
+        BrowserAnimationsModule,
+        NgxSpinnerModule.forRoot({ type: "ball-scale-multiple" }),
 
         //CUSTOM MODULES
         CoreModule,
@@ -31,7 +36,8 @@ import { UserModule } from './features/user-profile/user.module';
         UserAdminModule,
         UserModule,
         //LEAVE IT AT THE END OF THE ROUTES
-        AppRoutingModule
+        AppRoutingModule,
+
     ]
 })
 export class AppModule { }
