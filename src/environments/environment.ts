@@ -1,5 +1,6 @@
 export const environment = {
-  baseUrl:"http://145.239.0.38:9999",
+  production: true,
+  baseUrl: 'http://145.239.0.38:9999',
   apiVersion: '/api/v1',
   authPaths: {
     base: '/Auth',
@@ -15,6 +16,7 @@ export const environment = {
   },
   testPaths: {
     base: '/Test',
+    testCategories: '/TestCategoryCompose',
   },
   testUserPaths: {
     base: '/TestUser',
@@ -24,9 +26,11 @@ export const environment = {
   questionPaths: {
     base: '/Question',
   },
-  languagesPath: '/Languages/getLanguagess',
-  languagePath: '/Languages/getLanguage',
-  languagePostPath: '/Languages/postLanguage',
-  languageRemovePath: '/Languages/removeLanguage',
-  languageUpdatePath: '/Languages/updateLanguage',
+  categoryPaths: {
+    base: '/Domain',
+    domainCompose: '/DomainCompose'
+  },
+  languagesPaths: {
+    base: '/Language'
+  },
 };

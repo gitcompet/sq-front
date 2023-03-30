@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { extractName } from 'src/app/core/constants/settings';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 
 @Component({
@@ -8,6 +9,8 @@ import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 })
 export class QuestionComponent implements OnInit {
   @Input() data!: IQuestionResponse;
+  isExpanded: boolean = false;
+  extractName = extractName;
   ngOnInit(): void {
   }
 

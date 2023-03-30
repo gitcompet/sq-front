@@ -1,0 +1,23 @@
+<ng-container *ngIf="quiz.questions && quiz.questions.length > 0 && currentQuestion">
+  <div
+    class="flex flex-col w-screen px-5 h-screen bg-[#fff] justify-center items-center"
+>
+  <h2 className="mt-10 text-xl text-black/60">Question {{findQuestionIndex()}} of {{quiz.questions.length}}</h2>
+  <div className="mt-4 text-2xl text-black">
+    {{currentQuestion.label}}
+  </div>
+  <div class="flex justify-center items-center w-full">
+    <div
+      *ngFor="let answer of getQuestionAnswers(currentQuestion)"
+      class="flex items-center w-full py-4 pl-5 m-2 ml-0 space-x-2 border-2 cursor-pointer bg-white/5 border-white/10 rounded-xl"
+    >
+      <input type="checkbox" class="w-6 h-6 bg-white" />
+      <p class="ml-6 text-black">{{answer}}</p>
+    </div>
+  </div>
+  <div class="flex justify-center gap-2 w-full mt-4 text-white">
+    <button [disabled]="currentIdx <= 0" (click)="previousQuestion()" class="w-[20%] py-3 bg-indigo-600 rounded-lg">Previous</button>
+    <button [disabled]="currentIdx > quiz.questions.length"  (click)="nextQuestion()" class="w-[20%] py-3 bg-indigo-600 rounded-lg">Next</button>
+  </div>
+</div>
+</ng-container>

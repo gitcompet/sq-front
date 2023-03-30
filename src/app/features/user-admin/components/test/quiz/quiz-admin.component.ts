@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { forkJoin, Observable, Subscription, switchMap } from 'rxjs';
+import { IDomain } from 'src/app/core/models/domain.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { IQuestion } from 'src/app/core/models/question.model';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
@@ -23,15 +24,15 @@ import { QuizService } from '../../../services/quiz.service';
 export class QuizAdminComponent implements OnInit, OnDestroy {
   quizForm: FormGroup;
   showModal: boolean = false;
-  quizzes: IQuiz[] = [];
+  quizzes: IQuizResponse[] = [];
   questionsIds: string[] = [];
 
-  quizQuestions: IQuestion[] = [];
+  quizQuestions: IQuestionResponse[] = [];
   headers: string[] = ['Title', 'Domain', 'Subdomain', 'Action'];
   questionActions: unknown[] = [
     { actionName: 'select', componentName: CheckBoxComponent },
   ];
-  categories: string[] = ['JAVA', 'DOTNET', 'PHP'];
+  categories: IDomain[] = [];
   _subscriptions: Subscription[] = [];
   constructor(
     private _formBuilder: FormBuilder,
@@ -72,6 +73,7 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
     this._subscriptions.forEach((sub) => sub.unsubscribe());
   }
   onAddQuiz() {
+    this.quizService.getCategories().subscribe((res)=>this.categories = res);
     this.showModal = !this.showModal;
     this.modalService.openModal({ id: 'quizModal', isShown: this.showModal });
   }
@@ -85,8 +87,8 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
   createQuiz(form: FormGroup) {
     const newQuiz = {
       title: form.get('title')?.value,
-      subDomainId: '1',
-      domainId: '1',
+      subDomainId: ['1'],
+      domainId: ['1'],
       weight: form.get('weight')?.value,
       comment: form.get('description')?.value,
     } as IQuiz;
@@ -107,8 +109,6 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
       })
     )
     .subscribe((response) => {
-      console.log(response);
-
       this.modalService.closeModal({
         id: 'quizModal',
         isShown: this.showModal,

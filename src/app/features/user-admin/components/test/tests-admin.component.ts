@@ -6,6 +6,7 @@ import {
   Subscription,
   switchMap,
 } from 'rxjs';
+import { IDomain } from 'src/app/core/models/domain.model';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
 import { IQuiz } from 'src/app/core/models/quiz.model';
 import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
@@ -23,7 +24,7 @@ import { QuizService } from '../../services/quiz.service';
 export class TestsAdminComponent implements OnInit, OnDestroy {
   testForm: FormGroup;
   showModal: boolean = false;
-  testQuizzes: IQuiz[] = [];
+  testQuizzes: IQuizResponse[] = [];
   quizzesIds: string[] = [];
   quizActions: unknown[] = [
     { actionName: 'select', componentName: CheckBoxComponent },
@@ -31,7 +32,7 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
   tests: ITestResponse[] = [];
   headers: string[] = ['Name', 'Category', 'Action'];
   quizHeaders: string[] = ['Name', 'Category', 'Sub Category', 'Action'];
-  categories: string[] = ['JAVA', 'DOTNET', 'PHP'];
+  categories: IDomain[] = [];
   _subscriptions: Subscription[] = [];
   newTest: ITest = {} as ITest;
   constructor(
@@ -40,7 +41,7 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
     private quizService: QuizService
   ) {
     this.testForm = this._formBuilder.group({
-      name: this._formBuilder.control('', [Validators.required]),
+      title: this._formBuilder.control('', [Validators.required]),
       categories: this._formBuilder.control('', Validators.required),
     });
   }
@@ -61,14 +62,15 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
     );
   }
   onAddTest() {
+    this.quizService.getCategories().subscribe((res)=>this.categories = res);
     this.showModal = !this.showModal;
     this.modalService.openModal({ id: 'testModal', isShown: this.showModal });
   }
   createTest(form: FormGroup) {
     this.newTest = {
       ...this.newTest,
-      testCategoryId: '1', // form.get('categories').value array of categories
-      comment: form.get('name')?.value,
+      testCategoryId: form.get('categories')?.value, // form.get('categories').value array of categories
+      title: form.get('title')?.value,
     } as ITest;
     this.quizService
       .addTest(this.newTest)

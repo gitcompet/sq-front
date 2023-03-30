@@ -44,7 +44,6 @@ export class TableComponent implements OnInit {
   }
   loadComponents() {
     if (this.actions && this.actions.length > 0) {
-      console.log(this.actionHost);
 
       // const viewContainerRef = this.actionHost.viewContainerRef;
       // viewContainerRef.clear();
@@ -53,14 +52,13 @@ export class TableComponent implements OnInit {
     }
   }
   getRowContext(row: any) {
-    const rowKey: string = Object.keys(row).find((keyName)=> keyName.match(/id/i))!;
-
-    return {$implicit: row[rowKey]};
+    const rowKey: string = Object.keys(row).find((keyName)=> keyName.match(/(id|login)/i))!;
+    return {$implicit: row[rowKey],data: row};
   }
   // Preserve original property order
   originalOrder = (
     a: KeyValue<number, string>,
-    b: KeyValue<number, string>
+    b: KeyValue<number, string>,
   ): number => {
     return 0;
   };

@@ -4,53 +4,53 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
 import { headers } from 'src/app/core/constants/settings';
 import { Language } from 'src/app/core/models/language.model';
-import { IdResponse } from '../../../core/models/id-response';
+import { Patch } from 'src/app/core/models/patch.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LanguageService {
-  constructor(
-    private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
   isLoggedin: boolean = false;
 
   getLanguages(): Observable<Language[]> {
     return this.http.get<Language[]>(
-      `${environment.baseUrl}${environment.apiVersion}${environment.languagesPath}`,
+      `${environment.baseUrl}${environment.apiVersion}${environment.languagesPaths.base}`,
       {
         headers: headers,
       }
     );
   }
-  getLanguage(): Observable<Language> {
+  getLanguage(languageId: string): Observable<Language> {
     return this.http.get<Language>(
-      `${environment.baseUrl}${environment.apiVersion}${environment.languagePath}`,
+      `${environment.baseUrl}${environment.apiVersion}${environment.languagesPaths.base}/${languageId}`,
       {
         headers: headers,
       }
     );
   }
-  removeLanguages(payload: IdResponse): Observable<IdResponse> {
-    return this.http.post<IdResponse>(
-      `${environment.baseUrl}${environment.apiVersion}${environment.languageRemovePath}`,
+  removeLanguages(languageId: string): Observable<Language> {
+    return this.http.delete<Language>(
+      `${environment.baseUrl}${environment.apiVersion}${environment.languagesPaths.base}/${languageId}`,
       {
         headers: headers,
       }
     );
   }
-  postLanguages(payload: IdResponse): Observable<IdResponse> {
-    return this.http.get<IdResponse>(
-      `${environment.baseUrl}${environment.apiVersion}${environment.languagePostPath}`,
+  postLanguages(payload: Language): Observable<Language> {
+    return this.http.post<Language>(
+      `${environment.baseUrl}${environment.apiVersion}${environment.languagesPaths.base}`,
+      payload,
       {
         headers: headers,
       }
     );
   }
-  updateLanguages(payload: IdResponse/*Languages?*/): Observable<IdResponse> {
-    return this.http.get<IdResponse>(
-      `${environment.baseUrl}${environment.apiVersion}${environment.languageUpdatePath}`,
+  updateLanguages(payload: Language): Observable<Language> {
+    return this.http.patch<Language>(
+      `${environment.baseUrl}${environment.apiVersion}${environment.languagesPaths.base}/${payload.languageId}`,
+      payload,
       {
         headers: headers,
       }

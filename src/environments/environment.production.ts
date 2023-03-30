@@ -1,5 +1,9 @@
+export interface IMapping {
+  [propertyName: string]: string;
+}
 export const environment = {
-  baseUrl: 'https://localhost:5001',
+  production: true,
+  baseUrl: 'http://145.239.0.38:9999',
   apiVersion: '/api/v1',
   authPaths: {
     base: '/Auth',
