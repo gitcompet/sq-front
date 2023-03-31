@@ -1,11 +1,10 @@
+import { IDomain } from "./domain.model";
 import { IQuestionResponse } from "./question-response.model";
 
 export interface IQuizResponse {
     quizId: string,
-    domainId:string[];
-    domainNames:string[];
-    subDomainId:string[];
-    subDomainNames:string[];
+    domains:IDomain[];
+    subDomains:IDomain[];
     weight: number ;
     comment: string;
     isActive: boolean;
@@ -16,11 +15,9 @@ export interface IQuizResponse {
 }
 export class QuizResponse implements IQuizResponse{
   quizId: string;
-  domainId: string[];
   weight: number ;
-  domainNames:string[];
-  subDomainId:string[];
-  subDomainNames:string[];
+  domains:IDomain[];
+  subDomains:IDomain[];
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
@@ -29,14 +26,12 @@ export class QuizResponse implements IQuizResponse{
   label?: string;
   constructor(
     quizId: string,
-    domainId: string[],
-    subDomainId: string[],
+    subDomains:IDomain[],
     comment: string,
     isActive: boolean,
     isDeleted: boolean,
     weight: number,
-    domainNames:string[],
-    subDomainNames:string[],
+    domains:IDomain[],
     questions? : IQuestionResponse[],
     title?: string,
     label?: string,
@@ -45,14 +40,12 @@ export class QuizResponse implements IQuizResponse{
     this.quizId = quizId;
     this.title = title;
     this.label = label;
-    this.domainId = domainId;
-    this.subDomainId = subDomainId;
+    this.domains = domains;
+    this.subDomains = subDomains;
     this.comment = comment;
     this.isActive = isActive;
     this.isDeleted = isDeleted;
     this.weight = weight;
     this.questions = questions;
-    this.domainNames = domainNames;
-    this.subDomainNames = subDomainNames;
   }
 }

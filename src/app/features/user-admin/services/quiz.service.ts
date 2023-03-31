@@ -33,8 +33,6 @@ export class QuizService {
           return tests.map((test) => {
             const modifiedTest = {} as ITestResponse;
             modifiedTest.testId = test.testId;
-            modifiedTest.testCategoryId = test.testCategoryId;
-            modifiedTest.categoryNames = test.categoryNames;
             modifiedTest.comment = test.comment;
             modifiedTest.title = test.title;
             modifiedTest.label = test.label;
@@ -59,8 +57,14 @@ export class QuizService {
             )[0];
             return {
               ...test,
-              categoryNames: [...testCatgories.categoryNames],
-              testCategoryId: [...testCatgories.testCategoryId],
+              categories: testCatgories.categoryNames.map(
+                (categoryName: string, index: number) => {
+                  return {
+                    domainId: testCatgories.testCategoryId[index],
+                    name: categoryName,
+                  } as IDomain;
+                }
+              ),
             };
           });
         })
@@ -80,7 +84,6 @@ export class QuizService {
         map((test: ITestResponse) => {
           const modifiedTest = {} as ITestResponse;
           modifiedTest.testId = test.testId;
-          modifiedTest.testCategoryId = test.testCategoryId;
           modifiedTest.comment = test.comment;
           modifiedTest.title = test.title;
           modifiedTest.label = test.label;
@@ -116,8 +119,14 @@ export class QuizService {
             )[0];
             return {
               ...test,
-              categoryNames: [...testCatgories.categoryNames],
-              testCategoryId: [...testCatgories.testCategoryId],
+              categories: testCatgories.categoryNames.map(
+                (categoryName: string, index: number) => {
+                  return {
+                    domainId: testCatgories.testCategoryId[index],
+                    name: categoryName,
+                  } as IDomain;
+                }
+              ),
             };
           });
 
@@ -170,7 +179,6 @@ export class QuizService {
         map((test: ITestResponse) => {
           const modifiedTest = {} as ITestResponse;
           modifiedTest.testId = test.testId;
-          modifiedTest.testCategoryId = test.testCategoryId;
           modifiedTest.comment = test.comment;
           modifiedTest.title = test.title;
           modifiedTest.label = test.label;
@@ -192,7 +200,6 @@ export class QuizService {
         map((test: ITestResponse) => {
           const modifiedTest = {} as ITestResponse;
           modifiedTest.testId = test.testId;
-          modifiedTest.testCategoryId = test.testCategoryId;
           modifiedTest.comment = test.comment;
           modifiedTest.title = test.title;
           modifiedTest.label = test.label;
@@ -249,7 +256,6 @@ export class QuizService {
           return quizzes.map((quiz) => {
             const modifiedQuiz = {} as IQuizResponse;
             modifiedQuiz.quizId = quiz.quizId;
-            modifiedQuiz.subDomainId = quiz.subDomainId;
             modifiedQuiz.title = quiz.title;
             modifiedQuiz.label = quiz.label;
             modifiedQuiz.comment = quiz.comment;
@@ -271,16 +277,31 @@ export class QuizService {
         }),
         map((compositions) => {
           const quizzes: IQuizResponse[] = compositions[0] as IQuizResponse[];
-          const domains = compositions[1] as any[];
+          const domains = compositions[1] as any;
 
           return quizzes.map((quiz) => {
             const quizDomains: any = domains.filter(
               (domain: any) => domain.elementId === quiz.quizId
             )[0];
+
             return {
               ...quiz,
-              domainNames: [...quizDomains.domainNames],
-              // subDomainNames:[...quizDomains.subDomainNames]
+              domains: quizDomains.domainNames.map(
+                (domainName: string, index: number) => {
+                  return {
+                    domainId: quizDomains.domainId[index],
+                    name: domainName,
+                  } as IDomain;
+                }
+              ),
+              // subDomains: quizDomains.subDomainNames.map(
+              //   (subDomainName: string, index: number) => {
+              //     return {
+              //       domainId: quizDomains.subDomainId[index],
+              //       name: subDomainName,
+              //     } as IDomain;
+              //   }
+              // ),
             };
           });
         })
@@ -299,7 +320,6 @@ export class QuizService {
         map((quiz: IQuizResponse) => {
           const modifiedQuiz = {} as IQuizResponse;
           modifiedQuiz.quizId = quiz.quizId;
-          modifiedQuiz.subDomainId = quiz.subDomainId;
           modifiedQuiz.title = quiz.title;
           modifiedQuiz.comment = quiz.comment;
           return modifiedQuiz;
@@ -319,7 +339,6 @@ export class QuizService {
         map((quiz: IQuizResponse) => {
           const modifiedQuiz = {} as IQuizResponse;
           modifiedQuiz.quizId = quiz.quizId;
-          modifiedQuiz.subDomainId = quiz.subDomainId;
           modifiedQuiz.title = quiz.title;
           modifiedQuiz.comment = quiz.comment;
           return modifiedQuiz;
@@ -375,7 +394,6 @@ export class QuizService {
           return quizzes.map((question) => {
             const modifiedQuestion = {} as IQuestionResponse;
             modifiedQuestion.questionId = question.questionId;
-            modifiedQuestion.subDomainId = question.subDomainId;
             modifiedQuestion.title = question.title;
             modifiedQuestion.label = question.label;
             modifiedQuestion.level = question.level;
@@ -402,16 +420,31 @@ export class QuizService {
         map((compositions) => {
           const questions: IQuestionResponse[] =
             compositions[0] as IQuestionResponse[];
-          const domains = compositions[1] as any[];
+          const domains = compositions[1] as any;
 
           return questions.map((question) => {
             const questionDomains: any = domains.filter(
               (domain: any) => domain.elementId === question.questionId
             )[0];
+
             return {
               ...question,
-              domainNames: [...questionDomains.domainNames],
-              // subDomainNames:[...quizDomains.subDomainNames]
+              domains: questionDomains.domainNames.map(
+                (domainName: string, index: number) => {
+                  return {
+                    domainId: questionDomains.domainId[index],
+                    name: domainName,
+                  } as IDomain;
+                }
+              ),
+              // subDomains: questionDomains.subDomainNames.map(
+              //   (subDomainName: string, index: number) => {
+              //     return {
+              //       domainId: questionDomains.subDomainId[index],
+              //       name: subDomainName,
+              //     } as IDomain;
+              //   }
+              // ),
             };
           });
         })
@@ -430,7 +463,6 @@ export class QuizService {
         map((question: IQuestionResponse) => {
           const modifiedQuestion = {} as IQuestionResponse;
           modifiedQuestion.questionId = question.questionId;
-          modifiedQuestion.subDomainId = question.subDomainId;
           modifiedQuestion.title = question.title;
           return modifiedQuestion;
         })
@@ -449,7 +481,6 @@ export class QuizService {
         map((question: IQuestionResponse) => {
           const modifiedQuestion = {} as IQuestionResponse;
           modifiedQuestion.questionId = question.questionId;
-          modifiedQuestion.subDomainId = question.subDomainId;
           modifiedQuestion.title = question.title;
           return modifiedQuestion;
         })

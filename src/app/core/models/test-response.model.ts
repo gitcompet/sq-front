@@ -1,9 +1,9 @@
+import { IDomain } from "./domain.model";
 import { IQuizResponse } from "./quiz-response.model";
 
 export interface ITestResponse {
     testId: string,
-    testCategoryId:string[] ;
-    categoryNames: string[];
+    categories: IDomain[];
     comment: string;
     isActive?: boolean;
     isDeleted?: boolean;
@@ -13,8 +13,7 @@ export interface ITestResponse {
 }
 export class TestResponse implements ITestResponse{
   testId: string;
-  testCategoryId:string [];
-  categoryNames: string[];
+  categories: IDomain[];
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
@@ -23,8 +22,7 @@ export class TestResponse implements ITestResponse{
   label?: string;
   constructor(
     testId: string,
-    testCategoryId: string[],
-    categoryNames: string[],
+    categories: IDomain[],
     comment: string,
     isActive: boolean,
     isDeleted: boolean,
@@ -33,8 +31,7 @@ export class TestResponse implements ITestResponse{
     label?: string
   ) {
     this.testId = testId;
-    this.testCategoryId = testCategoryId;
-    this.categoryNames = categoryNames;
+    this.categories = categories;
     this.comment = comment;
     this.isActive = isActive;
     this.isDeleted = isDeleted;

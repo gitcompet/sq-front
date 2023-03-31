@@ -1,10 +1,10 @@
+import { IDomain } from "./domain.model";
+
 export interface IQuestionResponse {
   questionId: string;
   comment: string;
-  domainId: string;
-  domainNames:string[];
-  subDomainId:string[];
-  subDomainNames:string[];
+  domains: IDomain[];
+  subDomains: IDomain[];
   level: number;
   answers: string[],
   isActive: boolean;
@@ -15,10 +15,8 @@ export interface IQuestionResponse {
 export class QuestionResponse implements IQuestionResponse {
   questionId: string;
   comment: string;
-  domainId: string;
-  domainNames:string[];
-  subDomainId:string[];
-  subDomainNames:string[];
+  domains: IDomain[];
+  subDomains: IDomain[];
   level: number;
   answers: string[];
   isActive: boolean;
@@ -27,15 +25,13 @@ export class QuestionResponse implements IQuestionResponse {
   label?: string;
   constructor(
     questionId: string,
-    domainId: string,
-    subDomainId: string[],
+    domains: IDomain[],
+    subDomains: IDomain[],
     level: number,
     answers: string[],
     isActive: boolean,
     isDeleted: boolean,
     comment: string,
-    domainNames:string[],
-    subDomainNames:string[],
     title?: string,
     label?: string
   ){
@@ -43,13 +39,11 @@ export class QuestionResponse implements IQuestionResponse {
     this.title = title;
     this.label = label;
     this.level = level;
-    this.domainId = domainId;
-    this.subDomainId = subDomainId;
+    this.domains = domains;
+    this.subDomains = subDomains;
     this.comment = comment;
     this.isActive = isActive;
     this.isDeleted = isDeleted;
-    this.domainNames = domainNames;
-    this.subDomainNames = subDomainNames;
     this.answers = answers;
   };
 }

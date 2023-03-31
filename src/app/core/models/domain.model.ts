@@ -1,28 +1,34 @@
 export interface IDomain {
   domainId: string;
+  subDomainId: string,
   isActive: boolean;
   isDeleted: boolean;
+  name: string;
   title?: string;
   label?: string;
-  name?: string;
+
 }
 export class Domain implements IDomain {
   domainId: string;
+  subDomainId: string;
   isActive: boolean;
   isDeleted: boolean;
+  name: string;
   title?: string;
   label?: string;
-  name?: string;
 
   constructor(
     domainId: string,
+    subDomainId: string,
     isActive: boolean,
     isDeleted: boolean,
+    name: string,
     title?: string,
     label?: string,
-    name?: string
+
   ) {
     this.domainId = domainId;
+    this.subDomainId = subDomainId;
     this.isActive = isActive;
     this.isDeleted = isDeleted;
     this.title = title;

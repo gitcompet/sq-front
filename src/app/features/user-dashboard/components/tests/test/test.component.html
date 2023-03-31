@@ -10,9 +10,9 @@
       <i (click)="toggle()" class="fas fa-plus"></i>
       <h3>{{ data.title }}</h3>
       <i
-        *ngFor="let programCategory of data.categoryNames"
+        *ngFor="let programCategory of data.categories"
         [ngClass]="[
-          'devicon-' + extractName(programCategory) + '-plain colored'
+          'devicon-' + extractName(programCategory.name) + '-plain colored'
         ]"
       ></i>
       <div

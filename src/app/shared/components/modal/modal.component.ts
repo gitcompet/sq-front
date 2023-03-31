@@ -48,6 +48,7 @@ export class ModalComponent implements OnInit, OnDestroy {
     this.showModal = true;
   }
   save() {
+
     if (this.data instanceof FormGroup) {
      if (this.data.valid) {
         this.dataEmitter.emit(this.data);

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin, of, Subscription, switchMap } from 'rxjs';
+import { finalize, forkJoin, of, Subscription, switchMap } from 'rxjs';
 import { IDomain } from 'src/app/core/models/domain.model';
 import { OperationType, Patch } from 'src/app/core/models/patch.model';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
@@ -22,7 +22,7 @@ import { QuizService } from '../../services/quiz.service';
 })
 export class TestsAdminComponent implements OnInit, OnDestroy {
   testForm: FormGroup;
-  testUpdateForm: FormGroup
+  testUpdateForm: FormGroup;
   showModal: boolean = false;
   testQuizzes: IQuizResponse[] = [];
   data: unknown;
@@ -32,7 +32,7 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
   ];
   tests: ITestResponse[] = [];
   headers: string[] = ['Name', 'Category', 'Action'];
-  quizHeaders: string[] = ['Id','Name','Category', 'Action'];
+  quizHeaders: string[] = ['Id', 'Name', 'Category', 'Action'];
   categories: IDomain[] = [];
   _subscriptions: Subscription[] = [];
   newTest: ITest = {} as ITest;
@@ -59,8 +59,12 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
         if (data && Object.hasOwn(data, 'testId')) {
           this.data = data.testId;
           this.testUpdateForm.patchValue(data);
-          this.categories = data.categoryNames;
-          this.testUpdateForm.patchValue({categories:data.categoryNames});
+          this.categories = data.categories;
+          this.testUpdateForm.patchValue({
+            categories: data.categories.map(
+              (category: IDomain) => category.name
+            ),
+          });
           this.testUpdateForm.updateValueAndValidity();
         }
       })
@@ -88,34 +92,35 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
       ...this.newTest,
       testCategoryId: form.get('categories')?.value, // form.get('categories').value array of categories
       title: form.get('title')?.value,
-      comment: ''
+      comment: '',
     } as ITest;
     this.quizService
       .addTest(this.newTest)
       .pipe(
         switchMap((newTest: ITestResponse) => {
           this.tests = [...this.tests, newTest];
-          return this.quizzesIds.length > 0 ? forkJoin(
-            this.quizzesIds.map((quizId) =>
-              this.quizService.assignQuiz({
-                quizId: quizId,
-                testId: newTest.testId,
-              })
-            )
-          ) : of();
-        })
+          return this.quizzesIds.length > 0
+            ? forkJoin(
+                this.quizzesIds.map((quizId) =>
+                  this.quizService.assignQuiz({
+                    quizId: quizId,
+                    testId: newTest.testId,
+                  })
+                )
+              )
+            : of();
+        }),
+        finalize(() =>
+          this.modalService.closeModal({
+            id: 'testModal',
+            isShown: this.showModal,
+          })
+        )
       )
-      .subscribe((response) => {
-        this.modalService.closeModal({
-          id: 'testModal',
-          isShown: this.showModal,
-        });
-      });
+      .subscribe((response) => {});
   }
 
   updateTest(form: FormGroup) {
-    console.log(form.controls); return;
-
     if (!form.valid) return;
     const controls = form.controls;
     const patches: Patch[] = Object.entries(controls).map((entry) => ({
@@ -123,8 +128,6 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
       op: OperationType.REPLACE,
       value: entry[1].value,
     }));
-
-
     this.quizService
       .updateTest(patches)
       .pipe(
@@ -138,21 +141,31 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
               })
             )
           );
-        })
+        }),
+        finalize(() =>
+          this.modalService.closeModal({
+            id: 'updateTestModal',
+            isShown: this.showModal,
+          })
+        )
       )
-      .subscribe((response) => {
-        this.modalService.closeModal({
-          id: 'updateTestModal',
-          isShown: this.showModal,
-        });
-      });
+      .subscribe();
   }
   deleteTest() {
-    if(this.data){
-      this.quizService.deleteTest(this.data as string).subscribe((res)=>{
-        this.tests = this.tests.filter((test)=> test.testId !== res.testId);
-        this.modalService.closeModal({ id: 'confirmationModal', isShown: false });
-      });
+    if (this.data) {
+      this.quizService
+        .deleteTest(this.data as string)
+        .pipe(
+          finalize(() =>
+            this.modalService.closeModal({
+              id: 'confirmationModal',
+              isShown: false,
+            })
+          )
+        )
+        .subscribe((res) => {
+          this.tests = this.tests.filter((test) => test.testId !== res.testId);
+        });
     }
   }
   selectQuizzes() {
