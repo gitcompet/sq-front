@@ -6,7 +6,7 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { forkJoin, Observable, Subscription, switchMap } from 'rxjs';
+import { forkJoin, Observable, of, Subscription, switchMap } from 'rxjs';
 import { IDomain } from 'src/app/core/models/domain.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { IQuestion } from 'src/app/core/models/question.model';
@@ -96,7 +96,7 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
     this.quizService.addQuiz(newQuiz) .pipe(
       switchMap((newQuiz: IQuizResponse) => {
         this.quizzes = [...this.quizzes, newQuiz];
-        return forkJoin(
+        return this.questionsIds.length > 0 ?forkJoin(
           this.questionsIds.map((questionId) =>
             this.quizService.assignQuesion({
               quizId: newQuiz.quizId,
@@ -105,7 +105,7 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
               questionWeight: 1
             })
           )
-        );
+        ): of();
       })
     )
     .subscribe((response) => {

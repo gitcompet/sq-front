@@ -60,7 +60,9 @@ export class ModalComponent implements OnInit, OnDestroy {
   // close modal
   close(): void {
     this.showModal = false;
+
     if (this._data) {
+      if(this.data instanceof FormGroup) this.data.reset();
       this.modalService.updateData({ data: this._data } as DTO);
     }
   }

@@ -17,6 +17,10 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
   currentQuestion: IQuestionResponse | undefined;
   currentIdx: number = 0;
   _subscriptions: Subscription[] = [];
+  userAnswers: string[] = [];
+  userScore: number = 0;
+  rightAnswers: any[] = ['addEventListener','select','row nowrap'];
+  quizValidate: boolean = false;
   constructor(private router: Router, private quizService: QuizService) {
     this.quiz = this.router.getCurrentNavigation()?.extras
       .state as IQuizResponse;
@@ -83,7 +87,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
         'row wrap',
         'row no-wrap',
       ];
-      return  currentQuestion.answers;
+    return currentQuestion.answers;
   }
   previousQuestion(): void {
     this.currentIdx = this.quiz.questions?.indexOf(this.currentQuestion!)! - 1;
@@ -101,6 +105,25 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
       this.currentQuestion =
         this.quiz.questions?.[this.quiz.questions?.length - 1];
     else this.currentQuestion = this.quiz.questions?.at(this.currentIdx);
+  }
+  updateUserAnswer(answer: any) {
+    if (answer.target.checked) {
+      this.userAnswers.push(answer.target.value);
+    } else {
+      this.userAnswers.splice(this.userAnswers.indexOf(answer.target.value), 1);
+    }
+  }
+  validateQuiz() {
+    const intersectionResult = this.userAnswers.filter(x => this.rightAnswers.indexOf(x) !== -1);
+    // if(this.userAnswers.some((value)=> this.rightAnswers[0].rightAnswer.includes(value)))this.userScore= this.userScore +1;
+    // if(this.userAnswers.some((value)=>this.rightAnswers[1].rightAnswer.includes(value)))this.userScore= this.userScore +1;
+    // if(this.userAnswers.some((value)=>this.rightAnswers[2].rightAnswer.includes(value)))this.userScore = this.userScore+ 1;
+
+    this.quizValidate = true;
+    this.userScore = intersectionResult.length;
+  }
+  calculateScore(){
+    return this.userScore;
   }
   ngOnDestroy(): void {
     this._subscriptions.map((sub) => sub.unsubscribe());

@@ -11,6 +11,7 @@ import { extractName } from 'src/app/core/constants/settings';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
+import { ModalService } from 'src/app/shared/services/modal.service';
 
 @Component({
   selector: 'app-quiz',
@@ -28,11 +29,10 @@ export class QuizComponent implements OnInit, OnDestroy {
   constructor(
     private quizService: QuizService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private modalService: ModalService
   ) {}
   ngOnInit(): void {
-    console.log(this.data);
-
     if (this.isAdmin) {
       this.route.fragment.subscribe((f) => {
         const element = document.querySelector('#el-' + f);
@@ -61,6 +61,18 @@ export class QuizComponent implements OnInit, OnDestroy {
 
   toggle() {
     this.isExpanded = !this.isExpanded;
+  }
+  onUpdateQuiz(){
+    this.modalService.updateData(this.data);
+    this.modalService.openModal({
+      id: 'updateQuizModal'
+    });
+  }
+  onDeleteQuiz(){
+    this.modalService.updateData(this.data);
+    this.modalService.openModal({
+      id: 'confirmationModal'
+    });
   }
   takeQuiz(selectedQuiz: IQuizResponse){
     const selectedQuizUrl = this.router.createUrlTree(['../..','quiz', selectedQuiz.quizId], {
