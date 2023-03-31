@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { forkJoin, of, Subscription, switchMap } from 'rxjs';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
-import { IQuiz } from 'src/app/core/models/quiz.model';
 import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
 import { ITestResponse } from 'src/app/core/models/test-response.model';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';

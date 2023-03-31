@@ -14,6 +14,7 @@ import { ITestUserResponse } from 'src/app/core/models/test-user-response.model'
 import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
 import { IQuizQuestion } from 'src/app/core/models/quiz-question-assign.model copy';
 import { ElementTypes, IDomain } from 'src/app/core/models/domain.model';
+import { Patch } from 'src/app/core/models/patch.model';
 
 @Injectable({
   providedIn: 'root',
@@ -101,8 +102,26 @@ export class QuizService {
 
           return forkJoin(testIds.map((id: string) => this.getTest(id)));
         }),
+        switchMap((newTests: ITestResponse[]) => {
+          const testsObervables: Observable<ITestResponse>[] = newTests.map(
+            (newTest: ITestResponse) => this.getTestCategories(newTest.testId)
+          );
+          const observables = [of(newTests), forkJoin(testsObervables)];
+          return forkJoin(observables);
+        }),
         switchMap((tests) => {
-          const observables = [of(tests), this.getAsssignedTestQuizzes()];
+          tests[0] = tests[0].map((test) => {
+            const testCatgories: any = tests[1].filter(
+              (category: any) => category.testId === test.testId
+            )[0];
+            return {
+              ...test,
+              categoryNames: [...testCatgories.categoryNames],
+              testCategoryId: [...testCatgories.testCategoryId],
+            };
+          });
+
+          const observables = [of(tests[0]), this.getAsssignedTestQuizzes()];
           return forkJoin(observables);
         }),
         switchMap((result) => {
@@ -160,7 +179,7 @@ export class QuizService {
       );
   }
 
-  updateTest(payload: ITest): Observable<ITestResponse> {
+  updateTest(payload: Patch[]): Observable<ITestResponse> {
     return this.httpClient
       .patch<ITestResponse>(
         `${environment.baseUrl}${environment.apiVersion}${environment.testPaths.base}`,
@@ -458,6 +477,7 @@ export class QuizService {
       )
       .pipe(tap((res) => console.log(res)));
   }
+
   getElementDomain(element: any, type: string): Observable<any[]> {
     return this.httpClient
       .get<any[]>(
