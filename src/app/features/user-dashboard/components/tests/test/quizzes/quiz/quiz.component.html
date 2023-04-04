@@ -64,11 +64,11 @@
       [class]="isExpanded ? 'max-h-60 ' : ''"
     >
       <div
-        *ngIf="relatedQuizQuestions && relatedQuizQuestions.length > 0"
+        *ngIf="data.questions && data.questions.length > 0"
         class="grid grid-cols-2 gap-2 px-2 py-3 justify-center items-start"
       >
         <app-question
-          *ngFor="let question of relatedQuizQuestions"
+          *ngFor="let question of this.data.questions"
           [data]="question"
         ></app-question>
       </div>

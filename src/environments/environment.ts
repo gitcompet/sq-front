@@ -25,6 +25,7 @@ export const environment = {
   },
   questionPaths: {
     base: '/Question',
+    answer: '/Answer'
   },
   categoryPaths: {
     base: '/Domain',

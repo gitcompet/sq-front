@@ -98,26 +98,50 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
       .addTest(this.newTest)
       .pipe(
         switchMap((newTest: ITestResponse) => {
-          this.tests = [...this.tests, newTest];
-          return this.quizzesIds.length > 0
-            ? forkJoin(
-                this.quizzesIds.map((quizId) =>
-                  this.quizService.assignQuiz({
-                    quizId: quizId,
-                    testId: newTest.testId,
-                  })
-                )
-              )
-            : of();
+          this.tests.push(newTest);
+          return this.quizzesIds.length > 0 ? forkJoin(
+            this.quizzesIds.map((quizId) =>
+              this.quizService.assignQuiz({
+                quizId: quizId,
+                testId: newTest.testId,
+              })
+            )
+          ): of()
         }),
-        finalize(() =>
+        switchMap((compositions: ITestQuiz[]) => {
+
+          const filtredComposition = compositions
+            .map((testQuiz) => testQuiz.quizId)
+            .filter((item, pos, self) => self.indexOf(item) == pos);
+          const observables = [
+            of(compositions),
+            forkJoin(
+              filtredComposition.map((quizId) =>
+                this.quizService.getQuiz({quizId}as IQuizResponse)
+              )
+            ),
+          ];
+          return forkJoin(observables);
+        })
+      )
+      .subscribe({
+        next: (mergedResults) => {
+          const quizzes: IQuizResponse[] = mergedResults[1] as IQuizResponse[];
+          this.tests = [
+            ...this.tests,
+            {
+              ...this.tests.at(this.tests.length - 1),
+              quizzes: quizzes,
+            } as ITestResponse,
+          ];
+        },
+        complete: () => {
           this.modalService.closeModal({
             id: 'testModal',
             isShown: this.showModal,
-          })
-        )
-      )
-      .subscribe((response) => {});
+          });
+        },
+      });
   }
 
   updateTest(form: FormGroup) {

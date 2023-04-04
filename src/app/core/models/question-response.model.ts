@@ -1,12 +1,14 @@
+import { IAnswerResponse } from "./answer-response.model";
 import { IDomain } from "./domain.model";
 
 export interface IQuestionResponse {
   questionId: string;
+  questionUserId: string;
   comment: string;
   domains: IDomain[];
   subDomains: IDomain[];
   level: number;
-  answers: string[],
+  answers: IAnswerResponse[],
   isActive: boolean;
   isDeleted: boolean;
   title?: string;
@@ -14,21 +16,23 @@ export interface IQuestionResponse {
 }
 export class QuestionResponse implements IQuestionResponse {
   questionId: string;
+  questionUserId: string;
   comment: string;
   domains: IDomain[];
   subDomains: IDomain[];
   level: number;
-  answers: string[];
+  answers: IAnswerResponse[];
   isActive: boolean;
   isDeleted: boolean;
   title?: string;
   label?: string;
   constructor(
     questionId: string,
+    questionUserId: string,
     domains: IDomain[],
     subDomains: IDomain[],
     level: number,
-    answers: string[],
+    answers: IAnswerResponse[],
     isActive: boolean,
     isDeleted: boolean,
     comment: string,
@@ -36,6 +40,7 @@ export class QuestionResponse implements IQuestionResponse {
     label?: string
   ){
     this.questionId = questionId;
+    this.questionUserId = questionUserId;
     this.title = title;
     this.label = label;
     this.level = level;

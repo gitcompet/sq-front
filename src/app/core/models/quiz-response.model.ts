@@ -9,9 +9,11 @@ export interface IQuizResponse {
     comment: string;
     isActive: boolean;
     isDeleted: boolean;
-    questions? : IQuestionResponse[];
+    questions : IQuestionResponse[];
     title?: string;
     label?: string;
+    testUserId?:string;
+    quizUserId?:string;
 }
 export class QuizResponse implements IQuizResponse{
   quizId: string;
@@ -21,7 +23,7 @@ export class QuizResponse implements IQuizResponse{
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
-  questions? : IQuestionResponse[];
+  questions : IQuestionResponse[];
   title?: string;
   label?: string;
   constructor(
@@ -32,7 +34,7 @@ export class QuizResponse implements IQuizResponse{
     isDeleted: boolean,
     weight: number,
     domains:IDomain[],
-    questions? : IQuestionResponse[],
+    questions : IQuestionResponse[],
     title?: string,
     label?: string,
 

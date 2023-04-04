@@ -5,7 +5,7 @@
     <i class="fas fa-plus" aria-hidden="true"> </i>&nbsp;&nbsp;Add Quiz
   </button>
 </div>
-<app-quizzes></app-quizzes>
+<app-quizzes [relatedTestQuizzes]="quizzes"></app-quizzes>
 <app-modal (onSave)="createQuiz($event)" [data]="quizForm" [id]="'quizModal'">
   <h3 header class="text-xl font-medium text-gray-900 dark:text-white">
     New Quiz

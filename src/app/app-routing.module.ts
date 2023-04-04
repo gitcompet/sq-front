@@ -3,14 +3,26 @@ import { RouterModule, Routes } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PageNotFoundComponent } from './shared/components/page-not-found/page-not-found.component';
 import { TakeQuizComponent } from './features/user-dashboard/components/tests/test/quizzes/take-quiz/take-quiz.component';
+import { QuizScore } from './core/models/quiz-score.model';
+import { QuizScoreComponent } from './features/user-dashboard/components/tests/test/quizzes/quiz-score/quiz-score.component';
 
-const routes: Routes = [      {
-  path: 'quiz/:id',
-  component: TakeQuizComponent,
-  data: {
-    roles: ['USER'],
+const routes: Routes = [
+  {
+    path: 'quiz/:id',
+    component: TakeQuizComponent,
+    data: {
+      roles: ['USER'],
+    },
   },
-},{ path: '**', component: PageNotFoundComponent }];
+  {
+    path: 'score',
+    component: QuizScoreComponent,
+    data: {
+      roles: ['USER'],
+    },
+  },
+  { path: '**', component: PageNotFoundComponent },
+];
 
 @NgModule({
   imports: [

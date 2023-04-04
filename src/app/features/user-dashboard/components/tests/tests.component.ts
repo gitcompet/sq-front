@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { forkJoin, of, Subscription, switchMap } from 'rxjs';
-import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
-import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
+import { Subscription } from 'rxjs';
 import { ITestResponse } from 'src/app/core/models/test-response.model';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -35,41 +33,8 @@ export class TestsComponent implements OnInit {
       this._subscriptions.push(
         this.quizService
           .getAvailableTests()
-          .pipe(
-            switchMap((res: ITestResponse[]) => {
-              this.tests = res;
-              return this.quizService.getAsssignedTestQuizzes();
-            }),
-            switchMap((compositions: ITestQuiz[]) => {
-              const filtredComposition = compositions
-                .map((testQuiz) => testQuiz.quizId)
-                .filter((item, pos, self) => self.indexOf(item) == pos);
-              const observables = [
-                of(compositions),
-                forkJoin(
-                  filtredComposition.map((quizId) =>
-                    this.quizService.getQuiz(quizId)
-                  )
-                ),
-              ];
-              return forkJoin(observables);
-            })
-          )
-          .subscribe((mergedResults) => {
-            const compositions: ITestQuiz[] = mergedResults[0] as ITestQuiz[];
-            const quizzes: IQuizResponse[] =
-              mergedResults[1] as IQuizResponse[];
-            this.tests = this.tests.map((test) => {
-              const filtredComposition = compositions
-                .filter((testQuiz) => test.testId === testQuiz.testId)
-                .map((testQuiz) => testQuiz.quizId);
-              return {
-                ...test,
-                quizzes: quizzes.filter((quiz: IQuizResponse) =>
-                  filtredComposition.includes(quiz.quizId)
-                ),
-              };
-            });
+          .subscribe((res) => {
+            this.tests = res;
           })
       );
     }

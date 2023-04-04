@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Login } from 'src/app/core/models/login.model';
 import { TokenResponse } from 'src/app/core/models/token-response.model';
-import { User } from 'src/app/core/models/user.model';
+import { IUser, User } from 'src/app/core/models/user.model';
 import { environment } from 'src/environments/environment.development';
 import { JWTHelperService } from './jwt-helper.service';
 
@@ -20,11 +20,23 @@ export class AuthService {
 
   isLoggedin: boolean = false;
 
-  signUp(payload: User): Observable<User> {
-    return this.http.post<User>(
-      `${environment.baseUrl}${environment.apiVersion}${environment.userPaths.base}`,
-      payload
-    );
+  signUp(payload: User): Observable<IUser> {
+    return this.http
+      .post<User>(
+        `${environment.baseUrl}${environment.apiVersion}${environment.userPaths.base}`,
+        payload
+      )
+      .pipe(
+        map((user) => {
+          const modifiedUser = {} as IUser;
+          modifiedUser.loginId = user.loginId;
+          modifiedUser.email = user.email;
+          modifiedUser.firstName = user.firstName;
+          modifiedUser.lastName = user.lastName;
+          modifiedUser.login = user.login;
+          return modifiedUser;
+        })
+      );
   }
   login(payload: Login): Observable<TokenResponse> {
     return this.http.post<TokenResponse>(
@@ -65,10 +77,10 @@ export class AuthService {
   getId(): string {
     const decodedToken: any = this.jwtService.decode(this.getToken());
     const properties: string[] = Object.getOwnPropertyNames(decodedToken);
-    const key: string = properties.filter((value)=> value.includes("identifier"))[0];
-    const id = decodedToken[
-      key
-    ] as string;
+    const key: string = properties.filter((value) =>
+      value.includes('identifier')
+    )[0];
+    const id = decodedToken[key] as string;
     return id;
   }
   setToken(response: TokenResponse) {
@@ -79,24 +91,19 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('refresh');
   }
-  getRoles(): string [] {
+  getRoles(): string[] {
     const decodedToken: any = this.jwtService.decode(this.getToken());
     const properties: string[] = Object.getOwnPropertyNames(decodedToken);
-    const key: string = properties.filter((value)=> value.includes("role"))[0];
-    const roles = decodedToken[
-      key
-    ] as string[];
+    const key: string = properties.filter((value) => value.includes('role'))[0];
+    const roles = decodedToken[key] as string[];
     return roles;
   }
-  isAdmin(){
-    return this.getRoles()
-            .includes("admin".toUpperCase())
+  isAdmin() {
+    return this.getRoles().includes('admin'.toUpperCase());
   }
   getUsername(): string {
     const decodedToken: any = this.jwtService.decode(this.getToken());
-    const username = decodedToken[
-      'sub'
-    ] as string;
+    const username = decodedToken['sub'] as string;
     return username;
   }
 }

@@ -13,6 +13,7 @@ import { ModalService } from 'src/app/shared/services/modal.service';
 })
 export class QuestionAdminComponent implements OnInit, OnDestroy {
   questions: IQuestionResponse[] = [];
+
   questionForm: FormGroup;
   showModal: boolean = false;
   categories: IDomain[] = [];
@@ -34,11 +35,11 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
     });
   }
   ngOnInit(): void {
-    this.quizService
+    this._subscriptions.push(this.quizService
       .getAvailableQuestions()
       .subscribe((questions: IQuestionResponse[]) => {
         this.questions = questions;
-      });
+      }));
   }
   onAddQuestion() {
     this.showModal = !this.showModal;
