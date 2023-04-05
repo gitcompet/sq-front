@@ -5,11 +5,19 @@ import { PageNotFoundComponent } from './shared/components/page-not-found/page-n
 import { TakeQuizComponent } from './features/user-dashboard/components/tests/test/quizzes/take-quiz/take-quiz.component';
 import { QuizScore } from './core/models/quiz-score.model';
 import { QuizScoreComponent } from './features/user-dashboard/components/tests/test/quizzes/quiz-score/quiz-score.component';
+import { QuizSummaryComponent } from './features/user-dashboard/components/tests/test/quizzes/quiz-summary/quiz-summary.component';
 
 const routes: Routes = [
   {
     path: 'quiz/:id',
     component: TakeQuizComponent,
+    data: {
+      roles: ['USER'],
+    },
+  },
+  {
+    path: 'summary',
+    component: QuizSummaryComponent,
     data: {
       roles: ['USER'],
     },

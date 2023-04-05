@@ -68,18 +68,18 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     );
   }
   nextQuestion(): void {
-    this.currentIdx = this.quiz.questions?.indexOf(this.currentQuestion!)! + 1;
-    if (
-      this.quiz.questions &&
-      this.currentIdx &&
-      this.currentIdx >= this.quiz.questions?.length
-    )
-      this.currentQuestion =
-        this.quiz.questions?.[this.quiz.questions?.length - 1];
-    else this.currentQuestion = this.quiz.questions?.at(this.currentIdx);
-    this.questionAnswers = this.candiateService.getQuestionAnswers(
-      this.currentQuestion!.questionId
-    );
+    this.currentIdx = this.currentIdx + 1;
+    this.currentQuestion = this.quiz.questions?.at(this.currentIdx);
+    if (this.currentQuestion && this.currentQuestion.questionId)
+      this.questionAnswers = this.candiateService.getQuestionAnswers(
+        this.currentQuestion.questionId
+      );
+    if (this.currentIdx === this.questionsLength) {
+      this.router.navigate(['/summary'], {
+        relativeTo: this.route,
+        state: this.quiz,
+      });
+    }
   }
   updateUserAnswer(answer: any) {
     if (answer.target.checked) {
@@ -89,23 +89,19 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     }
   }
   validateQuiz() {
-    if (this.currentIdx === this.questionsLength - 1) {
-      this.router.navigate(['/score'], {
-        relativeTo: this.route,
-        state: { quizUserId: this.quiz.quizUserId },
-      });
-    } else {
-      this.nextQuestion();
-      // this.candiateService.submitAnswer({answerId:})
-      const answerObs: Observable<IAnswerResponse>[] = this.userAnswers.map(
-        (answerId) =>
-          this.candiateService.submitAnswer({
-            answerId: answerId,
-            questionUserId: this.currentQuestion!.questionUserId,
-          })
-      );
-      this._subscriptions.push(forkJoin(answerObs).subscribe());
-    }
+    const answerObs: Observable<IAnswerResponse>[] = this.userAnswers.map(
+      (answerId) =>
+        this.candiateService.submitAnswer({
+          answerId: answerId,
+          questionUserId: this.currentQuestion?.questionUserId!,
+        })
+    );
+    this._subscriptions.push(
+      forkJoin(answerObs).subscribe(() => {
+        this.userAnswers = [];
+        this.nextQuestion();
+      })
+    );
   }
   calculateScore() {
     return this.userScore;

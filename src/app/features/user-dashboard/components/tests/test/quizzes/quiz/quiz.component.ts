@@ -36,6 +36,7 @@ export class QuizComponent implements OnInit, OnDestroy {
     this.relatedQuizQuestions = new Observable<IQuestionResponse[]>();
   }
   ngOnInit(): void {
+
     if (this.isAdmin) {
       this.route.fragment.subscribe((f) => {
         const element = document.querySelector('#el-' + f);

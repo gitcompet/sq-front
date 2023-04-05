@@ -41,11 +41,11 @@ export class TestComponent implements OnInit, OnDestroy {
   toggle() {
     this.isExpanded = !this.isExpanded;
     if (this.isExpanded) {
+      if(this.isAdmin){
       this.quizzes = this.quizService
         .getAsssignedTestQuizzes(this.data.testId)
         .pipe(
           switchMap((compositions: ITestQuiz[]) => {
-
             const filtredComposition = compositions.map(
               (testQuiz) => testQuiz.quizId
             );
@@ -53,6 +53,7 @@ export class TestComponent implements OnInit, OnDestroy {
               filtredComposition.map((quizId) =>
                 this.quizService.getQuiz({
                   quizId: quizId,
+                  testUserId: this.data.testUserId
                 } as IQuizResponse)
               )
             );
@@ -68,6 +69,21 @@ export class TestComponent implements OnInit, OnDestroy {
             return this.data.quizzes;
           })
         );
+      }else{
+        this.quizzes = this.quizService
+        .getUserQuizzes(this.data.testUserId)
+        .pipe(
+          map((quizzesRes) => {
+
+            this.data = {
+              ...this.data,
+              quizzes: quizzesRes,
+            };
+
+            return this.data.quizzes;
+          })
+        );
+      }
     }
   }
   onUpdateTest() {

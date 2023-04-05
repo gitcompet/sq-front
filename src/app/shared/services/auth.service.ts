@@ -7,6 +7,7 @@ import { TokenResponse } from 'src/app/core/models/token-response.model';
 import { IUser, User } from 'src/app/core/models/user.model';
 import { environment } from 'src/environments/environment.development';
 import { JWTHelperService } from './jwt-helper.service';
+import { formUrlEncodedHeaders, headers } from 'src/app/core/constants/settings';
 
 @Injectable({
   providedIn: 'root',
@@ -44,10 +45,16 @@ export class AuthService {
       payload
     );
   }
-  refreshToken(refreshToken: string): Observable<TokenResponse> {
+  refreshToken(payload: any): Observable<TokenResponse> {
+    const body = new URLSearchParams();
+    body.set("token", payload.token);
+    body.set("refreshToken", payload.refreshToken);
+
     return this.http.post<TokenResponse>(
       `${environment.baseUrl}${environment.apiVersion}${environment.authPaths.base}${environment.authPaths.refresh}`,
-      refreshToken
+
+      payload,
+      { headers: headers }
     );
   }
   logout() {
@@ -55,14 +62,13 @@ export class AuthService {
     this.isLoggedin = false;
     this.router.navigateByUrl('/');
   }
+  hasTokenExpired():boolean{
+    const token = this.getToken();
+    return (token === undefined || token === null) && this.jwtService.hasTokenExpired(token);
+  }
   isLoggedIn(): boolean {
     const token = this.getToken();
-    if (token == null && this.jwtService.hasTokenExpired(token)) {
-      //REFRESH TOKEN INSTEAD
-      // this.refreshToken(this.getRefreshToken()).subscribe((response)=>{
-      //    this.setToken(response);
-      //    this.isLoggedin = true;
-      // });
+    if (token && this.jwtService.hasTokenExpired(token)) {
       return this.isLoggedin;
     }
     return true;

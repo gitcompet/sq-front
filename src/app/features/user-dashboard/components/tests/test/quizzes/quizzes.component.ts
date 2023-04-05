@@ -35,7 +35,7 @@ export class QuizzesComponent implements OnInit, OnChanges {
     this.isAdmin = this.authService.isAdmin();
     this._subscriptions.push(this.modalService.getDataExchange().subscribe());
     if(this.isAdmin){
-      this.quizService.getAvailableQuizzes().subscribe();
+      this.quizService.getAvailableQuizzes(this.authService.getId()).subscribe();
     }
   }
   ngOnChanges(changes: SimpleChanges) {
