@@ -46,11 +46,7 @@ export class AuthService {
     );
   }
   refreshToken(payload: any): Observable<TokenResponse> {
-    const body = new URLSearchParams();
-    body.set("token", payload.token);
-    body.set("refreshToken", payload.refreshToken);
-
-    return this.http.post<TokenResponse>(
+     return this.http.post<TokenResponse>(
       `${environment.baseUrl}${environment.apiVersion}${environment.authPaths.base}${environment.authPaths.refresh}`,
 
       payload,
@@ -94,8 +90,7 @@ export class AuthService {
     localStorage.setItem('refresh', response.refreshToken);
   }
   removeToken() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refresh');
+    localStorage.clear();
   }
   getRoles(): string[] {
     const decodedToken: any = this.jwtService.decode(this.getToken());

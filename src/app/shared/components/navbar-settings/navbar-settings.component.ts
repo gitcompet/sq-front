@@ -1,4 +1,11 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription, switchMap, tap } from 'rxjs';
 import { Language } from 'src/app/core/models/language.model';
@@ -22,7 +29,9 @@ export class NavbarSettingsComponent implements OnInit, OnDestroy {
   currentLang: Language = {} as Language;
   _subscriptions: Subscription[] = [];
   languageForm: FormGroup;
-
+  @Output('onUpdateUi') updateUI: EventEmitter<unknown> = new EventEmitter(
+    false
+  );
   constructor(
     private authService: AuthService,
     private languageManagerService: LanguageManagerService,
@@ -41,7 +50,11 @@ export class NavbarSettingsComponent implements OnInit, OnDestroy {
       switchMap((res) => {
         return this.languagesService.getLanguages();
       }),
-      tap((res)=>this.currentLang = res.find((lang)=>lang.languageId === this.langId)!)
+      tap((res) => {
+        const found = res.find((lang) => lang.languageId === this.langId);
+        this.languageForm.setValue({ language: found });
+        this.languageForm.updateValueAndValidity();
+      })
     );
   }
   onLanguageChange(event: Event) {
@@ -64,10 +77,9 @@ export class NavbarSettingsComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe((newToken: TokenResponse) => {
-        console.log(newToken);
-
         this.authService.removeToken();
         this.authService.setToken(newToken);
+        window.location.reload();
       });
   }
   toggleProfileMenu() {

@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { forkJoin, map, mergeMap, Observable, of, switchMap, tap } from 'rxjs';
-import { headers } from 'src/app/core/constants/settings';
+import { headers, patchHeaders } from 'src/app/core/constants/settings';
 import { IQuestion } from 'src/app/core/models/question.model';
 import { IQuiz } from 'src/app/core/models/quiz.model';
 import { ITest } from 'src/app/core/models/test.model';
@@ -240,6 +240,37 @@ export class QuizService {
         })
       );
   }
+  updateUserQuiz(id: string, payload: Patch[]): Observable<IQuizResponse> {
+    return this.httpClient
+      .patch<IQuizResponse>(
+        `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.userQuiz}/${id}`,
+        payload,
+        {
+          headers: patchHeaders,
+        }
+      )
+      .pipe(
+        switchMap((res) => {
+
+          return this.getQuiz({
+            quizId: res.quizId,
+            quizUserId: res.quizUserId,
+            testUserId: res.testUserId,
+          } as IQuizResponse);
+        }),
+        map((quiz) => {
+
+          const modifiedQuiz = {} as IQuizResponse;
+          modifiedQuiz.quizId = quiz.quizId;
+          modifiedQuiz.title = quiz.title;
+          modifiedQuiz.label = quiz.label;
+          modifiedQuiz.comment = quiz.comment;
+          modifiedQuiz.quizUserId = quiz.quizUserId;
+          modifiedQuiz.testUserId = quiz.quizUserId;
+          return modifiedQuiz;
+        })
+      );
+  }
 
   getAsssignedQuizzes(testId: string): Observable<IQuizResponse[]> {
     return this.httpClient
@@ -258,8 +289,6 @@ export class QuizService {
       )
       .pipe(
         map((quizzes: IQuizResponse[]) => {
-          console.log(quizzes);
-
           return quizzes.map((quiz) => {
             const modifiedQuiz = {} as IQuizResponse;
             modifiedQuiz.quizId = quiz.quizId;
@@ -393,6 +422,36 @@ export class QuizService {
           if (quizPayload.quizUserId)
             modifiedQuiz.quizUserId = quizPayload.quizUserId;
           return modifiedQuiz;
+        }),
+        switchMap((newQuiz: IQuizResponse) => {
+          const observables = [
+            of(newQuiz),
+            this.getElementDomain({ id: newQuiz.quizId }, ElementTypes.QUIZ),
+          ];
+          return forkJoin(observables);
+        }),
+        map((compositions) => {
+          const quiz: IQuizResponse = compositions[0] as IQuizResponse;
+          const domains = compositions[1] as any;
+          return {
+            ...quiz,
+            domains: domains.domainNames.map(
+              (domainName: string, index: number) => {
+                return {
+                  domainId: domains.domainId[index],
+                  name: domainName,
+                } as IDomain;
+              }
+            ),
+            // subDomains: quizDomains.subDomainNames.map(
+            //   (subDomainName: string, index: number) => {
+            //     return {
+            //       domainId: quizDomains.subDomainId[index],
+            //       name: subDomainName,
+            //     } as IDomain;
+            //   }
+            // ),
+          };
         })
       );
   }
@@ -542,10 +601,9 @@ export class QuizService {
         switchMap((userQuestion) => {
           return forkJoin(
             userQuestion['value'].map((question: any) => {
-
               return this.getQuestion({
                 ...question,
-                quizUserId: userQuestion.quizUserId,
+                quizUserId: quizUserId,
               });
             })
           );

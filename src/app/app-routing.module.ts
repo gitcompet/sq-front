@@ -6,10 +6,18 @@ import { TakeQuizComponent } from './features/user-dashboard/components/tests/te
 import { QuizScore } from './core/models/quiz-score.model';
 import { QuizScoreComponent } from './features/user-dashboard/components/tests/test/quizzes/quiz-score/quiz-score.component';
 import { QuizSummaryComponent } from './features/user-dashboard/components/tests/test/quizzes/quiz-summary/quiz-summary.component';
+import { QuizIntroductionComponent } from './features/user-dashboard/components/tests/test/quizzes/quiz-introduction/quiz-introduction.component';
 
 const routes: Routes = [
   {
     path: 'quiz/:id',
+    component: QuizIntroductionComponent,
+    data: {
+      roles: ['USER'],
+    },
+  },
+  {
+    path: 'quiz/:id/on',
     component: TakeQuizComponent,
     data: {
       roles: ['USER'],
