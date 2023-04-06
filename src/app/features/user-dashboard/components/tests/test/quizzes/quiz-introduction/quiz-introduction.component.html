@@ -23,7 +23,6 @@
       >
         <option
           *ngFor="let language of languages | async"
-          [value]="language.languageId"
           [ngValue]="language"
         >
           {{ language.title }}

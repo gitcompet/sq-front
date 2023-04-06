@@ -65,14 +65,13 @@ export class QuizIntroductionComponent implements OnInit {
     this.router.navigateByUrl(selectedQuizUrl, { state: this.quiz });
   }
   onLanguageChange(event: Event) {
-    const target = event.target as HTMLTextAreaElement;
-    const languageId: string = target.value;
+    const  language =  this.languageForm.get('language')?.value;
     this.quizService
       .updateUserQuiz(this.quiz.quizUserId!, [
         {
           op: OperationType.REPLACE,
           path: '/languageId',
-          value: languageId,
+          value: language.languageId,
         } as unknown as Patch,
       ])
       .subscribe((res) => {
