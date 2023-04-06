@@ -17,6 +17,7 @@ import { IAnswerResponse } from 'src/app/core/models/answer-response.model';
 import { IAnswer } from 'src/app/core/models/answer.model';
 import { OperationType, Patch } from 'src/app/core/models/patch.model';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
+import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -26,16 +27,18 @@ export class CandidateService {
   constructor(private httpClient: HttpClient) {
     this.answers$ = new BehaviorSubject<IAnswerResponse[]>([]);
   }
-  getQuestionAnswers(questionId: string): Observable<IAnswerResponse[]> {
+  getQuestionAnswers(question: IQuestionResponse): Observable<IAnswerResponse[]> {
     return this.httpClient
       .get<IAnswerResponse[]>(
-        `${environment.baseUrl}${environment.apiVersion}${environment.questionPaths.questionAnswers}/${questionId}`
+        `${environment.baseUrl}${environment.apiVersion}${environment.questionPaths.questionAnswers}/${question.questionId}?quizUserId=${question.quizUserId}`
       )
       .pipe(
         switchMap((questionAnswers) => {
+          console.log(questionAnswers);
+
           return forkJoin(
             questionAnswers.map((questionAnswer) =>
-              this.getAnswer(questionAnswer.answerId)
+              {return this.getAnswer({...questionAnswer,quizUserId: question.questionUserId})}
             )
           );
         })
@@ -48,9 +51,9 @@ export class CandidateService {
       answer
     );
   }
-  getAnswer(answerId: string): Observable<IAnswerResponse> {
+  getAnswer(answer: IAnswerResponse): Observable<IAnswerResponse> {
     return this.httpClient.get<IAnswerResponse>(
-      `${environment.baseUrl}${environment.apiVersion}${environment.questionPaths.answer}/${answerId}`
+      `${environment.baseUrl}${environment.apiVersion}${environment.questionPaths.answer}/${answer.answerId}?quizUserId=${answer.quizUserId}`
     );
   }
   updateUserQuiz(patch: Patch[],quizUserId: string) {

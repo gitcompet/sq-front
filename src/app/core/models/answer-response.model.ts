@@ -1,6 +1,7 @@
 
 export interface IAnswerResponse {
   answerId: string;
+  quizUserId: string;
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
@@ -9,6 +10,7 @@ export interface IAnswerResponse {
 }
 export class AnswerResponse implements IAnswerResponse {
   answerId: string;
+  quizUserId: string;
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
@@ -16,6 +18,7 @@ export class AnswerResponse implements IAnswerResponse {
   label?: string;
   constructor(
     answerId: string,
+    quizUserId: string,
     isActive: boolean,
     isDeleted: boolean,
     comment: string,
@@ -23,6 +26,7 @@ export class AnswerResponse implements IAnswerResponse {
     label?: string
   ){
     this.answerId = answerId;
+    this.quizUserId = quizUserId;
     this.title = title;
     this.label = label;
     this.comment = comment;

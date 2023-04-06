@@ -44,7 +44,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
           this.currentQuestion = questions[0];
           this.currentIdx = questions.indexOf(this.currentQuestion);
           this.questionAnswers = this.candiateService.getQuestionAnswers(
-            this.currentQuestion!.questionId
+            this.currentQuestion!
           );
           this.quiz = { ...this.quiz, questions: questions };
           if (this.quiz.questions?.length)
@@ -58,21 +58,21 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     return 1;
   }
 
-  previousQuestion(): void {
-    this.currentIdx = this.quiz.questions?.indexOf(this.currentQuestion!)! - 1;
-    if (this.currentIdx && this.currentIdx <= 0)
-      this.currentQuestion = this.quiz.questions?.[0];
-    else this.currentQuestion = this.quiz.questions?.at(this.currentIdx);
-    this.questionAnswers = this.candiateService.getQuestionAnswers(
-      this.currentQuestion!.questionId
-    );
-  }
+  // previousQuestion(): void {
+  //   this.currentIdx = this.quiz.questions?.indexOf(this.currentQuestion!)! - 1;
+  //   if (this.currentIdx && this.currentIdx <= 0)
+  //     this.currentQuestion = this.quiz.questions?.[0];
+  //   else this.currentQuestion = this.quiz.questions?.at(this.currentIdx);
+  //   this.questionAnswers = this.candiateService.getQuestionAnswers(
+  //     this.currentQuestion!
+  //   );
+  // }
   nextQuestion(): void {
     this.currentIdx = this.currentIdx + 1;
     this.currentQuestion = this.quiz.questions?.at(this.currentIdx);
     if (this.currentQuestion && this.currentQuestion.questionId)
       this.questionAnswers = this.candiateService.getQuestionAnswers(
-        this.currentQuestion.questionId
+        this.currentQuestion
       );
     if (this.currentIdx === this.questionsLength) {
       this.router.navigate(['/summary'], {
@@ -102,9 +102,6 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
         this.nextQuestion();
       })
     );
-  }
-  calculateScore() {
-    return this.userScore;
   }
   ngOnDestroy(): void {
     this._subscriptions.map((sub) => sub.unsubscribe());

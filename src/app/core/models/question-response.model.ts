@@ -4,6 +4,7 @@ import { IDomain } from "./domain.model";
 export interface IQuestionResponse {
   questionId: string;
   questionUserId: string;
+  quizUserId: string;
   comment: string;
   domains: IDomain[];
   subDomains: IDomain[];
@@ -17,6 +18,7 @@ export interface IQuestionResponse {
 export class QuestionResponse implements IQuestionResponse {
   questionId: string;
   questionUserId: string;
+  quizUserId: string;
   comment: string;
   domains: IDomain[];
   subDomains: IDomain[];
@@ -29,6 +31,7 @@ export class QuestionResponse implements IQuestionResponse {
   constructor(
     questionId: string,
     questionUserId: string,
+    quizUserId: string,
     domains: IDomain[],
     subDomains: IDomain[],
     level: number,
@@ -41,6 +44,7 @@ export class QuestionResponse implements IQuestionResponse {
   ){
     this.questionId = questionId;
     this.questionUserId = questionUserId;
+    this.quizUserId = quizUserId;
     this.title = title;
     this.label = label;
     this.level = level;

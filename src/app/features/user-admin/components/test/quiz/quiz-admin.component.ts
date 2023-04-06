@@ -41,7 +41,8 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
   ) {
     this.quizForm = this._formBuilder.group({
       title: this._formBuilder.control('', [Validators.required]),
-      description: this._formBuilder.control('', [Validators.required]),
+      comment: this._formBuilder.control('', [Validators.required]),
+      label: this._formBuilder.control('', [Validators.required]),
       role: this._formBuilder.control('', [Validators.required]),
       weight: this._formBuilder.control(0, [Validators.required]),
       categories: this._formBuilder.control('', [Validators.required]),
@@ -78,10 +79,11 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
   createQuiz(form: FormGroup) {
     const newQuiz = {
       title: form.get('title')?.value,
-      subDomainId: ['1'],
-      domainId: ['1'],
+      subDomainId: form.get('role')?.value,
+      domainId: form.get('categories')?.value,
       weight: form.get('weight')?.value,
       comment: form.get('description')?.value,
+      label: form.get('label')?.value,
     } as IQuiz;
 
     this.quizService.addQuiz(newQuiz) .pipe(

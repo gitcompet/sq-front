@@ -27,7 +27,7 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
     this.questionForm = this._formBuilder.group({
       title: this._formBuilder.control(''),
       label: this._formBuilder.control('', [Validators.required]),
-      description: this._formBuilder.control(''),
+      comment: this._formBuilder.control(''),
       role: this._formBuilder.control('', [Validators.required]),
       weight: this._formBuilder.control(0, [Validators.required]),
       duration: this._formBuilder.control(0, [Validators.required]),

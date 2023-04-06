@@ -589,6 +589,7 @@ export class QuizService {
         map((question) => ({
           ...question,
           questionUserId: questionPayload.questionUserId,
+          quizUserId: questionPayload.quizUserId
         }))
       );
   }

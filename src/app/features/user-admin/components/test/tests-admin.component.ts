@@ -43,10 +43,12 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
   ) {
     this.testForm = this._formBuilder.group({
       title: this._formBuilder.control('', [Validators.required]),
+      label:this._formBuilder.control('', [Validators.required]),
       categories: this._formBuilder.control('', Validators.required),
     });
     this.testUpdateForm = this._formBuilder.group({
       title: this._formBuilder.control('', [Validators.required]),
+      label: this._formBuilder.control('', [Validators.required]),
       categories: this._formBuilder.control('', Validators.required),
     });
   }
@@ -93,6 +95,7 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
       testCategoryId: form.get('categories')?.value, // form.get('categories').value array of categories
       title: form.get('title')?.value,
       comment: '',
+      label: form.get('label')?.value,
     } as ITest;
     this.quizService
       .addTest(this.newTest)
