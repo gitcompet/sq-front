@@ -58,14 +58,14 @@ export class NavbarSettingsComponent implements OnInit, OnDestroy {
     );
   }
   onLanguageChange(event: Event) {
-    const target = event.target as HTMLTextAreaElement;
-    const languageId: string = target.value;
+    const  language =  this.languageForm.get('language')?.value;
+
     this.userService
       .patchUser(this.authService.getId(), [
         {
           op: OperationType.REPLACE,
           path: '/languageId',
-          value: languageId,
+          value: language.languageId,
         } as unknown as Patch,
       ])
       .pipe(
