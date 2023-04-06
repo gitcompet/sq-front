@@ -1,12 +1,20 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subscription, switchMap } from 'rxjs';
+import { Observable, Subscription, switchMap, tap } from 'rxjs';
 import { Language } from 'src/app/core/models/language.model';
 import { OperationType, Patch } from 'src/app/core/models/patch.model';
 import { LanguageService } from 'src/app/features/user-admin/services/lngMgmt.service';
 import { UserService } from 'src/app/features/user-profile/services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { LanguageManagerService } from '../../services/language-manager.service';
+import { TokenResponse } from 'src/app/core/models/token-response.model';
 
 @Component({
   selector: 'app-navbar-settings',
@@ -16,11 +24,14 @@ import { LanguageManagerService } from '../../services/language-manager.service'
 export class NavbarSettingsComponent implements OnInit, OnDestroy {
   @Input() data: any;
   isOpen: boolean = false;
-  languages: Language[] = [];
-  selectedLanguage: Language = {} as Language;
+  languages: Observable<Language[]>;
+  langId: string = '';
+  currentLang: Language = {} as Language;
   _subscriptions: Subscription[] = [];
   languageForm: FormGroup;
-
+  @Output('onUpdateUi') updateUI: EventEmitter<unknown> = new EventEmitter(
+    false
+  );
   constructor(
     private authService: AuthService,
     private languageManagerService: LanguageManagerService,
@@ -28,24 +39,22 @@ export class NavbarSettingsComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private _formBuilder: FormBuilder
   ) {
+    this.languages = new Observable<Language[]>();
+    this.langId = this.languageManagerService.getCurrentLanguageId();
     this.languageForm = this._formBuilder.group({
       language: this._formBuilder.control('', [Validators.required]),
     });
   }
   ngOnInit() {
-    const langId = this.languageManagerService.getCurrentLanguageId();
-    this._subscriptions.push(
-      this.languagesService
-        .getLanguage(langId)
-        .pipe(
-          switchMap((res) => {
-            this.selectedLanguage = res;
-            return this.languagesService.getLanguages();
-          })
-        )
-        .subscribe((res) => {
-          this.languages = [...res];
-        })
+    this.languages = this.languagesService.getLanguage(this.langId).pipe(
+      switchMap((res) => {
+        return this.languagesService.getLanguages();
+      }),
+      tap((res) => {
+        const found = res.find((lang) => lang.languageId === this.langId);
+        this.languageForm.setValue({ language: found });
+        this.languageForm.updateValueAndValidity();
+      })
     );
   }
   onLanguageChange(event: Event) {
@@ -59,7 +68,18 @@ export class NavbarSettingsComponent implements OnInit, OnDestroy {
           value: languageId,
         } as unknown as Patch,
       ])
-      .subscribe((res) => {
+      .pipe(
+        switchMap((res) => {
+          return this.authService.refreshToken({
+            refreshToken: this.authService.getRefreshToken(),
+            accessToken: this.authService.getToken(),
+          });
+        })
+      )
+      .subscribe((newToken: TokenResponse) => {
+        this.authService.removeToken();
+        this.authService.setToken(newToken);
+        window.location.reload();
       });
   }
   toggleProfileMenu() {

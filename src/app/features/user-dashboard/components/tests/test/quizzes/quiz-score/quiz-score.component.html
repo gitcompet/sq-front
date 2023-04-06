@@ -1,0 +1,13 @@
+<div class="flex justify-center items-center gap-2 flex-col w-full h-full">
+  <p class="text-center text-2xl text-green-500">
+    Your score is {{ userScore.quizScore | number : "1.0-2" }}%
+  </p>
+  <button
+    type="button"
+    data-te-ripple-init
+    data-te-ripple-color="light"
+    class="rounded px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:bg-neutral-100 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700 dark:hover:bg-neutral-700"
+  >
+    <a routerLinkActive="active" [routerLink]="'../home'"> Back Home</a>
+  </button>
+</div>

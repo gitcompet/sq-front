@@ -52,16 +52,7 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
     this._subscriptions.push(this.modalService.getDataExchange().subscribe());
     this._subscriptions.push(
       this.quizService
-        .getAvailableQuestions()
-        .pipe(
-          switchMap((questions: IQuestionResponse[]) => {
-            if (questions && questions.length > 0) {
-              this.quizQuestions = questions;
-              this.modalService.updateData(this.quizQuestions);
-            }
-            return this.quizService.getAvailableQuizzes();
-          })
-        )
+        .getAvailableQuizzes()
         .subscribe((quizzes: IQuizResponse[]) => {
           if (quizzes && quizzes.length > 0) {
             this.quizzes = quizzes;
@@ -73,7 +64,7 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
     this._subscriptions.forEach((sub) => sub.unsubscribe());
   }
   onAddQuiz() {
-    this.quizService.getCategories().subscribe((res)=>this.categories = res);
+    this._subscriptions.push(this.quizService.getCategories().subscribe((res)=>this.categories = res));
     this.showModal = !this.showModal;
     this.modalService.openModal({ id: 'quizModal', isShown: this.showModal });
   }

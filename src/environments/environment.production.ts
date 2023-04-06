@@ -24,10 +24,15 @@ export const environment = {
   testUserPaths: {
     base: '/TestUser',
     quizTest: '/TestCompose',
+    userQuiz: '/QuizUser',
     quizQuestion: '/QuizCompose'
   },
   questionPaths: {
     base: '/Question',
+    answer: '/Answer',
+    answerUser: '/AnswerUser',
+    userQuestion: '/QuestionUser',
+    questionAnswers: '/AnswerQuestion'
   },
   categoryPaths: {
     base: '/Domain',

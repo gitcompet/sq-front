@@ -1,0 +1,38 @@
+<div class="flex flex-col justify-center items-center gap-2 py-3">
+  <h1 class="font-bold text-center text-2xl">
+    You're about to pass {{ quiz.title }}
+  </h1>
+  <div class="grid grid-cols-2 gap-2">
+    <div class="font-bold">
+      Type: &nbsp;
+      <i
+        *ngFor="let domain of quiz.domains"
+        [ngClass]="['devicon-' + extractName(domain.name) + '-plain colored']"
+      ></i>
+    </div>
+    <div class="text-center">NO Chrono</div>
+  </div>
+
+  <form [formGroup]="languageForm">
+    <div class="w-full md:w-full px-0 mb-6 md:mb-0">
+      <select
+        (change)="onLanguageChange($event)"
+        formControlName="language"
+        id="language"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-48 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option
+          *ngFor="let language of languages | async"
+          [value]="language.languageId"
+          [ngValue]="language"
+        >
+          {{ language.title }}
+        </option>
+      </select>
+    </div>
+  </form>
+
+  <div class="flex justify-center gap-2 w-full mt-4 text-white">
+    <button (click)="startQuiz()" class="w-[20%] py-3 bg-indigo-600 rounded-lg">Start</button>
+  </div>
+</div>

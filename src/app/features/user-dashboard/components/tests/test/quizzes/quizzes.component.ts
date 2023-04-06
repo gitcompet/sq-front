@@ -1,4 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, of, Subscription, switchMap } from 'rxjs';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
@@ -13,9 +19,9 @@ import { ModalService } from 'src/app/shared/services/modal.service';
   templateUrl: './quizzes.component.html',
   styleUrls: ['./quizzes.component.css'],
 })
-export class QuizzesComponent implements OnInit {
+export class QuizzesComponent implements OnInit, OnChanges {
   quizzes: IQuizResponse[] = [];
-  @Input() relatedTestQuizzes!: IQuizResponse[] | undefined;
+  @Input() relatedTestQuizzes!: IQuizResponse[] | null | undefined;
   isAdmin: boolean = false;
   _subscriptions: Subscription[] = [];
   constructor(
@@ -28,54 +34,13 @@ export class QuizzesComponent implements OnInit {
   ngOnInit(): void {
     this.isAdmin = this.authService.isAdmin();
     this._subscriptions.push(this.modalService.getDataExchange().subscribe());
-    if (!this.relatedTestQuizzes && this.isAdmin) {
-      this._subscriptions.push(
-        this.quizService
-
-          .getAvailableQuizzes()
-          .pipe(
-            switchMap((res: IQuizResponse[]) => {
-              this.quizzes = res;
-              return this.quizService.getAsssignedQuizQuestions();
-            }),
-            switchMap((compositions: IQuizQuestion[]) => {
-              const filtredComposition = compositions
-                .map((quizQuestion) => quizQuestion.questionId)
-                .filter((item, pos, self) => self.indexOf(item) === pos);
-
-              const observables = [
-                of(compositions),
-                forkJoin(
-                  filtredComposition.map((questionId) =>
-                    this.quizService.getQuestion(questionId)
-                  )
-                ),
-              ];
-              return forkJoin(observables);
-            })
-          )
-          .subscribe((mergedResults) => {
-            const compositions: IQuizQuestion[] =
-              mergedResults[0] as IQuizQuestion[];
-            const questions: IQuestionResponse[] =
-              mergedResults[1] as IQuestionResponse[];
-
-            this.quizzes = this.quizzes.map((quiz) => {
-              return {
-                ...quiz,
-                questions: questions.filter((question, pos) =>
-                  compositions.find(
-                    (composition) =>
-                      composition.questionId === question.questionId &&
-                      composition.quizId === quiz.quizId
-                  )
-                ),
-              };
-            });
-          })
-      );
-    } else if(this.relatedTestQuizzes){
-      this.quizzes = this.relatedTestQuizzes;
+    if(this.isAdmin){
+      this.quizService.getAvailableQuizzes(this.authService.getId()).subscribe();
+    }
+  }
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['relatedTestQuizzes']) {
+      this.quizzes = changes['relatedTestQuizzes'].currentValue;
     }
   }
   quizDetails(quizId: any) {

@@ -16,6 +16,10 @@ export const patchHeaders = new HttpHeaders().append(
   'Content-Type',
   'application/json-patch+json'
 );
+export const formUrlEncodedHeaders = new HttpHeaders().set(
+  'Content-Type',
+  'application/x-www-form-urlencoded'
+);
 //.append('content-type', 'text/plain; charset=utf-8')
 //.append('content-type', 'application/x-www-form-urlencoded');
 export function passwordMatching(formGroup: FormGroup): ValidatorFn {

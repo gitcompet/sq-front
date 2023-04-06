@@ -1,11 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { forkJoin, of, Subscription, switchMap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { forkJoin, Observable, of, Subscription, switchMap } from 'rxjs';
+import { IAnswerResponse } from 'src/app/core/models/answer-response.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
-import { IQuestion } from 'src/app/core/models/question.model';
 import { IQuizQuestion } from 'src/app/core/models/quiz-question-assign.model copy';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
+import { CandidateService } from 'src/app/features/user-admin/services/candiate.service';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-take-quiz',
@@ -18,48 +20,35 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
   currentIdx: number = 0;
   _subscriptions: Subscription[] = [];
   userAnswers: string[] = [];
+  questionAnswers?: Observable<IAnswerResponse[]>;
   userScore: number = 0;
-  rightAnswers: any[] = ['addEventListener','select','row nowrap'];
   quizValidate: boolean = false;
-  constructor(private router: Router, private quizService: QuizService) {
+  questionsLength: number = 0;
+  constructor(
+    private router: Router,
+    private quizService: QuizService,
+    private candiateService: CandidateService,
+    private authService: AuthService,
+    private route: ActivatedRoute
+  ) {
+    this.questionAnswers = this.candiateService.answers$;
     this.quiz = this.router.getCurrentNavigation()?.extras
       .state as IQuizResponse;
   }
   ngOnInit(): void {
     this._subscriptions.push(
       this.quizService
-        .getAsssignedQuizQuestions()
-        .pipe(
-          switchMap((compositions: IQuizQuestion[]) => {
-            const filtredComposition = compositions
-              .map((quizQuestion) => quizQuestion.questionId)
-              .filter((item, pos, self) => self.indexOf(item) === pos);
-
-            const observables = [
-              of(compositions),
-              forkJoin(
-                filtredComposition.map((questionId) =>
-                  this.quizService.getQuestion(questionId)
-                )
-              ),
-            ];
-            return forkJoin(observables);
-          })
-        )
-        .subscribe((mergedResults) => {
-          const compositions: IQuizQuestion[] =
-            mergedResults[0] as IQuizQuestion[];
-          const questions: IQuestionResponse[] =
-            mergedResults[1] as IQuestionResponse[];
-          const quizQuestions = questions.filter((question, pos) =>
-            compositions.find(
-              (composition) =>
-                composition.questionId === question.questionId &&
-                composition.quizId === this.quiz.quizId
-            )
+        .getUserQuestions(this.quiz.quizUserId!)
+        .pipe()
+        .subscribe((questions) => {
+          this.currentQuestion = questions[0];
+          this.currentIdx = questions.indexOf(this.currentQuestion);
+          this.questionAnswers = this.candiateService.getQuestionAnswers(
+            this.currentQuestion!.questionId
           );
-          this.currentQuestion = quizQuestions[0];
-          this.quiz = { ...this.quiz, questions: quizQuestions };
+          this.quiz = { ...this.quiz, questions: questions };
+          if (this.quiz.questions?.length)
+            this.questionsLength = this.quiz.questions.length;
         })
     );
   }
@@ -68,43 +57,29 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
       return this.quiz.questions.indexOf(this.currentQuestion) + 1;
     return 1;
   }
-  getQuestionAnswers(currentQuestion: IQuestionResponse) {
-    const idx = this.quiz.questions?.indexOf(currentQuestion);
-    if (idx === 0)
-      currentQuestion.answers = [
-        'addEventListener',
-        'attachEvent',
-        'attachEventListener',
-        'listen',
-      ];
-    if (idx === 1)
-      currentQuestion.answers = ['blur', 'focus', 'load', 'select'];
-    if (idx === 2)
-      currentQuestion.answers = [
-        'auto',
-        'normal',
-        'row nowrap',
-        'row wrap',
-        'row no-wrap',
-      ];
-    return currentQuestion.answers;
-  }
+
   previousQuestion(): void {
     this.currentIdx = this.quiz.questions?.indexOf(this.currentQuestion!)! - 1;
     if (this.currentIdx && this.currentIdx <= 0)
       this.currentQuestion = this.quiz.questions?.[0];
     else this.currentQuestion = this.quiz.questions?.at(this.currentIdx);
+    this.questionAnswers = this.candiateService.getQuestionAnswers(
+      this.currentQuestion!.questionId
+    );
   }
   nextQuestion(): void {
-    this.currentIdx = this.quiz.questions?.indexOf(this.currentQuestion!)! + 1;
-    if (
-      this.quiz.questions &&
-      this.currentIdx &&
-      this.currentIdx >= this.quiz.questions?.length
-    )
-      this.currentQuestion =
-        this.quiz.questions?.[this.quiz.questions?.length - 1];
-    else this.currentQuestion = this.quiz.questions?.at(this.currentIdx);
+    this.currentIdx = this.currentIdx + 1;
+    this.currentQuestion = this.quiz.questions?.at(this.currentIdx);
+    if (this.currentQuestion && this.currentQuestion.questionId)
+      this.questionAnswers = this.candiateService.getQuestionAnswers(
+        this.currentQuestion.questionId
+      );
+    if (this.currentIdx === this.questionsLength) {
+      this.router.navigate(['/summary'], {
+        relativeTo: this.route,
+        state: this.quiz,
+      });
+    }
   }
   updateUserAnswer(answer: any) {
     if (answer.target.checked) {
@@ -114,15 +89,21 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     }
   }
   validateQuiz() {
-    const intersectionResult = this.userAnswers.filter(x => this.rightAnswers.indexOf(x) !== -1);
-    // if(this.userAnswers.some((value)=> this.rightAnswers[0].rightAnswer.includes(value)))this.userScore= this.userScore +1;
-    // if(this.userAnswers.some((value)=>this.rightAnswers[1].rightAnswer.includes(value)))this.userScore= this.userScore +1;
-    // if(this.userAnswers.some((value)=>this.rightAnswers[2].rightAnswer.includes(value)))this.userScore = this.userScore+ 1;
-
-    this.quizValidate = true;
-    this.userScore = intersectionResult.length;
+    const answerObs: Observable<IAnswerResponse>[] = this.userAnswers.map(
+      (answerId) =>
+        this.candiateService.submitAnswer({
+          answerId: answerId,
+          questionUserId: this.currentQuestion?.questionUserId!,
+        })
+    );
+    this._subscriptions.push(
+      forkJoin(answerObs).subscribe(() => {
+        this.userAnswers = [];
+        this.nextQuestion();
+      })
+    );
   }
-  calculateScore(){
+  calculateScore() {
     return this.userScore;
   }
   ngOnDestroy(): void {

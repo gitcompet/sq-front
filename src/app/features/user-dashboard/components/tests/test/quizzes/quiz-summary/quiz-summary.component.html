@@ -1,0 +1,19 @@
+<h1 class="text-center py-3 text-2xl">Quiz Summary</h1>
+<div
+  *ngIf="quiz.questions && quiz.questions.length > 0"
+  class="grid grid-cols-2 gap-2 px-2 py-3 justify-center items-start"
+>
+  <app-question
+    *ngFor="let question of this.quiz.questions"
+    [data]="question"
+  ></app-question>
+</div>
+
+<div class="flex justify-center gap-2 w-full mt-4 text-white">
+  <button
+    (click)="validateQuiz()"
+    class="w-[20%] py-3 bg-indigo-600 rounded-lg"
+  >
+    Validate Quiz
+  </button>
+</div>

@@ -7,7 +7,7 @@
       <i class="fas fa-question-circle"></i>
 
       <h3>{{data.label}}</h3>
-      <i *ngFor="let programCategory of data.domainNames" [ngClass]="[('devicon-'+extractName(programCategory)+'-plain colored')]"></i>
+      <i *ngFor="let programCategory of data.domains" [ngClass]="[('devicon-'+extractName(programCategory.name)+'-plain colored')]"></i>
     </div>
   </div>
 </div>

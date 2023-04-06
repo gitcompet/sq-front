@@ -1,17 +1,18 @@
 import {
-  AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   Input,
   OnDestroy,
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription, forkJoin, map, switchMap } from 'rxjs';
 import { extractName } from 'src/app/core/constants/settings';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
 import { ModalService } from 'src/app/shared/services/modal.service';
+import { IQuizQuestion } from '../../../../../../../core/models/quiz-question-assign.model copy';
 
 @Component({
   selector: 'app-quiz',
@@ -22,7 +23,7 @@ export class QuizComponent implements OnInit, OnDestroy {
   isExpanded: boolean = false;
   @Input() isAdmin!: boolean;
   @Input() data!: IQuizResponse;
-  @Input() relatedQuizQuestions!: IQuestionResponse[] | undefined;
+  relatedQuizQuestions: Observable<IQuestionResponse[] | undefined>;
   questions: IQuestionResponse[] = [];
   _subscriptions: Subscription[] = [];
   extractName = extractName;
@@ -31,8 +32,11 @@ export class QuizComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private modalService: ModalService
-  ) {}
+  ) {
+    this.relatedQuizQuestions = new Observable<IQuestionResponse[]>();
+  }
   ngOnInit(): void {
+
     if (this.isAdmin) {
       this.route.fragment.subscribe((f) => {
         const element = document.querySelector('#el-' + f);
@@ -42,43 +46,63 @@ export class QuizComponent implements OnInit, OnDestroy {
           elementContent?.classList.add('max-h-40');
         }
       });
-      this._subscriptions.push(
-        this.quizService
-          .getAvailableQuestions()
-          .subscribe((res: IQuestionResponse[]) => {
-            this.questions = res;
-          })
-      );
     }
-    if (
-      this.router.url.includes('/admin/quizzes') &&
-      this.relatedQuizQuestions
-    ) {
-      this.questions = this.relatedQuizQuestions;
-    }
-
   }
 
   toggle() {
     this.isExpanded = !this.isExpanded;
+
+    if (this.isExpanded) {
+      this._subscriptions.push(
+        this.quizService
+
+          .getAsssignedQuizQuestions(this.data.quizId)
+          .pipe(
+            switchMap((compositions: IQuizQuestion[]) => {
+              const filtredComposition = compositions.map(
+                (quizQuestion) => quizQuestion.questionId
+              );
+
+              return forkJoin(
+                filtredComposition.map((questionId) =>
+                  this.quizService.getQuestion({
+                    questionId: questionId,
+                  } as IQuestionResponse)
+                )
+              );
+            }),
+
+            map((questionRes) => {
+              this.data = {
+                ...this.data,
+                questions: questionRes,
+              };
+            })
+          )
+          .subscribe()
+      );
+    }
   }
-  onUpdateQuiz(){
+  onUpdateQuiz() {
     this.modalService.updateData(this.data);
     this.modalService.openModal({
-      id: 'updateQuizModal'
+      id: 'updateQuizModal',
     });
   }
-  onDeleteQuiz(){
+  onDeleteQuiz() {
     this.modalService.updateData(this.data);
     this.modalService.openModal({
-      id: 'confirmationModal'
+      id: 'confirmationModal',
     });
   }
-  takeQuiz(selectedQuiz: IQuizResponse){
-    const selectedQuizUrl = this.router.createUrlTree(['../..','quiz', selectedQuiz.quizId], {
-      relativeTo: this.route,
-    });
-    this.router.navigateByUrl(selectedQuizUrl,{state:selectedQuiz});
+  takeQuiz(selectedQuiz: IQuizResponse) {
+    const selectedQuizUrl = this.router.createUrlTree(
+      ['../..', 'quiz', selectedQuiz.quizId],
+      {
+        relativeTo: this.route,
+      }
+    );
+    this.router.navigateByUrl(selectedQuizUrl, { state: selectedQuiz });
   }
   ngOnDestroy(): void {
     this._subscriptions.forEach((sub) => sub.unsubscribe());

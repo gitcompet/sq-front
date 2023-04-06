@@ -111,7 +111,6 @@ export class ProfilesComponent implements OnInit, OnDestroy {
     this._subscriptions.push(
       this.authService.signUp(form.value).subscribe((res) => {
         this.users = [...this.users, res];
-        form.reset();
         this.modalService.closeModal({
           id: 'addUserModal',
           isShown: this.showModal,

@@ -10,9 +10,9 @@
       <i (click)="toggle()" class="fas fa-plus"></i>
       <h3>{{ data.title }}</h3>
       <i
-        *ngFor="let programCategory of data.categoryNames"
+        *ngFor="let programCategory of data.categories"
         [ngClass]="[
-          'devicon-' + extractName(programCategory) + '-plain colored'
+          'devicon-' + extractName(programCategory.name) + '-plain colored'
         ]"
       ></i>
       <div
@@ -49,9 +49,9 @@
     <ng-container
       *ngIf="isExpanded"
       class="accordion-content flex flex-col justify-center items-center px-5 pt-0 overflow-y-scroll scroll-smooth"
-      [class]="isExpanded ? 'max-h-40 ' : ''"
-    >
-      <app-quizzes [relatedTestQuizzes]="data.quizzes"></app-quizzes>
+      [class]="isExpanded ? 'max-h-100 ' : ''"    >
+
+      <app-quizzes  [relatedTestQuizzes]="quizzes | async"></app-quizzes>
     </ng-container>
   </div>
 </div>

@@ -6,35 +6,25 @@
   class="rounded px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:bg-neutral-100 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700 dark:hover:bg-neutral-700">
   <a routerLinkActive="active" [routerLink]="'/home'"> Back Home</a>
 </button>
-<ng-container *ngIf="quiz.questions && quiz.questions.length > 0 && currentQuestion">
+<ng-container *ngIf="questionsLength > 0 && currentQuestion">
   <div
     class="flex flex-col w-screen px-5 h-screen bg-[#fff] justify-center items-center"
 >
-  <h2 className="mt-10 text-xl text-black/60">Question {{findQuestionIndex()}} of {{quiz.questions.length}}</h2>
+  <h2 className="mt-10 text-xl text-black/60">Question {{findQuestionIndex()}} of {{questionsLength}}</h2>
   <div className="mt-4 text-2xl text-black">
     {{currentQuestion.label}}
   </div>
-  <div class="flex justify-center items-center w-full">
+  <div class="flex justify-center items-center w-1/2">
     <div
-      *ngFor="let answer of getQuestionAnswers(currentQuestion)"
-      class="flex items-center w-full py-4 pl-5 m-2 ml-0 space-x-2 border-2 cursor-pointer bg-white/5 border-white/10 rounded-xl"
+      *ngFor="let answer of questionAnswers | async"
+      class="flex justify-center items-center w-full py-4 pl-5 m-2 ml-0 space-x-2 border-2 cursor-pointer bg-white/5 border-white/10 rounded-xl"
     >
-      <input (change)="updateUserAnswer($event)" [value]="answer" type="checkbox" class="w-6 h-6 bg-white" />
-      <p class="ml-6 text-black">{{answer}}</p>
+      <input (change)="updateUserAnswer($event)" [value]="answer.answerId" type="checkbox" class="w-6 h-6 bg-white" />
+      <p class="ml-6 text-black">{{answer.label}}</p>
     </div>
   </div>
-  <div class="flex justify-center gap-2 w-full mt-4 text-white">
-    <button [disabled]="currentIdx <= 0" (click)="previousQuestion()" class="w-[20%] py-3 bg-indigo-600 rounded-lg">Previous</button>
-    <button [disabled]="currentIdx > quiz.questions.length"  (click)="nextQuestion()" class="w-[20%] py-3 bg-indigo-600 rounded-lg">Next</button>
-  </div>
-  <ng-container>
-    <div *ngIf="quiz.questions && currentIdx === quiz.questions.length" class="flex justify-center gap-2 w-full mt-4 text-white">
-      <button  (click)="validateQuiz()" class="w-[20%] py-3 bg-indigo-600 rounded-lg">Validate</button>
+    <div class="flex justify-center gap-2 w-full mt-4 text-white">
+      <button (click)="validateQuiz()" class="w-[20%] py-3 bg-indigo-600 rounded-lg">Validate</button>
     </div>
-    <!-- <div *ngIf="quizValidate" class="flex justify-center gap-2 w-full mt-4 text-white">
-      <p class="ml-6 text-black">Your Score is : {{calculateScore()}} out of {{quiz.questions.length}} </p>
-    </div> -->
-  </ng-container>
 </div>
 </ng-container>
-
