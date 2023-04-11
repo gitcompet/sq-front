@@ -34,11 +34,9 @@ export class CandidateService {
       )
       .pipe(
         switchMap((questionAnswers) => {
-          console.log(questionAnswers);
-
           return forkJoin(
             questionAnswers.map((questionAnswer) =>
-              {return this.getAnswer({...questionAnswer,quizUserId: question.questionUserId})}
+              {return this.getAnswer({...questionAnswer,quizUserId: question.quizUserId})}
             )
           );
         })

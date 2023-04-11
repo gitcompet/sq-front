@@ -1,7 +1,5 @@
 import { KeyValue } from '@angular/common';
 import {
-  AfterContentInit,
-  AfterViewInit,
   Component,
   ContentChild,
   EventEmitter,
@@ -10,7 +8,6 @@ import {
   Output,
   TemplateRef,
   ViewChild,
-  ViewContainerRef,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ActionHostDirective } from 'src/app/core/directives/action-host.directive';
@@ -26,10 +23,10 @@ export class TableComponent implements OnInit {
   @Input() data: IUser[] | IQuestion[] | any[] = [];
   @Input() title: string = '';
   @Input() headers: string[] = [];
-  @Input() actions: any[] = [];
   @Output('onSave') dataEmitter: EventEmitter<any> = new EventEmitter<any>();
   _subscriptions: Subscription[] = [];
-  @ViewChild(ActionHostDirective, { static: true })actionHost!: ActionHostDirective;
+  @ViewChild(ActionHostDirective, { static: true })
+  actionHost!: ActionHostDirective;
   @ContentChild(TemplateRef) templateRef!: TemplateRef<any>;
   constructor(private modalService: ModalService) {}
   ngOnInit() {
@@ -40,26 +37,23 @@ export class TableComponent implements OnInit {
         }
       })
     );
-    this.loadComponents();
   }
-  loadComponents() {
-    if (this.actions && this.actions.length > 0) {
 
-      // const viewContainerRef = this.actionHost.viewContainerRef;
-      // viewContainerRef.clear();
-      // const componentRef =
-      //   viewContainerRef.createComponent<CheckBoxComponent>(this.actions[0].componentName);
-    }
-  }
   getRowContext(row: any) {
-    const rowKey: string = Object.keys(row).find((keyName)=> keyName.match(/(id|login)/i))!;
-    return {$implicit: row[rowKey],data: row};
+    const rowKey: string = Object.keys(row).find((keyName) =>
+      keyName.match(/(id|login)/i)
+    )!;
+    return { $implicit: row[rowKey], data: row };
   }
   // Preserve original property order
   originalOrder = (
-    a: KeyValue<number, string>,
-    b: KeyValue<number, string>,
+    a: KeyValue<number, any>,
+    b: KeyValue<number, any>
   ): number => {
     return 0;
   };
+  isObject(value: any) {
+    return typeof value === 'object';
+  }
+
 }

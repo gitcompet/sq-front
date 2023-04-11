@@ -86,10 +86,9 @@
             Quizzes
           </h3>
           <app-table
-            [actions]="quizActions"
             content
             [data]="testQuizzes"
-            [headers]="quizHeaders"
+            [headers]="headers"
             [title]="'Quizzes'"
           >
           <ng-template let-item>
@@ -167,10 +166,9 @@
           Quizzes
         </h3>
         <app-table
-          [actions]="quizActions"
           content
           [data]="testQuizzes"
-          [headers]="quizHeaders"
+          [headers]="headers"
           [title]="'Quizzes'"
         >
         <ng-template let-item>

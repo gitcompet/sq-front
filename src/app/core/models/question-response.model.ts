@@ -9,6 +9,7 @@ export interface IQuestionResponse {
   domains: IDomain[];
   subDomains: IDomain[];
   level: number;
+  duration: number;
   answers: IAnswerResponse[],
   isActive: boolean;
   isDeleted: boolean;
@@ -23,6 +24,7 @@ export class QuestionResponse implements IQuestionResponse {
   domains: IDomain[];
   subDomains: IDomain[];
   level: number;
+  duration: number;
   answers: IAnswerResponse[];
   isActive: boolean;
   isDeleted: boolean;
@@ -35,6 +37,7 @@ export class QuestionResponse implements IQuestionResponse {
     domains: IDomain[],
     subDomains: IDomain[],
     level: number,
+    duration: number,
     answers: IAnswerResponse[],
     isActive: boolean,
     isDeleted: boolean,
@@ -48,6 +51,7 @@ export class QuestionResponse implements IQuestionResponse {
     this.title = title;
     this.label = label;
     this.level = level;
+    this.duration = duration;
     this.domains = domains;
     this.subDomains = subDomains;
     this.comment = comment;

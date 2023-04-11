@@ -9,11 +9,14 @@ export interface IQuizResponse {
     comment: string;
     isActive: boolean;
     isDeleted: boolean;
+    isClosed: boolean;
+    hasTimer: boolean;
     questions : IQuestionResponse[];
     title?: string;
     label?: string;
     testUserId?:string;
     quizUserId?:string;
+    timer?: boolean;
 }
 export class QuizResponse implements IQuizResponse{
   quizId: string;
@@ -23,20 +26,27 @@ export class QuizResponse implements IQuizResponse{
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
+  isClosed: boolean;
+  hasTimer: boolean;
   questions : IQuestionResponse[];
   title?: string;
   label?: string;
+  timer?: boolean;
+
   constructor(
     quizId: string,
     subDomains:IDomain[],
     comment: string,
     isActive: boolean,
     isDeleted: boolean,
+    isClosed: boolean,
+    hasTimer:boolean,
     weight: number,
     domains:IDomain[],
     questions : IQuestionResponse[],
     title?: string,
     label?: string,
+    timer?: boolean,
 
   ) {
     this.quizId = quizId;
@@ -47,6 +57,9 @@ export class QuizResponse implements IQuizResponse{
     this.comment = comment;
     this.isActive = isActive;
     this.isDeleted = isDeleted;
+    this.isClosed = isClosed;
+    this.hasTimer = hasTimer;
+    this.timer = timer
     this.weight = weight;
     this.questions = questions;
   }

@@ -6,9 +6,9 @@ export interface ITestResponse {
     testUserId: string,
     categories: IDomain[];
     comment: string;
+    quizzes: IQuizResponse[];
     isActive?: boolean;
     isDeleted?: boolean;
-    quizzes?: IQuizResponse[];
     title?: string;
     label?: string;
 }
@@ -19,7 +19,7 @@ export class TestResponse implements ITestResponse{
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
-  quizzes?: IQuizResponse[];
+  quizzes: IQuizResponse[];
   title?: string;
   label?: string;
   constructor(
@@ -29,7 +29,7 @@ export class TestResponse implements ITestResponse{
     comment: string,
     isActive: boolean,
     isDeleted: boolean,
-    quizzes?: IQuizResponse[],
+    quizzes: IQuizResponse[],
     title?: string,
     label?: string
   ) {

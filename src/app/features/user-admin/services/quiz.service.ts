@@ -251,7 +251,6 @@ export class QuizService {
       )
       .pipe(
         switchMap((res) => {
-
           return this.getQuiz({
             quizId: res.quizId,
             quizUserId: res.quizUserId,
@@ -259,7 +258,6 @@ export class QuizService {
           } as IQuizResponse);
         }),
         map((quiz) => {
-
           const modifiedQuiz = {} as IQuizResponse;
           modifiedQuiz.quizId = quiz.quizId;
           modifiedQuiz.title = quiz.title;
@@ -267,6 +265,7 @@ export class QuizService {
           modifiedQuiz.comment = quiz.comment;
           modifiedQuiz.quizUserId = quiz.quizUserId;
           modifiedQuiz.testUserId = quiz.quizUserId;
+          modifiedQuiz.isClosed = quiz.isClosed;
           return modifiedQuiz;
         })
       );
@@ -295,6 +294,7 @@ export class QuizService {
             modifiedQuiz.title = quiz.title;
             modifiedQuiz.label = quiz.label;
             modifiedQuiz.comment = quiz.comment;
+            modifiedQuiz.isClosed = modifiedQuiz.isClosed;
             return modifiedQuiz;
           });
         }),
@@ -357,7 +357,9 @@ export class QuizService {
           const modifiedQuiz = {} as IQuizResponse;
           modifiedQuiz.quizId = quiz.quizId;
           modifiedQuiz.title = quiz.title;
+          modifiedQuiz.label = quiz.label;
           modifiedQuiz.comment = quiz.comment;
+          modifiedQuiz.isClosed = modifiedQuiz.isClosed;
           return modifiedQuiz;
         })
       );
@@ -376,7 +378,9 @@ export class QuizService {
           const modifiedQuiz = {} as IQuizResponse;
           modifiedQuiz.quizId = quiz.quizId;
           modifiedQuiz.title = quiz.title;
+          modifiedQuiz.label = quiz.label;
           modifiedQuiz.comment = quiz.comment;
+          modifiedQuiz.isClosed = modifiedQuiz.isClosed;
           return modifiedQuiz;
         })
       );
@@ -417,10 +421,14 @@ export class QuizService {
           modifiedQuiz.title = quiz.title;
           modifiedQuiz.label = quiz.label;
           modifiedQuiz.comment = quiz.comment;
+          if (quizPayload.isClosed)
+            modifiedQuiz.isClosed = quizPayload.isClosed;
           if (quizPayload.testUserId)
             modifiedQuiz.testUserId = quizPayload.testUserId;
           if (quizPayload.quizUserId)
             modifiedQuiz.quizUserId = quizPayload.quizUserId;
+          if (quizPayload.timer) modifiedQuiz.hasTimer = quizPayload.timer;
+
           return modifiedQuiz;
         }),
         switchMap((newQuiz: IQuizResponse) => {
@@ -484,6 +492,7 @@ export class QuizService {
             modifiedQuestion.label = question.label;
             modifiedQuestion.level = question.level;
             modifiedQuestion.comment = question.comment;
+            modifiedQuestion.duration = question.duration;
             return modifiedQuestion;
           });
         }),
@@ -589,7 +598,7 @@ export class QuizService {
         map((question) => ({
           ...question,
           questionUserId: questionPayload.questionUserId,
-          quizUserId: questionPayload.quizUserId
+          quizUserId: questionPayload.quizUserId,
         }))
       );
   }
@@ -597,18 +606,6 @@ export class QuizService {
     return this.httpClient
       .get<any>(
         `${environment.baseUrl}${environment.apiVersion}${environment.questionPaths.userQuestion}/${quizUserId}?isParentURL=true`
-      )
-      .pipe(
-        switchMap((userQuestion) => {
-          return forkJoin(
-            userQuestion['value'].map((question: any) => {
-              return this.getQuestion({
-                ...question,
-                quizUserId: quizUserId,
-              });
-            })
-          );
-        })
       );
   }
 

@@ -27,12 +27,8 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
   testQuizzes: IQuizResponse[] = [];
   data: unknown;
   quizzesIds: string[] = [];
-  quizActions: unknown[] = [
-    { actionName: 'select', componentName: CheckBoxComponent },
-  ];
   tests: ITestResponse[] = [];
-  headers: string[] = ['Name', 'Category', 'Action'];
-  quizHeaders: string[] = ['Id', 'Name', 'Category', 'Action'];
+  headers: string[] = ['Id', 'Title', 'Label', 'Domain', 'Action'];
   categories: IDomain[] = [];
   _subscriptions: Subscription[] = [];
   newTest: ITest = {} as ITest;
@@ -43,7 +39,7 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
   ) {
     this.testForm = this._formBuilder.group({
       title: this._formBuilder.control('', [Validators.required]),
-      label:this._formBuilder.control('', [Validators.required]),
+      label: this._formBuilder.control('', [Validators.required]),
       categories: this._formBuilder.control('', Validators.required),
     });
     this.testUpdateForm = this._formBuilder.group({
@@ -102,17 +98,18 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap((newTest: ITestResponse) => {
           this.tests.push(newTest);
-          return this.quizzesIds.length > 0 ? forkJoin(
-            this.quizzesIds.map((quizId) =>
-              this.quizService.assignQuiz({
-                quizId: quizId,
-                testId: newTest.testId,
-              })
-            )
-          ): of()
+          return this.quizzesIds.length > 0
+            ? forkJoin(
+                this.quizzesIds.map((quizId) =>
+                  this.quizService.assignQuiz({
+                    quizId: quizId,
+                    testId: newTest.testId,
+                  } as ITestQuiz)
+                )
+              )
+            : of();
         }),
         switchMap((compositions: ITestQuiz[]) => {
-
           const filtredComposition = compositions
             .map((testQuiz) => testQuiz.quizId)
             .filter((item, pos, self) => self.indexOf(item) == pos);
@@ -120,7 +117,7 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
             of(compositions),
             forkJoin(
               filtredComposition.map((quizId) =>
-                this.quizService.getQuiz({quizId}as IQuizResponse)
+                this.quizService.getQuiz({ quizId } as IQuizResponse)
               )
             ),
           ];
@@ -165,7 +162,7 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
               this.quizService.assignQuiz({
                 quizId: quizId,
                 testId: newTest.testId,
-              })
+              } as ITestQuiz)
             )
           );
         }),

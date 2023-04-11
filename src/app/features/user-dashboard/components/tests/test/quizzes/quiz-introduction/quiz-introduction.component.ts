@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Observable, switchMap, tap } from 'rxjs';
+import { Observable, count, map, reduce, switchMap, tap } from 'rxjs';
 import { extractName } from 'src/app/core/constants/settings';
 import { Language } from 'src/app/core/models/language.model';
 import { OperationType, Patch } from 'src/app/core/models/patch.model';
@@ -19,12 +19,12 @@ import { LanguageManagerService } from 'src/app/shared/services/language-manager
   templateUrl: './quiz-introduction.component.html',
   styleUrls: ['./quiz-introduction.component.css'],
 })
-export class QuizIntroductionComponent implements OnInit {
-  questions: IQuestionResponse[] = [];
+export class QuizIntroductionComponent implements OnInit, AfterViewInit {
   quiz: IQuizResponse;
   languageForm: FormGroup;
   langId: string;
   languages: Observable<Language[]>;
+  totalDuration: number = 0;
   extractName = extractName;
   constructor(
     private router: Router,
@@ -37,11 +37,23 @@ export class QuizIntroductionComponent implements OnInit {
   ) {
     this.quiz = this.router.getCurrentNavigation()?.extras
       .state as IQuizResponse;
+
     this.languages = new Observable<Language[]>();
     this.langId = this.languageManagerService.getCurrentLanguageId();
     this.languageForm = this._formBuilder.group({
       language: this._formBuilder.control('', [Validators.required]),
     });
+  }
+  ngAfterViewInit(): void {
+    // this.quizService
+    //   .getUserQuestions(this.quiz.quizUserId!)
+    //   .pipe()
+    //   .subscribe((questions: IQuestionResponse[]) => {
+    //     this.totalDuration =
+    //       questions
+    //         .map((question) => question.duration)
+    //         .reduce((acc, current) => current + acc);
+    //   });
   }
   ngOnInit(): void {
     this.languages = this.languagesService.getLanguage(this.langId).pipe(
@@ -65,7 +77,7 @@ export class QuizIntroductionComponent implements OnInit {
     this.router.navigateByUrl(selectedQuizUrl, { state: this.quiz });
   }
   onLanguageChange(event: Event) {
-    const  language =  this.languageForm.get('language')?.value;
+    const language = this.languageForm.get('language')?.value;
     this.quizService
       .updateUserQuiz(this.quiz.quizUserId!, [
         {
