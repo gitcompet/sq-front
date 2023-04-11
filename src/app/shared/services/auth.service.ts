@@ -7,7 +7,10 @@ import { TokenResponse } from 'src/app/core/models/token-response.model';
 import { IUser, User } from 'src/app/core/models/user.model';
 import { environment } from 'src/environments/environment.development';
 import { JWTHelperService } from './jwt-helper.service';
-import { formUrlEncodedHeaders, headers } from 'src/app/core/constants/settings';
+import {
+  formUrlEncodedHeaders,
+  headers,
+} from 'src/app/core/constants/settings';
 
 @Injectable({
   providedIn: 'root',
@@ -46,7 +49,7 @@ export class AuthService {
     );
   }
   refreshToken(payload: any): Observable<TokenResponse> {
-     return this.http.post<TokenResponse>(
+    return this.http.post<TokenResponse>(
       `${environment.baseUrl}${environment.apiVersion}${environment.authPaths.base}${environment.authPaths.refresh}`,
 
       payload,
@@ -58,9 +61,12 @@ export class AuthService {
     this.isLoggedin = false;
     this.router.navigateByUrl('/');
   }
-  hasTokenExpired():boolean{
+  hasTokenExpired(): boolean {
     const token = this.getToken();
-    return (token === undefined || token === null) && this.jwtService.hasTokenExpired(token);
+    return (
+      (token === undefined || token === null) &&
+      this.jwtService.hasTokenExpired(token)
+    );
   }
   isLoggedIn(): boolean {
     const token = this.getToken();
@@ -97,7 +103,10 @@ export class AuthService {
     const properties: string[] = Object.getOwnPropertyNames(decodedToken);
     const key: string = properties.filter((value) => value.includes('role'))[0];
     const roles = decodedToken[key] as string[];
-    return roles;
+    const activatedRoles: string[] = [];
+    if (Array.isArray(roles)) return roles;
+    activatedRoles.push(roles);
+    return activatedRoles;
   }
   isAdmin() {
     return this.getRoles().includes('admin'.toUpperCase());
