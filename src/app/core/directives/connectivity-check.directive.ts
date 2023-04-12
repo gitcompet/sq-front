@@ -1,4 +1,4 @@
-import { Directive, HostBinding } from '@angular/core';
+import { Directive, HostBinding, HostListener } from '@angular/core';
 import { LocalStorageService } from 'src/app/shared/services/local-storage.service';
 
 @Directive({
@@ -6,8 +6,14 @@ import { LocalStorageService } from 'src/app/shared/services/local-storage.servi
 })
 export class ConnectivityCheckDirective {
   constructor(private localStorageService: LocalStorageService) {}
-  @HostBinding('window:offline')
-  onLostNetwork() {}
-  @HostBinding('window:online')
-  onBackNetwork() {}
+  @HostListener('window:offline')
+  onLostNetwork() {
+    console.log
+    ("Connection Lost");
+  }
+  @HostListener('window:online')
+  onBackNetwork() {
+    console.log("Connection Back");
+
+  }
 }
