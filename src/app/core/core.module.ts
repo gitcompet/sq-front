@@ -5,9 +5,10 @@ import { TokenInterceptor } from './interceptors/token-interceptor.interceptor';
 import { ActionHostDirective } from './directives/action-host.directive';
 import { ErrorHandlerComponent } from './exceptions/error-handler/error-handler.component';
 import { LoaderInterceptor } from './interceptors/loader-interceptor.interceptor';
+import { ConnectivityCheckDirective } from './directives/connectivity-check.directive';
 
 @NgModule({
-  declarations: [ActionHostDirective],
+  declarations: [ActionHostDirective, ConnectivityCheckDirective],
   imports: [CommonModule],
   exports: [ActionHostDirective],
   providers: [

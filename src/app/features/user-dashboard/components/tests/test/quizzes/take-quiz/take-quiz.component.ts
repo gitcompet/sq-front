@@ -22,6 +22,7 @@ import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
 import { CandidateService } from 'src/app/features/user-admin/services/candiate.service';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { LocalStorageService } from 'src/app/shared/services/local-storage.service';
 
 @Component({
   selector: 'app-take-quiz',
@@ -47,7 +48,8 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     private router: Router,
     private quizService: QuizService,
     private candiateService: CandidateService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private localStorageService: LocalStorageService
   ) {
     this.questionAnswers = this.candiateService.answers$;
     this.quiz = this.router.getCurrentNavigation()?.extras
@@ -64,6 +66,8 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
           .getUserQuestions(this.quiz.quizUserId!)
           .pipe(
             switchMap((userQuestions) => {
+
+
               this.userQuestions = userQuestions['value'];
               if (userQuestions['value']?.length)
                 this.questionsLength = userQuestions['value'].length;
@@ -109,6 +113,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
   }
   tick() {
     this.duration = this.duration - this.timeInterv / 1000;
+    this.localStorageService.saveData("questionElapsedTime",this.duration.toString());
     this.elapsedTime = this.parseTime();
     if (this.duration === 0) {
       this.validateQuiz();
