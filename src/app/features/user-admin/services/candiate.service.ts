@@ -98,4 +98,11 @@ export class CandidateService {
         })
       );
   }
+  getUnansweredQuizQuestions(quizId: string): Observable<string[]> {
+    return this.httpClient
+      .get<string[]>(
+        `${environment.baseUrl}${environment.apiVersion}${environment.questionPaths.answerUser}${environment.questionPaths.unansweredUserQuestion}/${quizId}`
+      )
+      .pipe();
+  }
 }

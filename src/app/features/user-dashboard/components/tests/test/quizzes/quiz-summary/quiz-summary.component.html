@@ -4,6 +4,7 @@
   class="grid grid-cols-2 gap-2 px-2 py-3 justify-center items-start"
 >
   <app-question
+    (click)="retryQuestion(question)"
     *ngFor="let question of this.quiz.questions"
     [data]="question"
   ></app-question>

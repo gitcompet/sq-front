@@ -470,6 +470,7 @@ export class QuizService {
       )
       .pipe();
   }
+
   getAsssignedQuestions(quizId: string): Observable<IQuestionResponse[]> {
     return this.httpClient
       .get<IQuestionResponse[]>(

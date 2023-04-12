@@ -36,6 +36,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
   userAnswers: string[] = [];
   questionAnswers?: Observable<IAnswerResponse[]>;
   userQuestions: any;
+  userUnansweredQuestionsId: string = '';
   userScore: number = 0;
   questionsLength: number = 0;
   duration: number = 0; //in minutes
@@ -51,36 +52,60 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     this.questionAnswers = this.candiateService.answers$;
     this.quiz = this.router.getCurrentNavigation()?.extras
       .state as IQuizResponse;
+    this.route.params.subscribe((params)=>{
+      console.log(params);
+
+    })
   }
   ngOnInit(): void {
-    this._subscriptions.push(
-      this.quizService
-        .getUserQuestions(this.quiz.quizUserId!)
-        .pipe(
-          switchMap((userQuestions) => {
-            this.userQuestions = userQuestions['value'];
-            if (userQuestions['value']?.length)
-              this.questionsLength = userQuestions['value'].length;
-            return this.quizService.getQuestion(this.userQuestions[0]);
+    if (!this.userUnansweredQuestionsId) {
+      this._subscriptions.push(
+        this.quizService
+          .getUserQuestions(this.quiz.quizUserId!)
+          .pipe(
+            switchMap((userQuestions) => {
+              this.userQuestions = userQuestions['value'];
+              if (userQuestions['value']?.length)
+                this.questionsLength = userQuestions['value'].length;
+              return this.quizService.getQuestion(this.userQuestions[0]);
+            })
+          )
+          .subscribe((question) => {
+            this.currentQuestion = question;
+            this.quiz.questions = [] as IQuestionResponse[];
+            this.quiz.questions.push(question);
+            if (this.currentQuestion) {
+              this.duration = .3 * 60;
+              this.timer = setInterval(() => {
+                this.tick();
+              }, this.timeInterv);
+            }
+
+            this.currentIdx = 0;
+            this.questionAnswers = this.candiateService.getQuestionAnswers(
+              this.currentQuestion!
+            );
           })
-        )
+      );
+    } else {
+      this.quizService
+        .getQuestion(this.userUnansweredQuestionsId)
         .subscribe((question) => {
           this.currentQuestion = question;
-          this.quiz.questions =[] as IQuestionResponse[];
-          this.quiz.questions.push(question);
           if (this.currentQuestion) {
-            this.duration = this.currentQuestion.duration * 60;
+            this.duration = .3 * 60;
             this.timer = setInterval(() => {
               this.tick();
             }, this.timeInterv);
           }
 
           this.currentIdx = 0;
+          this.questionsLength = this.currentIdx + 1;
           this.questionAnswers = this.candiateService.getQuestionAnswers(
             this.currentQuestion!
           );
-        })
-    );
+        });
+    }
   }
   tick() {
     this.duration = this.duration - this.timeInterv / 1000;
@@ -114,7 +139,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
         .getQuestion(this.userQuestions[this.currentIdx])
 
         .subscribe((question) => {
-          this.quiz.questions = [...this.quiz.questions,question];
+          this.quiz.questions = [...this.quiz.questions, question];
           this.currentQuestion = question;
           if (this.currentQuestion) {
             this.duration = this.currentQuestion.duration * 60;
