@@ -15,6 +15,7 @@ export interface IQuestionResponse {
   isDeleted: boolean;
   title?: string;
   label?: string;
+  maxValidationDate?: string;
 }
 export class QuestionResponse implements IQuestionResponse {
   questionId: string;

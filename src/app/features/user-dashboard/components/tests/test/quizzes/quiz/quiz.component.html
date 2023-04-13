@@ -62,7 +62,7 @@
       id="{{ 'el-content-' + data.quizId }}"
       *ngIf="isExpanded && isAdmin"
       class="accordion-content flex flex-col justify-center items-center px-5 pt-0 overflow-y-scroll max-h-0"
-      [class]="isExpanded ? 'max-h-60 ' : ''"
+      [class]="isExpanded ? 'max-h-40 ' : ''"
     >
       <div
         *ngIf="data.questions && data.questions.length > 0"

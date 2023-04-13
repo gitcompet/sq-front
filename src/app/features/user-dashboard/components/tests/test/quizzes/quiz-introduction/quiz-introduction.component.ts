@@ -45,15 +45,15 @@ export class QuizIntroductionComponent implements OnInit, AfterViewInit {
     });
   }
   ngAfterViewInit(): void {
-    // this.quizService
-    //   .getUserQuestions(this.quiz.quizUserId!)
-    //   .pipe()
-    //   .subscribe((questions: IQuestionResponse[]) => {
-    //     this.totalDuration =
-    //       questions
-    //         .map((question) => question.duration)
-    //         .reduce((acc, current) => current + acc);
-    //   });
+    this.quizService
+      .getUserQuestions(this.quiz.quizUserId!)
+      .pipe()
+      .subscribe((questions: IQuestionResponse[]) => {
+        this.totalDuration =
+          questions
+            .map((question) => question.duration)
+            .reduce((acc, current) => current + acc);
+      });
   }
   ngOnInit(): void {
     this.languages = this.languagesService.getLanguage(this.langId).pipe(

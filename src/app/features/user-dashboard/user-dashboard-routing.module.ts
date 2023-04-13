@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'src/app/core/guards/auth.guard';
 import { ContactComponent } from './components/contact/contact.component';
 import { UserHomeComponent } from './components/home/user-home.component';
-import { TakeQuizComponent } from './components/tests/test/quizzes/take-quiz/take-quiz.component';
 import { TestComponent } from './components/tests/test/test.component';
 import { TestsComponent } from './components/tests/tests.component';
 

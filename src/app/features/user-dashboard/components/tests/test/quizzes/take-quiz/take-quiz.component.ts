@@ -1,27 +1,24 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  first,
+  catchError,
+  finalize,
   forkJoin,
-  interval,
+  iif,
   Observable,
   of,
   pipe,
+  shareReplay,
   Subscription,
   switchMap,
-  take,
-  TimeInterval,
-  timeInterval,
-  timer,
+  throwError,
 } from 'rxjs';
 import { IAnswerResponse } from 'src/app/core/models/answer-response.model';
-import { IAnswer } from 'src/app/core/models/answer.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
-import { IQuizQuestion } from 'src/app/core/models/quiz-question-assign.model copy';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
 import { CandidateService } from 'src/app/features/user-admin/services/candiate.service';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
-import { AuthService } from 'src/app/shared/services/auth.service';
 import { LocalStorageService } from 'src/app/shared/services/local-storage.service';
 
 @Component({
@@ -41,6 +38,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
   userScore: number = 0;
   questionsLength: number = 0;
   duration: number = 0; //in minutes
+  maxQuestionTime: number = 0;
   elapsedTime: string = '00:00';
   timer: any = null;
   timeInterv: number = 1000;
@@ -54,70 +52,21 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     this.questionAnswers = this.candiateService.answers$;
     this.quiz = this.router.getCurrentNavigation()?.extras
       .state as IQuizResponse;
-    this.route.params.subscribe((params)=>{
+    this.route.params.subscribe((params) => {
       console.log(params);
-
-    })
+    });
   }
   ngOnInit(): void {
-    if (!this.userUnansweredQuestionsId) {
-      this._subscriptions.push(
-        this.quizService
-          .getUserQuestions(this.quiz.quizUserId!)
-          .pipe(
-            switchMap((userQuestions) => {
-
-
-              this.userQuestions = userQuestions['value'];
-              if (userQuestions['value']?.length)
-                this.questionsLength = userQuestions['value'].length;
-              return this.quizService.getQuestion(this.userQuestions[0]);
-            })
-          )
-          .subscribe((question) => {
-            this.currentQuestion = question;
-            this.quiz.questions = [] as IQuestionResponse[];
-            this.quiz.questions.push(question);
-            if (this.currentQuestion) {
-              this.duration = .3 * 60;
-              this.timer = setInterval(() => {
-                this.tick();
-              }, this.timeInterv);
-            }
-
-            this.currentIdx = 0;
-            this.questionAnswers = this.candiateService.getQuestionAnswers(
-              this.currentQuestion!
-            );
-          })
-      );
-    } else {
-      this.quizService
-        .getQuestion(this.userUnansweredQuestionsId)
-        .subscribe((question) => {
-          this.currentQuestion = question;
-          if (this.currentQuestion) {
-            this.duration = .3 * 60;
-            this.timer = setInterval(() => {
-              this.tick();
-            }, this.timeInterv);
-          }
-
-          this.currentIdx = 0;
-          this.questionsLength = this.currentIdx + 1;
-          this.questionAnswers = this.candiateService.getQuestionAnswers(
-            this.currentQuestion!
-          );
-        });
-    }
+    this._subscriptions.push(this.getQuestions());
   }
+
   tick() {
-    this.duration = this.duration - this.timeInterv / 1000;
-    this.localStorageService.saveData("questionElapsedTime",this.duration.toString());
+    this.duration -= 1;
     this.elapsedTime = this.parseTime();
-    if (this.duration === 0) {
-      this.validateQuiz();
-    }
+    if (this.duration === 0) console.log('done');
+    // if (this.duration === 0) {
+    //   this.validateQuiz();
+    // }
   }
   parseTime() {
     let mins: string | number = Math.floor(this.duration / 60);
@@ -142,16 +91,53 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     this._subscriptions.push(
       this.quizService
         .getQuestion(this.userQuestions[this.currentIdx])
+        .pipe(
+          catchError((err) => {
+            return throwError(() => err);
+          })
+        )
+        .subscribe({
+          next: (result) => {
+            this.currentQuestion = this.userQuestions
+              .filter(
+                (question: IQuestionResponse) =>
+                  question.questionId === result?.questionId
+              )
+              .map((question: any) => {
+                return {
+                  ...result,
+                  maxValidationDate: question.maxValidationDate,
+                } as IQuestionResponse;
+              })[0];
+            this.quiz.questions = [] as IQuestionResponse[];
+            if (this.currentQuestion) {
+              this.quiz.questions.push(this.currentQuestion);
+              this.questionAnswers = this.candiateService.getQuestionAnswers(
+                this.currentQuestion
+              );
+              if (this.currentQuestion.maxValidationDate) {
+                const time = new Date(this.currentQuestion.maxValidationDate);
+                time.setTime(time.getTime() - 60 * 1000);
+                this.duration = Math.floor(
+                  (time.getTime() - new Date().getTime()) / 1000
+                );
 
-        .subscribe((question) => {
-          this.quiz.questions = [...this.quiz.questions, question];
-          this.currentQuestion = question;
-          if (this.currentQuestion) {
-            this.duration = this.currentQuestion.duration * 60;
-            this.questionAnswers = this.candiateService.getQuestionAnswers(
-              this.currentQuestion!
-            );
-          }
+                if (this.duration === 0) {
+                  this.nextQuestion();
+                }
+              } else {
+                this.duration = this.currentQuestion.duration * 60;
+              }
+              this.timer = setInterval(() => {
+                this.tick();
+              }, this.timeInterv);
+            }
+          },
+          error: (err) => {
+            if (this.currentIdx < this.questionsLength && this.duration === 0) {
+              this.nextQuestion();
+            }
+          },
         })
     );
   }
@@ -189,6 +175,80 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
           })
       );
   }
+  private getQuestions(): Subscription {
+    const userQuestionObs = pipe(
+      switchMap((userQuestions: any) => {
+        this.userQuestions = userQuestions['value'];
+        if (userQuestions['value']?.length)
+          this.questionsLength = userQuestions['value'].length;
+        return this.quizService.getQuestion(
+          this.userUnansweredQuestionsId
+            ? this.userUnansweredQuestionsId
+            : this.userQuestions[this.currentIdx]
+        );
+      }),
+      catchError((err) => {
+        return throwError(() => err);
+      })
+    );
+    const questionObs = this.quizService
+      .getQuestion(
+        this.userUnansweredQuestionsId
+          ? this.userUnansweredQuestionsId
+          : this.userQuestions[this.currentIdx]
+      )
+      .pipe(
+        (this.userQuestions && this.userQuestions.length === 0) ??
+          userQuestionObs
+      )
+      .subscribe({
+        next: (result: any) => {
+          this.currentQuestion = this.userQuestions
+            .filter(
+              (question: IQuestionResponse) =>
+                question.questionId === result?.questionId
+            )
+            .map((question: any) => {
+              return {
+                ...result,
+                maxValidationDate: question.maxValidationDate,
+              } as IQuestionResponse;
+            })[0];
+          this.quiz.questions = [] as IQuestionResponse[];
+          if (this.currentQuestion) {
+            this.quiz.questions.push(this.currentQuestion);
+            this.currentIdx =
+              this.quiz.questions.indexOf(this.currentQuestion) + 1;
+            this.questionAnswers = this.candiateService.getQuestionAnswers(
+              this.currentQuestion
+            );
+            if (this.currentQuestion.maxValidationDate) {
+              const time = new Date(this.currentQuestion.maxValidationDate);
+              time.setTime(time.getTime() - 60 * 1000);
+              this.duration = Math.floor(
+                (time.getTime() - new Date().getTime()) / 1000
+              );
+            } else {
+              this.duration = this.currentQuestion.duration * 60;
+            }
+            if (this.duration === 0) {
+              this.nextQuestion();
+            }
+            this.timer = setInterval(() => {
+              this.tick();
+            }, this.timeInterv);
+          }
+        },
+        error: (err) => {
+          if (this.currentIdx < this.questionsLength && this.duration === 0) {
+            this.nextQuestion();
+          }
+        },
+      });
+
+    return questionObs;
+  }
+
   ngOnDestroy(): void {
     clearInterval(this.timer);
     this._subscriptions.map((sub) => sub.unsubscribe());
