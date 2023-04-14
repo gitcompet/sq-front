@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription, finalize } from 'rxjs';
 import { IDomain } from 'src/app/core/models/domain.model';
+import { Patch, OperationType } from 'src/app/core/models/patch.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
 import { ModalService } from 'src/app/shared/services/modal.service';
@@ -13,10 +14,11 @@ import { ModalService } from 'src/app/shared/services/modal.service';
 })
 export class QuestionAdminComponent implements OnInit, OnDestroy {
   questions: IQuestionResponse[] = [];
-
+  data: unknown;
   questionForm: FormGroup;
+  updateQuestionForm: FormGroup;
   showModal: boolean = false;
-  categories: IDomain[] = [];
+  categories: Observable<IDomain[]> = new Observable();
   _subscriptions: Subscription[] = [];
 
   constructor(
@@ -33,26 +35,46 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
       duration: this._formBuilder.control(0, [Validators.required]),
       categories: this._formBuilder.control('', [Validators.required]),
     });
+    this.updateQuestionForm = this._formBuilder.group({
+      title: this._formBuilder.control(''),
+      label: this._formBuilder.control(''),
+      comment: this._formBuilder.control(''),
+      role: this._formBuilder.control(''),
+      weight: this._formBuilder.control(0),
+      duration: this._formBuilder.control(0),
+      categories: this._formBuilder.control(''),
+    });
   }
   ngOnInit(): void {
-    this._subscriptions.push(this.quizService
-      .getAvailableQuestions()
-      .subscribe((questions: IQuestionResponse[]) => {
-        this.questions = questions;
-      }));
+    this._subscriptions.push(
+      this.modalService.getDataExchange().subscribe((data: any) => {
+        if (data && Object.hasOwn(data, 'questionId')) {
+          this.data = data.questionId;
+          this.updateQuestionForm.patchValue(data);
+          this.updateQuestionForm.updateValueAndValidity();
+        }
+      })
+    );
+    this._subscriptions.push(
+      this.quizService
+        .getAvailableQuestions()
+        .subscribe((questions: IQuestionResponse[]) => {
+          this.questions = questions;
+        })
+    );
+    this.categories = this.quizService.getCategories();
   }
   onAddQuestion() {
     this.showModal = !this.showModal;
-    this.quizService.getCategories().subscribe((res)=>this.categories = res);
     this.modalService.openModal({
       id: 'questionModal',
       isShown: this.showModal,
     });
   }
   createQuestion(form: FormGroup) {
-     this._subscriptions.push(
+    this._subscriptions.push(
       this.quizService.addQuestion(form.value).subscribe((res) => {
-        this.questions = [...this.questions,res];
+        this.questions = [...this.questions, res];
         this.modalService.closeModal({
           id: 'questionModal',
           isShown: this.showModal,
@@ -60,6 +82,48 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
       })
     );
   }
+  updateQuestion(form: FormGroup) {
+    if (!form.valid) return;
+    const controls = form.controls;
+    const patches: Patch[] = Object.entries(controls).map((entry) => ({
+      path: `/${entry[0]}`,
+      op: OperationType.REPLACE,
+      value: entry[1].value,
+    }));
+    this._subscriptions.push(
+      this.quizService
+        .updateQuestion(this.data as string, patches)
+        .subscribe((res) => {
+          this.questions = [...this.questions, res];
+          this.modalService.closeModal({
+            id: 'updateQuestionModal',
+            isShown: this.showModal,
+          });
+        })
+    );
+  }
+  deleteQuestion() {
+    if (this.data) {
+      this.quizService
+        .deleteQuestion(this.data as string)
+        .pipe(
+          finalize(() =>
+            this.modalService.closeModal({
+              id: 'confirmationModal',
+              isShown: false,
+            })
+          )
+        )
+        .subscribe((res: any) => {
+          this.questions = [
+            ...this.questions.filter(
+              (question) => res.questionId !== question.questionId
+            ),
+          ];
+        });
+    }
+  }
+
   ngOnDestroy(): void {
     this._subscriptions.forEach((sub) => sub.unsubscribe());
   }

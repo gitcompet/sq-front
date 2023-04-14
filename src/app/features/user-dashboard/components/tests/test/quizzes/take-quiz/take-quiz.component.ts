@@ -76,7 +76,12 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     return this.duration >= 0 ? `${mins}:${secs}` : '00:00';
   }
   findQuestionIndex(): number {
-    if (this.currentQuestion) return this.currentIdx + 1;
+    if (this.currentQuestion)
+      return (
+        this.userQuestions.findIndex(
+          (qst: any) => this.currentQuestion?.questionId === qst.questionId
+        ) + 1
+      );
     return 1;
   }
   nextQuestion(): void {
@@ -88,58 +93,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    this._subscriptions.push(
-      this.quizService
-        .getQuestion(this.userQuestions[this.currentIdx])
-        .pipe(
-          catchError((err) => {
-            return throwError(() => err);
-          })
-        )
-        .subscribe({
-          next: (result) => {
-            this.currentQuestion = this.userQuestions
-              .filter(
-                (question: IQuestionResponse) =>
-                  question.questionId === result?.questionId
-              )
-              .map((question: any) => {
-                return {
-                  ...result,
-                  maxValidationDate: question.maxValidationDate,
-                } as IQuestionResponse;
-              })[0];
-            this.quiz.questions = [] as IQuestionResponse[];
-            if (this.currentQuestion) {
-              this.quiz.questions.push(this.currentQuestion);
-              this.questionAnswers = this.candiateService.getQuestionAnswers(
-                this.currentQuestion
-              );
-              if (this.currentQuestion.maxValidationDate) {
-                const time = new Date(this.currentQuestion.maxValidationDate);
-                time.setTime(time.getTime() - 60 * 1000);
-                this.duration = Math.floor(
-                  (time.getTime() - new Date().getTime()) / 1000
-                );
-
-                if (this.duration === 0) {
-                  this.nextQuestion();
-                }
-              } else {
-                this.duration = this.currentQuestion.duration * 60;
-              }
-              this.timer = setInterval(() => {
-                this.tick();
-              }, this.timeInterv);
-            }
-          },
-          error: (err) => {
-            if (this.currentIdx < this.questionsLength && this.duration === 0) {
-              this.nextQuestion();
-            }
-          },
-        })
-    );
+    this._subscriptions.push(this.getQuestions());
   }
   updateUserAnswer(answer: any) {
     if (answer.target.checked) {
@@ -192,15 +146,8 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
       })
     );
     const questionObs = this.quizService
-      .getQuestion(
-        this.userUnansweredQuestionsId
-          ? this.userUnansweredQuestionsId
-          : this.userQuestions[this.currentIdx]
-      )
-      .pipe(
-        (this.userQuestions && this.userQuestions.length === 0) ??
-          userQuestionObs
-      )
+      .getUserQuestions(this.quiz.quizUserId!)
+      .pipe(userQuestionObs)
       .subscribe({
         next: (result: any) => {
           this.currentQuestion = this.userQuestions

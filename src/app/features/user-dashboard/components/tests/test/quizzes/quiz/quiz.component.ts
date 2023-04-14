@@ -43,7 +43,7 @@ export class QuizComponent implements OnInit, OnDestroy {
         if (element) {
           element.scrollIntoView({ block: 'end', behavior: 'smooth' });
           const elementContent = document.querySelector('#el-content' + f);
-          elementContent?.classList.add('max-h-40');
+          elementContent?.classList.add('max-h-max');
         }
       });
     }
@@ -52,7 +52,7 @@ export class QuizComponent implements OnInit, OnDestroy {
   toggle() {
     this.isExpanded = !this.isExpanded;
 
-    if (this.isExpanded) {
+    if (this.isExpanded && this.isAdmin) {
       this._subscriptions.push(
         this.quizService
 

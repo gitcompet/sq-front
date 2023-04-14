@@ -62,11 +62,11 @@
       id="{{ 'el-content-' + data.quizId }}"
       *ngIf="isExpanded && isAdmin"
       class="accordion-content flex flex-col justify-center items-center px-5 pt-0 overflow-y-scroll max-h-0"
-      [class]="isExpanded ? 'max-h-40 ' : ''"
+      [class]="isExpanded ? 'max-h-max ' : ''"
     >
       <div
         *ngIf="data.questions && data.questions.length > 0"
-        class="grid grid-cols-2 gap-2 px-2 py-3 justify-center items-start"
+        class="grid grid-cols-2 gap-2 break-words py-3 px-3 w-10/12 leading-6"
       >
         <app-question
           *ngFor="let question of this.data.questions"

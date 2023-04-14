@@ -1,17 +1,21 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { finalize, forkJoin, of, Subscription, switchMap } from 'rxjs';
+import {
+  finalize,
+  forkJoin,
+  Observable,
+  of,
+  Subscription,
+  switchMap,
+} from 'rxjs';
 import { IDomain } from 'src/app/core/models/domain.model';
 import { OperationType, Patch } from 'src/app/core/models/patch.model';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
-import { IQuiz } from 'src/app/core/models/quiz.model';
 import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
 import {
   ITestResponse,
-  TestResponse,
 } from 'src/app/core/models/test-response.model';
 import { ITest } from 'src/app/core/models/test.model';
-import { CheckBoxComponent } from 'src/app/shared/components/checkbox/checkbox.component';
 import { ModalService } from 'src/app/shared/services/modal.service';
 import { QuizService } from '../../services/quiz.service';
 
@@ -28,8 +32,8 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
   data: unknown;
   quizzesIds: string[] = [];
   tests: ITestResponse[] = [];
-  headers: string[] = ['Id', 'Title', 'Label', 'Domain', 'Action'];
-  categories: IDomain[] = [];
+  headers: string[] = ['Id','Title', 'Description','Domain', 'Action'];
+  categories: Observable<IDomain[]> = new Observable();
   _subscriptions: Subscription[] = [];
   newTest: ITest = {} as ITest;
   constructor(
@@ -48,40 +52,24 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
       categories: this._formBuilder.control('', Validators.required),
     });
   }
-  ngOnDestroy(): void {
-    this._subscriptions.forEach((sub) => sub.unsubscribe());
-  }
+
   ngOnInit(): void {
     this._subscriptions.push(
-      this.modalService.getDataExchange().subscribe((data: any) => {
-        if (data && Object.hasOwn(data, 'testId')) {
-          this.data = data.testId;
-          this.testUpdateForm.patchValue(data);
-          this.categories = data.categories;
-          this.testUpdateForm.patchValue({
-            categories: data.categories.map(
-              (category: IDomain) => category.name
-            ),
-          });
-          this.testUpdateForm.updateValueAndValidity();
-        }
-      })
-    );
-    this._subscriptions.push(
-      this.quizService
-        .getAvailableQuizzes()
-        .subscribe((quizzes: IQuizResponse[]) => {
-          if (quizzes && quizzes.length > 0) {
-            this.testQuizzes = quizzes;
-            this.modalService.updateData(this.testQuizzes);
+      this.modalService
+        .getDataExchange()
+         .subscribe((data: any) => {
+          if (data && Object.hasOwn(data, 'testId')) {
+            this.data = data.testId;
+            this.testUpdateForm.patchValue(data);
+
+
+            this.testUpdateForm.updateValueAndValidity();
           }
         })
     );
+    this.categories = this.quizService.getCategories();
   }
   onAddTest() {
-    this.quizService
-      .getCategories()
-      .subscribe((res) => (this.categories = res));
     this.showModal = !this.showModal;
     this.modalService.openModal({ id: 'testModal', isShown: this.showModal });
   }
@@ -153,7 +141,7 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
       value: entry[1].value,
     }));
     this.quizService
-      .updateTest(patches)
+      .updateTest(this.data as string,patches)
       .pipe(
         switchMap((newTest: ITestResponse) => {
           this.tests = [...this.tests, newTest];
@@ -188,12 +176,27 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
           )
         )
         .subscribe((res) => {
-          this.tests = this.tests.filter((test) => test.testId !== res.testId);
+          this.tests = [...this.tests.filter((test) => test.testId !== res.testId)];
         });
     }
   }
   selectQuizzes() {
-    this.modalService.openModal({ id: 'quizModal', isShown: true });
+    this._subscriptions.push(
+      this.quizService
+        .getAvailableQuizzes()
+        .subscribe((quizzes: IQuizResponse[]) => {
+          if (quizzes && quizzes.length > 0) {
+            this.testQuizzes = quizzes.map((quiz: IQuizResponse)=>({
+              quizId: quiz.quizId,
+              title: quiz.title,
+              comment: quiz.comment,
+              domains: quiz.domains,
+            } as IQuizResponse));
+            this.modalService.updateData(this.testQuizzes);
+            this.modalService.openModal({ id: 'quizModal', isShown: true });
+          }
+        })
+    );
   }
   assignQuizzes() {
     this.modalService.closeModal({ id: 'quizModal', isShown: this.showModal });
@@ -203,5 +206,8 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
     if (event.target.checked) {
       this.quizzesIds.push(event.target.defaultValue);
     }
+  }
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }

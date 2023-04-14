@@ -15,7 +15,6 @@ import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
 import { IQuizQuestion } from 'src/app/core/models/quiz-question-assign.model copy';
 import { ElementTypes, IDomain } from 'src/app/core/models/domain.model';
 import { Patch } from 'src/app/core/models/patch.model';
-import { IQuizScore } from 'src/app/core/models/quiz-score.model';
 
 @Injectable({
   providedIn: 'root',
@@ -176,13 +175,13 @@ export class QuizService {
       );
   }
 
-  updateTest(payload: Patch[]): Observable<ITestResponse> {
+  updateTest(testId:string,payload: Patch[]): Observable<ITestResponse> {
     return this.httpClient
       .patch<ITestResponse>(
-        `${environment.baseUrl}${environment.apiVersion}${environment.testPaths.base}`,
+        `${environment.baseUrl}${environment.apiVersion}${environment.testPaths.base}/${testId}`,
         payload,
         {
-          headers: headers,
+          headers: patchHeaders,
         }
       )
       .pipe(
@@ -284,7 +283,7 @@ export class QuizService {
       .get<IQuizResponse[]>(
         userId
           ? `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.userQuiz}/${userId}?isParentURL=false`
-          : `${environment.baseUrl}${environment.apiVersion}${environment.quizPaths.base}`
+          : `${environment.baseUrl}${environment.apiVersion}${environment.quizPaths.base}?isParentURL=true`
       )
       .pipe(
         map((quizzes: IQuizResponse[]) => {
@@ -364,13 +363,13 @@ export class QuizService {
         })
       );
   }
-  updateQuiz(payload: IQuiz): Observable<IQuizResponse> {
+  updateQuiz(quizId:string,payload: Patch[]): Observable<IQuizResponse> {
     return this.httpClient
       .patch<IQuizResponse>(
-        `${environment.baseUrl}${environment.apiVersion}${environment.quizPaths.base}`,
+        `${environment.baseUrl}${environment.apiVersion}${environment.quizPaths.base}/${quizId}`,
         payload,
         {
-          headers: headers,
+          headers: patchHeaders,
         }
       )
       .pipe(
@@ -491,8 +490,8 @@ export class QuizService {
             modifiedQuestion.questionId = question.questionId;
             modifiedQuestion.title = question.title;
             modifiedQuestion.label = question.label;
-            modifiedQuestion.level = question.level;
             modifiedQuestion.comment = question.comment;
+            modifiedQuestion.level = question.level;
             modifiedQuestion.duration = question.duration;
             return modifiedQuestion;
           });
@@ -560,14 +559,18 @@ export class QuizService {
           const modifiedQuestion = {} as IQuestionResponse;
           modifiedQuestion.questionId = question.questionId;
           modifiedQuestion.title = question.title;
+          modifiedQuestion.label = question.label;
+          modifiedQuestion.comment = question.comment;
+          modifiedQuestion.level = question.level;
+          modifiedQuestion.duration = question.duration;
           return modifiedQuestion;
         })
       );
   }
-  updateQuestion(payload: IQuestion): Observable<IQuestionResponse> {
+  updateQuestion(questionId:string,payload: Patch[]): Observable<IQuestionResponse> {
     return this.httpClient
       .patch<IQuestionResponse>(
-        `${environment.baseUrl}${environment.apiVersion}${environment.questionPaths.base}`,
+        `${environment.baseUrl}${environment.apiVersion}${environment.questionPaths.base}/${questionId}`,
         payload,
         {
           headers: headers,
@@ -578,6 +581,10 @@ export class QuizService {
           const modifiedQuestion = {} as IQuestionResponse;
           modifiedQuestion.questionId = question.questionId;
           modifiedQuestion.title = question.title;
+          modifiedQuestion.label = question.label;
+          modifiedQuestion.comment = question.comment;
+          modifiedQuestion.level = question.level;
+          modifiedQuestion.duration = question.duration;
           return modifiedQuestion;
         })
       );

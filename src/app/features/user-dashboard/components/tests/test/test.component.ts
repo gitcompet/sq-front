@@ -3,8 +3,6 @@ import {
   Input,
   OnInit,
   OnDestroy,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
 } from '@angular/core';
 import { ITestResponse } from 'src/app/core/models/test-response.model';
 import { extractName } from 'src/app/core/constants/settings';
@@ -43,7 +41,7 @@ export class TestComponent implements OnInit, OnDestroy {
     if (this.isExpanded) {
       if (this.isAdmin) {
         this.quizzes = this.quizService
-          .getAsssignedTestQuizzes(this.data.testUserId)
+          .getAsssignedTestQuizzes(this.data.testId)
           .pipe(
             switchMap((compositions: ITestQuiz[]) => {
               const filtredComposition = compositions.map(

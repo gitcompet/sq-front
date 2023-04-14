@@ -6,7 +6,7 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { forkJoin, Observable, of, Subscription, switchMap } from 'rxjs';
+import { finalize, forkJoin, Observable, of, Subscription, switchMap } from 'rxjs';
 import { IDomain } from 'src/app/core/models/domain.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { IQuestion } from 'src/app/core/models/question.model';
@@ -15,6 +15,9 @@ import { IQuiz } from 'src/app/core/models/quiz.model';
 import { CheckBoxComponent } from 'src/app/shared/components/checkbox/checkbox.component';
 import { ModalService } from 'src/app/shared/services/modal.service';
 import { QuizService } from '../../../services/quiz.service';
+import { Patch, OperationType } from 'src/app/core/models/patch.model';
+import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
+import { IQuizQuestion } from 'src/app/core/models/quiz-question-assign.model copy';
 
 @Component({
   selector: 'app-quiz',
@@ -23,16 +26,18 @@ import { QuizService } from '../../../services/quiz.service';
 })
 export class QuizAdminComponent implements OnInit, OnDestroy {
   quizForm: FormGroup;
+  updateQuizForm: FormGroup;
+  data: unknown;
   showModal: boolean = false;
   quizzes: IQuizResponse[] = [];
   questionsIds: string[] = [];
 
   quizQuestions: IQuestionResponse[] = [];
-  headers: string[] = ['Title', 'Domain', 'Subdomain', 'Action'];
+  headers: string[] = ['Id','Label', 'Title', 'Description','Level','Duration (mn)','Domain', 'Action'];
   questionActions: unknown[] = [
     { actionName: 'select', componentName: CheckBoxComponent },
   ];
-  categories: IDomain[] = [];
+  categories: Observable<IDomain[]> = new Observable();
   _subscriptions: Subscription[] = [];
   constructor(
     private _formBuilder: FormBuilder,
@@ -48,9 +53,26 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
       categories: this._formBuilder.control('', [Validators.required]),
       questions: this._formBuilder.array([]),
     });
+    this.updateQuizForm = this._formBuilder.group({
+      title: this._formBuilder.control('', [Validators.required]),
+      comment: this._formBuilder.control('', [Validators.required]),
+      label: this._formBuilder.control('', [Validators.required]),
+      role: this._formBuilder.control('', [Validators.required]),
+      weight: this._formBuilder.control(0, [Validators.required]),
+      categories: this._formBuilder.control('', [Validators.required]),
+      questions: this._formBuilder.array([]),
+    });
   }
   ngOnInit(): void {
-    this._subscriptions.push(this.modalService.getDataExchange().subscribe());
+    this._subscriptions.push(this.modalService.getDataExchange().subscribe((data:any)=>{
+
+
+      if (data && Object.hasOwn(data, 'quizId')) {
+        this.data = data.quizId;
+        this.updateQuizForm.patchValue(data);
+        this.updateQuizForm.updateValueAndValidity();
+      }
+    }));
     this._subscriptions.push(
       this.quizService
         .getAvailableQuizzes()
@@ -60,12 +82,10 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
           }
         })
     );
+    this.categories =  this.quizService.getCategories();
   }
-  ngOnDestroy(): void {
-    this._subscriptions.forEach((sub) => sub.unsubscribe());
-  }
+
   onAddQuiz() {
-    this._subscriptions.push(this.quizService.getCategories().subscribe((res)=>this.categories = res));
     this.showModal = !this.showModal;
     this.modalService.openModal({ id: 'quizModal', isShown: this.showModal });
   }
@@ -93,10 +113,8 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
           this.questionsIds.map((questionId) =>
             this.quizService.assignQuesion({
               quizId: newQuiz.quizId,
-              questionId: questionId,
-              questionLevel: 1,
-              questionWeight: 1
-            })
+              questionId: questionId
+            } as IQuizQuestion)
           )
         ): of();
       })
@@ -107,6 +125,58 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
         isShown: this.showModal,
       });
     });
+  }
+  updateQuiz(form: FormGroup) {
+    if (!form.valid) return;
+    const controls = form.controls;
+    const patches: Patch[] = Object.entries(controls).map((entry) => ({
+      path: `/${entry[0]}`,
+      op: OperationType.REPLACE,
+      value: entry[1].value,
+    }));
+    this.quizService
+      .updateQuiz(this.data as string, patches)
+      .pipe(
+        switchMap((newQuiz: IQuizResponse) => {
+          this.quizzes = [...this.quizzes, newQuiz];
+          return forkJoin(
+            this.questionsIds.map((questionId) =>
+            this.quizService.assignQuesion({
+              quizId: newQuiz.quizId,
+              questionId: questionId
+            }as IQuizQuestion)
+            )
+          );
+        }),
+        finalize(() =>
+          this.modalService.closeModal({
+            id: 'updateQuizModal',
+            isShown: this.showModal,
+          })
+        )
+      )
+      .subscribe();
+  }
+  deleteQuiz() {
+    if (this.data) {
+      this.quizService
+        .deleteQuestion(this.data as string)
+        .pipe(
+          finalize(() =>
+            this.modalService.closeModal({
+              id: 'confirmationModal',
+              isShown: false,
+            })
+          )
+        )
+        .subscribe((res: any) => {
+          this.quizzes = [
+            ...this.quizzes.filter(
+              (quiz) => res.quizId !== quiz.quizId
+            ),
+          ];
+        });
+    }
   }
   assignQuestions() {
     this.modalService.closeModal({ id: 'questionsModal', isShown: this.showModal });
@@ -131,7 +201,18 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
     this.options(index).push(this.createOption());
   }
   selectQuestions() {
-    this.modalService.openModal({ id: 'questionsModal', isShown: true });
+    this.quizService.getAvailableQuestions().subscribe((questions)=>{
+      if (questions && questions.length > 0) {
+        this.quizQuestions = questions;
+        this.modalService.updateData(this.quizQuestions);
+        this.modalService.openModal({ id: 'questionsModal', isShown: true });
+      }
+
+    })
+  }
+
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((sub) => sub.unsubscribe());
   }
   get options() {
     return (index: number) => {
