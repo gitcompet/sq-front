@@ -1,18 +1,61 @@
+<div
+  class="flex flex-col w-screen px-5 h-screen bg-[#282828] justify-center items-center"
+>
+  <div class="flex w-full justify-between items-center">
+    <button
+      type="button"
+      data-te-ripple-init
+      data-te-ripple-color="light"
+      class="place-self-start my-0 rounded inline-block px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:bg-neutral-100 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700 dark:hover:bg-neutral-700"
+    >
+      <a routerLinkActive="active" [routerLink]="'/home'"> Back Home</a>
+    </button>
+    <span
+      *ngIf="quiz.hasTimer"
+      (ngChangeModel)="(duration)"
+      class="block text-center font-bold text-xl text-white"
+      >Time: {{ elapsedTime }}
+    </span>
+  </div>
 
-<button
-  type="button"
-  data-te-ripple-init
-  data-te-ripple-color="light"
-  class="rounded inline-block px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:bg-neutral-100 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700 dark:hover:bg-neutral-700">
-  <a routerLinkActive="active" [routerLink]="'/home'"> Back Home</a>
-</button>
-<ng-container *ngIf="questionsLength > 0 && currentQuestion">
-  <span (ngChangeModel)="duration" class="block text-center font-bold text-xl">Remaining Time: {{elapsedTime}} </span>
+  <ng-container *ngIf="questionsLength > 0 && currentQuestion">
+    <div class="flex flex-col items-start w-full">
+      <h2 class="mt-10 text-xl text-white/30">
+        Question {{ findQuestionIndex() }} of {{ questionsLength }}
+      </h2>
+      <div class="mt-4 text-2xl text-white">
+        {{ currentQuestion.label }}
+      </div>
+      <div class="flex flex-col w-full">
+        <div
+          *ngFor="let answer of questionAnswers | async"
+          class="flex items-center w-full py-4 pl-5 m-2 ml-0 space-x-2 border-2 cursor-pointer bg-white/5 border-white/10 rounded-xl"
+        >
+          <input
+            (change)="updateUserAnswer($event)"
+            [value]="answer.answerId"
+            type="checkbox"
+            class="w-6 h-6 bg-black"
+          />
+          <p class="ml-6 text-white">{{ answer.label }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-center w-1/2 mt-4 text-white">
+      <button
+        [disabled]="duration === 0"
+        (click)="validateQuiz()"
+        class="w-[49%] py-3 bg-indigo-600 rounded-lg"
+      >
+        Validate
+      </button>
+    </div>
+    <!-- <span (ngChangeModel)="duration" class="block text-center font-bold text-xl">Remaining Time: {{elapsedTime}} </span>
 
   <div
     class="flex flex-col w-screen px-5 h-screen bg-[#fff] justify-center items-center"
 >
-  <h2 className="mt-10 text-xl text-black/60">Question {{findQuestionIndex()}} of {{questionsLength}}</h2>
+
   <div className="mt-4 text-2xl text-black">
     {{currentQuestion.label}}
   </div>
@@ -28,6 +71,7 @@
     <div class="flex justify-center gap-2 w-full mt-4 text-white">
       <button [disabled]="duration === 0" (click)="validateQuiz()" class="w-[20%] py-3 bg-indigo-600 rounded-lg">Validate</button>
     </div>
+</div> -->
+  </ng-container>
+  <router-outlet></router-outlet>
 </div>
-</ng-container>
-<router-outlet></router-outlet>

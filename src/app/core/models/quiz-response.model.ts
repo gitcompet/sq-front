@@ -5,6 +5,8 @@ export interface IQuizResponse {
     quizId: string,
     domains:IDomain[];
     subDomains:IDomain[];
+    quizDomainComposeId: string[];
+    quizsubDomainComposeId: string[];
     weight: number ;
     comment: string;
     isActive: boolean;
@@ -22,6 +24,8 @@ export class QuizResponse implements IQuizResponse{
   quizId: string;
   weight: number ;
   domains:IDomain[];
+  quizDomainComposeId: string[];
+  quizsubDomainComposeId: string[];
   subDomains:IDomain[];
   comment: string;
   isActive: boolean;
@@ -36,6 +40,8 @@ export class QuizResponse implements IQuizResponse{
   constructor(
     quizId: string,
     subDomains:IDomain[],
+    quizDomainComposeId: string[],
+    quizsubDomainComposeId: string[],
     comment: string,
     isActive: boolean,
     isDeleted: boolean,
@@ -53,6 +59,8 @@ export class QuizResponse implements IQuizResponse{
     this.title = title;
     this.label = label;
     this.domains = domains;
+    this.quizDomainComposeId = quizDomainComposeId;
+    this.quizsubDomainComposeId = quizsubDomainComposeId;
     this.subDomains = subDomains;
     this.comment = comment;
     this.isActive = isActive;

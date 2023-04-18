@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Observable, Subscription, finalize } from 'rxjs';
+import { Observable, Subscription, finalize, forkJoin } from 'rxjs';
 import { IDomain } from 'src/app/core/models/domain.model';
 import { Patch, OperationType } from 'src/app/core/models/patch.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
@@ -14,7 +14,7 @@ import { ModalService } from 'src/app/shared/services/modal.service';
 })
 export class QuestionAdminComponent implements OnInit, OnDestroy {
   questions: IQuestionResponse[] = [];
-  data: unknown;
+  data!: IQuestionResponse;
   questionForm: FormGroup;
   updateQuestionForm: FormGroup;
   showModal: boolean = false;
@@ -49,7 +49,7 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
     this._subscriptions.push(
       this.modalService.getDataExchange().subscribe((data: any) => {
         if (data && Object.hasOwn(data, 'questionId')) {
-          this.data = data.questionId;
+          this.data = data;
           this.updateQuestionForm.patchValue(data);
           this.updateQuestionForm.updateValueAndValidity();
         }
@@ -85,27 +85,86 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
   updateQuestion(form: FormGroup) {
     if (!form.valid) return;
     const controls = form.controls;
-    const patches: Patch[] = Object.entries(controls).map((entry) => ({
-      path: `/${entry[0]}`,
-      op: OperationType.REPLACE,
-      value: entry[1].value,
-    }));
-    this._subscriptions.push(
-      this.quizService
-        .updateQuestion(this.data as string, patches)
-        .subscribe((res) => {
-          this.questions = [...this.questions, res];
+    const patches: Patch[] = Object.entries(controls)
+      .map((entry) => {
+        if (entry[1].value && (!entry[1].pristine || entry[1].dirty)) {
+          return {
+            path: `/${entry[0]}`,
+            op: OperationType.REPLACE,
+            value: entry[1].value,
+          };
+        }
+        return undefined as unknown as Patch;
+      })
+      .filter(
+        (patch) => patch !== undefined && !patch.path.includes('categories')
+      );
+
+    const categoryPathes = Object.entries(controls)
+      .filter((entry) => entry[0].includes('categories'))
+      .flatMap((entry) => {
+        if (entry[1].value && (!entry[1].pristine || entry[1].dirty)) {
+          return entry[1].value.map(
+            (value: string) =>
+              ({
+                path: `/questionCategoryId`,
+                op: OperationType.REPLACE,
+                value: value,
+              } as Patch)
+          );
+        }
+        return undefined as unknown as Patch;
+      })
+      .filter((patch) => patch !== undefined);
+
+    if (patches.length > 0 && this.data) {
+      this._subscriptions.push(
+        this.quizService
+          .updateQuestion(this.data.questionId, patches)
+          .subscribe((newQuestion) => {
+            this.data = { ...newQuestion };
+            this.modalService.updateData(this.data);
+            this.modalService.closeModal({
+              id: 'updateQuestionModal',
+              isShown: this.showModal,
+            });
+          })
+      );
+    }
+
+    if (categoryPathes.length > 0 && this.data) {
+      const result =
+        this.data.questionDomainComposeId.length > 0
+          ? this.data.questionDomainComposeId
+              .filter((value, index) => {
+                return categoryPathes[index];
+              })
+              .map((value, index) => {
+                return this.quizService.updateQuestionDomains(value, [
+                  categoryPathes[index],
+                ]);
+              })
+          : categoryPathes.map((patch) =>
+              this.quizService.addQuestionDomains({
+                questionId: this.data.questionId,
+                questionCategoryId: patch.value,
+              })
+            );
+      this._subscriptions.push(
+        forkJoin(result).subscribe((res) => {
+          this.modalService.updateData(this.data);
           this.modalService.closeModal({
             id: 'updateQuestionModal',
             isShown: this.showModal,
           });
         })
-    );
+      );
+    }
   }
   deleteQuestion() {
     if (this.data) {
       this.quizService
-        .deleteQuestion(this.data as string)
+        .deleteQuestion(this.data.questionId)
         .pipe(
           finalize(() =>
             this.modalService.closeModal({
@@ -115,11 +174,9 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
           )
         )
         .subscribe((res: any) => {
-          this.questions = [
-            ...this.questions.filter(
-              (question) => res.questionId !== question.questionId
-            ),
-          ];
+          this.questions = this.questions.filter(
+            (question) => res.questionId !== question.questionId
+          );
         });
     }
   }

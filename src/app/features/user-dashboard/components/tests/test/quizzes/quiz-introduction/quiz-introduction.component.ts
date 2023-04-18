@@ -1,7 +1,15 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Observable, count, map, reduce, switchMap, tap } from 'rxjs';
+import {
+  Observable,
+  Subscription,
+  count,
+  map,
+  reduce,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { extractName } from 'src/app/core/constants/settings';
 import { Language } from 'src/app/core/models/language.model';
 import { OperationType, Patch } from 'src/app/core/models/patch.model';
@@ -19,12 +27,15 @@ import { LanguageManagerService } from 'src/app/shared/services/language-manager
   templateUrl: './quiz-introduction.component.html',
   styleUrls: ['./quiz-introduction.component.css'],
 })
-export class QuizIntroductionComponent implements OnInit, AfterViewInit {
+export class QuizIntroductionComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   quiz: IQuizResponse;
   languageForm: FormGroup;
   langId: string;
   languages: Observable<Language[]>;
   totalDuration: number = 0;
+  _subscriptions: Subscription[] = [];
   extractName = extractName;
   constructor(
     private router: Router,
@@ -44,16 +55,18 @@ export class QuizIntroductionComponent implements OnInit, AfterViewInit {
       language: this._formBuilder.control('', [Validators.required]),
     });
   }
+
   ngAfterViewInit(): void {
-    this.quizService
-      .getUserQuestions(this.quiz.quizUserId!)
-      .pipe()
-      .subscribe((questions: IQuestionResponse[]) => {
-        this.totalDuration =
-          questions
-            .map((question) => question.duration)
-            .reduce((acc, current) => current + acc);
-      });
+    this._subscriptions.push(
+      this.quizService
+        .getUserQuestions(this.quiz.quizUserId!)
+        .pipe()
+        .subscribe((questions: any) => {
+          this.totalDuration = questions['value']
+            .map((question: any) => question.duration)
+            .reduce((acc: number, current: number) => current + acc);
+        })
+    );
   }
   ngOnInit(): void {
     this.languages = this.languagesService.getLanguage(this.langId).pipe(
@@ -89,5 +102,8 @@ export class QuizIntroductionComponent implements OnInit, AfterViewInit {
       .subscribe((res) => {
         this.quiz = res;
       });
+  }
+  ngOnDestroy(): void {
+    this._subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }

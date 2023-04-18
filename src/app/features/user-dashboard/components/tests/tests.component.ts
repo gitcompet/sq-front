@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { ITestResponse } from 'src/app/core/models/test-response.model';
+import {
+  ITestResponse,
+  TestResponse,
+} from 'src/app/core/models/test-response.model';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { ModalService } from 'src/app/shared/services/modal.service';
@@ -19,7 +22,15 @@ export class TestsComponent implements OnInit {
     private authService: AuthService
   ) {}
   ngOnInit(): void {
-    this._subscriptions.push(this.modalService.getDataExchange().subscribe());
+    this._subscriptions.push(
+      this.modalService.getDataExchange().subscribe((data) => {
+        if (data && Object.hasOwn(data, 'testId')) {
+          const test = data as ITestResponse;
+          this.tests= this.tests.map((tst) => tst.testId === test.testId ? test: tst);
+
+        }
+      })
+    );
 
     if (!this.authService.isAdmin()) {
       this._subscriptions.push(
@@ -31,11 +42,9 @@ export class TestsComponent implements OnInit {
       );
     } else {
       this._subscriptions.push(
-        this.quizService
-          .getAvailableTests()
-          .subscribe((res) => {
-            this.tests = res;
-          })
+        this.quizService.getAvailableTests().subscribe((res) => {
+          this.tests = res;
+        })
       );
     }
   }

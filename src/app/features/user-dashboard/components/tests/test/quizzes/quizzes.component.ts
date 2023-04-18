@@ -31,8 +31,19 @@ export class QuizzesComponent implements OnInit, OnChanges {
   ) {}
   ngOnInit(): void {
     this.isAdmin = this.authService.isAdmin();
-    this._subscriptions.push(this.modalService.getDataExchange().subscribe());
-    if(this.isAdmin){
+    this._subscriptions.push(
+      this.modalService.getDataExchange().subscribe((data) => {
+        if (data && Object.hasOwn(data, 'quizId')) {
+          const quiz = data as IQuizResponse;
+          this.quizzes = this.quizzes.map((qz) =>
+            qz.quizId === quiz.quizId ? quiz : qz
+          );
+          console.log(this.quizzes);
+
+        }
+      })
+    );
+    if (this.isAdmin) {
       this.quizService.getAvailableQuizzes().subscribe();
     }
   }

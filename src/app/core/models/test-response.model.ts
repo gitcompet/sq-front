@@ -4,6 +4,7 @@ import { IQuizResponse } from "./quiz-response.model";
 export interface ITestResponse {
     testId: string,
     testUserId: string,
+    testCategoryComposeId: string[];
     categories: IDomain[];
     comment: string;
     quizzes: IQuizResponse[];
@@ -15,6 +16,7 @@ export interface ITestResponse {
 export class TestResponse implements ITestResponse{
   testId: string;
   testUserId: string;
+  testCategoryComposeId: string[];
   categories: IDomain[];
   comment: string;
   isActive: boolean;
@@ -25,6 +27,7 @@ export class TestResponse implements ITestResponse{
   constructor(
     testId: string,
     testUserId:string,
+    testCategoryComposeId:string[],
     categories: IDomain[],
     comment: string,
     isActive: boolean,
@@ -35,6 +38,7 @@ export class TestResponse implements ITestResponse{
   ) {
     this.testId = testId;
     this.testUserId = testUserId;
+    this.testCategoryComposeId = testCategoryComposeId;
     this.categories = categories;
     this.comment = comment;
     this.isActive = isActive;

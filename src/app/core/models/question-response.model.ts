@@ -8,6 +8,8 @@ export interface IQuestionResponse {
   comment: string;
   domains: IDomain[];
   subDomains: IDomain[];
+  questionDomainComposeId: string[];
+  questionsubDomainComposeId: string[];
   level: number;
   duration: number;
   answers: IAnswerResponse[],
@@ -24,6 +26,8 @@ export class QuestionResponse implements IQuestionResponse {
   comment: string;
   domains: IDomain[];
   subDomains: IDomain[];
+  questionDomainComposeId: string[];
+  questionsubDomainComposeId: string[];
   level: number;
   duration: number;
   answers: IAnswerResponse[];
@@ -37,6 +41,8 @@ export class QuestionResponse implements IQuestionResponse {
     quizUserId: string,
     domains: IDomain[],
     subDomains: IDomain[],
+    questionDomainComposeId: string[],
+    questionsubDomainComposeId: string[],
     level: number,
     duration: number,
     answers: IAnswerResponse[],
@@ -55,6 +61,8 @@ export class QuestionResponse implements IQuestionResponse {
     this.duration = duration;
     this.domains = domains;
     this.subDomains = subDomains;
+    this.questionDomainComposeId = questionDomainComposeId;
+    this.questionsubDomainComposeId=questionsubDomainComposeId;
     this.comment = comment;
     this.isActive = isActive;
     this.isDeleted = isDeleted;

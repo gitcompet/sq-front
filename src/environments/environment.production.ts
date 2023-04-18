@@ -31,6 +31,7 @@ export const environment = {
     base: '/Question',
     answer: '/Answer',
     answerUser: '/AnswerUser',
+    unansweredUserQuestion: '/Remaining',
     userQuestion: '/QuestionUser',
     questionAnswers: '/AnswerQuestion'
   },

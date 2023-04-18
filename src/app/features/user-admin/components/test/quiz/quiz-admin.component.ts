@@ -6,7 +6,14 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { finalize, forkJoin, Observable, of, Subscription, switchMap } from 'rxjs';
+import {
+  finalize,
+  forkJoin,
+  Observable,
+  of,
+  Subscription,
+  switchMap,
+} from 'rxjs';
 import { IDomain } from 'src/app/core/models/domain.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { IQuestion } from 'src/app/core/models/question.model';
@@ -27,13 +34,22 @@ import { IQuizQuestion } from 'src/app/core/models/quiz-question-assign.model co
 export class QuizAdminComponent implements OnInit, OnDestroy {
   quizForm: FormGroup;
   updateQuizForm: FormGroup;
-  data: unknown;
+  data!: IQuizResponse;
   showModal: boolean = false;
   quizzes: IQuizResponse[] = [];
   questionsIds: string[] = [];
 
   quizQuestions: IQuestionResponse[] = [];
-  headers: string[] = ['Id','Label', 'Title', 'Description','Level','Duration (mn)','Domain', 'Action'];
+  headers: string[] = [
+    'Id',
+    'Label',
+    'Title',
+    'Description',
+    'Level',
+    'Duration (mn)',
+    'Domain',
+    'Action',
+  ];
   questionActions: unknown[] = [
     { actionName: 'select', componentName: CheckBoxComponent },
   ];
@@ -54,25 +70,25 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
       questions: this._formBuilder.array([]),
     });
     this.updateQuizForm = this._formBuilder.group({
-      title: this._formBuilder.control('', [Validators.required]),
-      comment: this._formBuilder.control('', [Validators.required]),
-      label: this._formBuilder.control('', [Validators.required]),
-      role: this._formBuilder.control('', [Validators.required]),
-      weight: this._formBuilder.control(0, [Validators.required]),
-      categories: this._formBuilder.control('', [Validators.required]),
+      title: this._formBuilder.control(''),
+      comment: this._formBuilder.control(''),
+      label: this._formBuilder.control(''),
+      role: this._formBuilder.control(''),
+      weight: this._formBuilder.control(0),
+      categories: this._formBuilder.control(''),
       questions: this._formBuilder.array([]),
     });
   }
   ngOnInit(): void {
-    this._subscriptions.push(this.modalService.getDataExchange().subscribe((data:any)=>{
-
-
-      if (data && Object.hasOwn(data, 'quizId')) {
-        this.data = data.quizId;
-        this.updateQuizForm.patchValue(data);
-        this.updateQuizForm.updateValueAndValidity();
-      }
-    }));
+    this._subscriptions.push(
+      this.modalService.getDataExchange().subscribe((data: any) => {
+        if (data && Object.hasOwn(data, 'quizId')) {
+          this.data = data;
+          this.updateQuizForm.patchValue(data);
+          this.updateQuizForm.updateValueAndValidity();
+        }
+      })
+    );
     this._subscriptions.push(
       this.quizService
         .getAvailableQuizzes()
@@ -82,7 +98,7 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
           }
         })
     );
-    this.categories =  this.quizService.getCategories();
+    this.categories = this.quizService.getCategories();
   }
 
   onAddQuiz() {
@@ -95,7 +111,8 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
   onChecked(event: any) {
     if (event.target.checked) {
       this.questionsIds.push(event.target.defaultValue);
-    }}
+    }
+  }
   createQuiz(form: FormGroup) {
     const newQuiz = {
       title: form.get('title')?.value,
@@ -106,61 +123,133 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
       label: form.get('label')?.value,
     } as IQuiz;
 
-    this.quizService.addQuiz(newQuiz) .pipe(
-      switchMap((newQuiz: IQuizResponse) => {
-        this.quizzes = [...this.quizzes, newQuiz];
-        return this.questionsIds.length > 0 ?forkJoin(
-          this.questionsIds.map((questionId) =>
-            this.quizService.assignQuesion({
-              quizId: newQuiz.quizId,
-              questionId: questionId
-            } as IQuizQuestion)
-          )
-        ): of();
-      })
-    )
-    .subscribe((response) => {
-      this.modalService.closeModal({
-        id: 'quizModal',
-        isShown: this.showModal,
+    this.quizService
+      .addQuiz(newQuiz)
+      .pipe(
+        switchMap((newQuiz: IQuizResponse) => {
+          this.quizzes = [...this.quizzes, newQuiz];
+          return this.questionsIds.length > 0
+            ? forkJoin(
+                this.questionsIds.map((questionId) =>
+                  this.quizService.assignQuesion({
+                    quizId: newQuiz.quizId,
+                    questionId: questionId,
+                  } as IQuizQuestion)
+                )
+              )
+            : of();
+        })
+      )
+      .subscribe((response) => {
+        this.modalService.closeModal({
+          id: 'quizModal',
+          isShown: this.showModal,
+        });
       });
-    });
   }
   updateQuiz(form: FormGroup) {
     if (!form.valid) return;
     const controls = form.controls;
-    const patches: Patch[] = Object.entries(controls).map((entry) => ({
-      path: `/${entry[0]}`,
-      op: OperationType.REPLACE,
-      value: entry[1].value,
-    }));
-    this.quizService
-      .updateQuiz(this.data as string, patches)
-      .pipe(
-        switchMap((newQuiz: IQuizResponse) => {
-          this.quizzes = [...this.quizzes, newQuiz];
-          return forkJoin(
-            this.questionsIds.map((questionId) =>
-            this.quizService.assignQuesion({
-              quizId: newQuiz.quizId,
-              questionId: questionId
-            }as IQuizQuestion)
-            )
+    const patches: Patch[] = Object.entries(controls)
+      .map((entry) => {
+        if (entry[1].value && (!entry[1].pristine || entry[1].dirty)) {
+          return {
+            path: `/${entry[0]}`,
+            op: OperationType.REPLACE,
+            value: entry[1].value,
+          };
+        }
+        return undefined as unknown as Patch;
+      })
+      .filter(
+        (patch) => patch !== undefined && !patch.path.includes('categories')
+      );
+
+    const categoryPathes = Object.entries(controls)
+      .filter((entry) => entry[0].includes('categories'))
+      .flatMap((entry) => {
+        if (entry[1].value && (!entry[1].pristine || entry[1].dirty)) {
+          return entry[1].value.map(
+            (value: string) =>
+              ({
+                path: `/quizCategoryId`,
+                op: OperationType.REPLACE,
+                value: value,
+              } as Patch)
           );
-        }),
-        finalize(() =>
-          this.modalService.closeModal({
-            id: 'updateQuizModal',
-            isShown: this.showModal,
+        }
+        return undefined as unknown as Patch;
+      })
+      .filter((patch) => patch !== undefined);
+
+    if (patches.length > 0 && this.data) {
+      this._subscriptions.push(
+        this.quizService
+          .updateQuiz(this.data.quizId as string, patches)
+          .pipe(
+            switchMap((newQuiz: IQuizResponse) => {
+              this.data = { ...newQuiz };
+              this.modalService.updateData(this.data);
+              return forkJoin(
+                this.questionsIds.map((questionId) =>
+                  this.quizService.assignQuesion({
+                    quizId: newQuiz.quizId,
+                    questionId: questionId,
+                  } as IQuizQuestion)
+                )
+              );
+            }),
+            finalize(() =>
+              this.modalService.closeModal({
+                id: 'updateQuizModal',
+                isShown: this.showModal,
+              })
+            )
+          )
+          .subscribe()
+      );
+    }
+
+    if (categoryPathes.length > 0 && this.data) {
+      const result =
+        this.data.quizDomainComposeId.length > 0
+          ? this.data.quizDomainComposeId
+              .filter((value, index) => {
+                return categoryPathes[index];
+              })
+              .map((value, index) => {
+                return this.quizService.updateQuizDomains(value, [
+                  categoryPathes[index],
+                ]);
+              })
+          : categoryPathes.map((patch) =>
+              this.quizService.addQuizDomains({
+                quizId: this.data.quizId,
+                quizCategoryId: patch.value,
+              })
+            );
+      this._subscriptions.push(
+        forkJoin(result)
+          .pipe(
+            switchMap(() => this.quizService.getQuiz(this.data)),
+            finalize(() => {
+              this.modalService.closeModal({
+                id: 'updateQuizModal',
+                isShown: this.showModal,
+              });
+            })
+          )
+          .subscribe((res) => {
+            this.data = { ...res };
+            this.modalService.updateData(this.data);
           })
-        )
-      )
-      .subscribe();
+      );
+    }
   }
   deleteQuiz() {
     if (this.data) {
       this.quizService
-        .deleteQuestion(this.data as string)
+        .deleteQuiz(this.data.quizId)
         .pipe(
           finalize(() =>
             this.modalService.closeModal({
@@ -171,15 +260,16 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
         )
         .subscribe((res: any) => {
           this.quizzes = [
-            ...this.quizzes.filter(
-              (quiz) => res.quizId !== quiz.quizId
-            ),
+            ...this.quizzes.filter((quiz) => res.quizId !== quiz.quizId),
           ];
         });
     }
   }
   assignQuestions() {
-    this.modalService.closeModal({ id: 'questionsModal', isShown: this.showModal });
+    this.modalService.closeModal({
+      id: 'questionsModal',
+      isShown: this.showModal,
+    });
   }
   createQuestion(): FormGroup {
     return this._formBuilder.group({
@@ -201,14 +291,13 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
     this.options(index).push(this.createOption());
   }
   selectQuestions() {
-    this.quizService.getAvailableQuestions().subscribe((questions)=>{
+    this.quizService.getAvailableQuestions().subscribe((questions) => {
       if (questions && questions.length > 0) {
         this.quizQuestions = questions;
         this.modalService.updateData(this.quizQuestions);
         this.modalService.openModal({ id: 'questionsModal', isShown: true });
       }
-
-    })
+    });
   }
 
   ngOnDestroy(): void {

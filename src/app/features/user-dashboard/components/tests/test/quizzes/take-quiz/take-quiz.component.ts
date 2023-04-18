@@ -52,9 +52,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     this.questionAnswers = this.candiateService.answers$;
     this.quiz = this.router.getCurrentNavigation()?.extras
       .state as IQuizResponse;
-    this.route.params.subscribe((params) => {
-      console.log(params);
-    });
+    this.route.params.subscribe((params) => {});
   }
   ngOnInit(): void {
     this._subscriptions.push(this.getQuestions());
