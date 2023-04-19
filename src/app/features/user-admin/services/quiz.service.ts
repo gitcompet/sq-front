@@ -29,46 +29,9 @@ export class QuizService {
         `${environment.baseUrl}${environment.apiVersion}${environment.testPaths.base}`
       )
       .pipe(
-        map((tests: ITestResponse[]) => {
-          return tests.map((test) => {
-            const modifiedTest = {} as ITestResponse;
-            modifiedTest.testId = test.testId;
-            modifiedTest.comment = test.comment;
-            modifiedTest.title = test.title;
-            modifiedTest.label = test.label;
-            return modifiedTest;
-          });
-        }),
-        switchMap((newTests: ITestResponse[]) => {
-          const testsObervables: Observable<ITestResponse>[] = newTests.map(
-            (newTest: ITestResponse) => this.getTestCategories(newTest.testId)
-          );
-          const observables = [of(newTests), forkJoin(testsObervables)];
-          return forkJoin(observables);
-        }),
-
-        map((compositions) => {
-          const tests: ITestResponse[] = compositions[0] as ITestResponse[];
-          const categories = compositions[1] as ITestResponse[];
-
-          return tests.map((test) => {
-            const testCatgories: any = categories.filter(
-              (category: any) => category.testId === test.testId
-            )[0];
-            return {
-              ...test,
-              testCategoryComposeId: testCatgories.testCategoryComposeId,
-              categories: testCatgories.categoryNames.map(
-                (categoryName: string, index: number) => {
-                  return {
-                    domainId: testCatgories.testCategoryId[index],
-                    name: categoryName,
-                  } as IDomain;
-                }
-              ),
-            };
-          });
-        })
+        switchMap((tests) =>
+          forkJoin(tests.map((test) => this.getTest(test.testId)))
+        )
       );
   }
   private getTestCategories(testId: string): Observable<ITestResponse> {
@@ -109,12 +72,20 @@ export class QuizService {
                 return {
                   domainId: categories.testCategoryId[index],
                   name: categoryName,
+                  domainComposeId: categories.testCategoryComposeId[index],
                 } as IDomain;
               }
             ),
           };
         })
       );
+  }
+  unAssignCategoriesTest(
+    testCategoryComposeId: string
+  ): Observable<ITestResponse> {
+    return this.httpClient.delete<ITestResponse>(
+      `${environment.baseUrl}${environment.apiVersion}${environment.testPaths.testCategories}/${testCategoryComposeId}`
+    );
   }
 
   getUserTests(userId: string): Observable<ITestResponse[]> {
@@ -270,17 +241,6 @@ export class QuizService {
             quizUserId: res.quizUserId,
             testUserId: res.testUserId,
           } as IQuizResponse);
-        }),
-        map((quiz) => {
-          const modifiedQuiz = {} as IQuizResponse;
-          modifiedQuiz.quizId = quiz.quizId;
-          modifiedQuiz.title = quiz.title;
-          modifiedQuiz.label = quiz.label;
-          modifiedQuiz.comment = quiz.comment;
-          modifiedQuiz.quizUserId = quiz.quizUserId;
-          modifiedQuiz.testUserId = quiz.quizUserId;
-          modifiedQuiz.isClosed = quiz.isClosed;
-          return modifiedQuiz;
         })
       );
   }
@@ -301,59 +261,8 @@ export class QuizService {
           : `${environment.baseUrl}${environment.apiVersion}${environment.quizPaths.base}?isParentURL=true`
       )
       .pipe(
-        map((quizzes: IQuizResponse[]) => {
-          return quizzes.map((quiz) => {
-            const modifiedQuiz = {} as IQuizResponse;
-            modifiedQuiz.quizId = quiz.quizId;
-            modifiedQuiz.title = quiz.title;
-            modifiedQuiz.label = quiz.label;
-            modifiedQuiz.comment = quiz.comment;
-            modifiedQuiz.isClosed = modifiedQuiz.isClosed;
-            return modifiedQuiz;
-          });
-        }),
-
-        switchMap((newQuizzes: IQuizResponse[]) => {
-          const quizzesDomainsObervables: Observable<any>[] = newQuizzes.map(
-            (newQuiz: IQuizResponse) =>
-              this.getElementDomain({ id: newQuiz.quizId }, ElementTypes.QUIZ)
-          );
-          const observables = [
-            of(newQuizzes),
-            forkJoin(quizzesDomainsObervables),
-          ];
-
-          return forkJoin(observables);
-        }),
-        map((compositions) => {
-          const quizzes: IQuizResponse[] = compositions[0] as IQuizResponse[];
-          const domains = compositions[1] as any;
-
-          return quizzes.map((quiz) => {
-            const quizDomains: any = domains.filter(
-              (domain: any) => domain.elementId === quiz.quizId
-            )[0];
-            return {
-              ...quiz,
-              quizDomainComposeId: quizDomains.quizDomainComposeId,
-              domains: quizDomains.domainNames.map(
-                (domainName: string, index: number) => {
-                  return {
-                    domainId: quizDomains.domainId[index],
-                    name: domainName,
-                  } as IDomain;
-                }
-              ),
-              // subDomains: quizDomains.subDomainNames.map(
-              //   (subDomainName: string, index: number) => {
-              //     return {
-              //       domainId: quizDomains.subDomainId[index],
-              //       name: subDomainName,
-              //     } as IDomain;
-              //   }
-              // ),
-            };
-          });
+        switchMap((quizzes) => {
+          return forkJoin(quizzes.map((quiz) => this.getQuiz(quiz)));
         })
       );
   }
@@ -366,50 +275,7 @@ export class QuizService {
           headers: headers,
         }
       )
-      .pipe(
-        map((quiz: IQuizResponse) => {
-          const modifiedQuiz = {} as IQuizResponse;
-          modifiedQuiz.quizId = quiz.quizId;
-          modifiedQuiz.title = quiz.title;
-          modifiedQuiz.label = quiz.label;
-          modifiedQuiz.comment = quiz.comment;
-          modifiedQuiz.isClosed = modifiedQuiz.isClosed;
-          return modifiedQuiz;
-        }),
-        switchMap((newQuiz: IQuizResponse) => {
-          const observables = [
-            of(newQuiz),
-            this.getElementDomain({ id: newQuiz.quizId }, ElementTypes.QUIZ),
-          ];
-
-          return forkJoin(observables);
-        }),
-        map((compositions) => {
-          const quiz: IQuizResponse = compositions[0] as IQuizResponse;
-          const domains = compositions[1] as any;
-
-          return {
-            ...quiz,
-            quizDomainComposeId: domains.quizDomainComposeId,
-            domains: domains.domainNames.map(
-              (domainName: string, index: number) => {
-                return {
-                  domainId: domains.domainId[index],
-                  name: domainName,
-                } as IDomain;
-              }
-            ),
-            // subDomains: quizDomains.subDomainNames.map(
-            //   (subDomainName: string, index: number) => {
-            //     return {
-            //       domainId: quizDomains.subDomainId[index],
-            //       name: subDomainName,
-            //     } as IDomain;
-            //   }
-            // ),
-          };
-        })
-      );
+      .pipe(switchMap((quiz) => this.getQuiz(quiz)));
   }
   updateQuiz(quizId: string, payload: Patch[]): Observable<IQuizResponse> {
     return this.httpClient
@@ -470,41 +336,54 @@ export class QuizService {
           const observables = [
             of(newQuiz),
             this.getElementDomain({ id: newQuiz.quizId }, ElementTypes.QUIZ),
+            this.getElementSubDomain({ id: newQuiz.quizId }, ElementTypes.QUIZ),
           ];
           return forkJoin(observables);
         }),
         map((compositions) => {
           const quiz: IQuizResponse = compositions[0] as IQuizResponse;
           const domains = compositions[1] as any;
+          const subDomains = compositions[2] as any;
           return {
             ...quiz,
-            quizDomainComposeId: domains.quizDomainComposeId,
+            quizDomainComposeId: domains.domainComposeId,
             domains: domains.domainNames.map(
               (domainName: string, index: number) => {
                 return {
                   domainId: domains.domainId[index],
                   name: domainName,
+                  domainComposeId: domains.domainComposeId[index],
                 } as IDomain;
               }
             ),
-            // subDomains: quizDomains.subDomainNames.map(
-            //   (subDomainName: string, index: number) => {
-            //     return {
-            //       domainId: quizDomains.subDomainId[index],
-            //       name: subDomainName,
-            //     } as IDomain;
-            //   }
-            // ),
-          };
+            quizsubDomainComposeId: subDomains.subDomaComposeinId,
+            subDomains: subDomains.subDomainNames.map(
+              (subDomainName: string, index: number) => {
+                return {
+                  domainId: subDomains.subDomainId[index],
+                  name: subDomainName,
+                  subDomainComposeId: subDomains.subDomaComposeinId[index],
+                } as IDomain;
+              }
+            ),
+          } as IQuizResponse;
         })
       );
   }
-  getAsssignedQuizQuestions(quizId: string): Observable<IQuizQuestion[]> {
+  getAsssignedQuizQuestions(quizId: string): Observable<IQuestionResponse[]> {
     return this.httpClient
-      .get<IQuizQuestion[]>(
+      .get<IQuestionResponse[]>(
         `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.quizQuestion}/${quizId}?isParentURL=true`
       )
-      .pipe();
+      .pipe(
+        switchMap((quizQuestions) =>
+          forkJoin(
+            quizQuestions.map((quizQuestion) =>
+              this.getQuestion({ questionId: quizQuestion.questionId })
+            )
+          )
+        )
+      );
   }
 
   getAsssignedQuestions(quizId: string): Observable<IQuestionResponse[]> {
@@ -521,65 +400,9 @@ export class QuizService {
         `${environment.baseUrl}${environment.apiVersion}${environment.questionPaths.base}`
       )
       .pipe(
-        map((quizzes: IQuestionResponse[]) => {
-          return quizzes.map((question) => {
-            const modifiedQuestion = {} as IQuestionResponse;
-            modifiedQuestion.questionId = question.questionId;
-            modifiedQuestion.title = question.title;
-            modifiedQuestion.label = question.label;
-            modifiedQuestion.comment = question.comment;
-            modifiedQuestion.level = question.level;
-            modifiedQuestion.duration = question.duration;
-            return modifiedQuestion;
-          });
-        }),
-
-        switchMap((newQuestions: IQuestionResponse[]) => {
-          const quizzesDomainsObervables: Observable<any>[] = newQuestions.map(
-            (newQuestion: IQuestionResponse) =>
-              this.getElementDomain(
-                { id: newQuestion.questionId },
-                ElementTypes.QUESTION
-              )
-          );
-          const observables = [
-            of(newQuestions),
-            forkJoin(quizzesDomainsObervables),
-          ];
-
-          return forkJoin(observables);
-        }),
-        map((compositions) => {
-          const questions: IQuestionResponse[] =
-            compositions[0] as IQuestionResponse[];
-          const domains = compositions[1] as any;
-
-          return questions.map((question) => {
-            const questionDomains: any = domains.filter(
-              (domain: any) => domain.elementId === question.questionId
-            )[0];
-
-            return {
-              ...question,
-              domains: questionDomains.domainNames.map(
-                (domainName: string, index: number) => {
-                  return {
-                    domainId: questionDomains.domainId[index],
-                    name: domainName,
-                  } as IDomain;
-                }
-              ),
-              // subDomains: questionDomains.subDomainNames.map(
-              //   (subDomainName: string, index: number) => {
-              //     return {
-              //       domainId: questionDomains.subDomainId[index],
-              //       name: subDomainName,
-              //     } as IDomain;
-              //   }
-              // ),
-            };
-          });
-        })
+        switchMap((questions) =>
+          forkJoin(questions.map((question) => this.getQuestion(question)))
+        )
       );
   }
   addQuestion(payload: IQuestion): Observable<IQuestionResponse> {
@@ -591,18 +414,7 @@ export class QuizService {
           headers: headers,
         }
       )
-      .pipe(
-        map((question: IQuestionResponse) => {
-          const modifiedQuestion = {} as IQuestionResponse;
-          modifiedQuestion.questionId = question.questionId;
-          modifiedQuestion.title = question.title;
-          modifiedQuestion.label = question.label;
-          modifiedQuestion.comment = question.comment;
-          modifiedQuestion.level = question.level;
-          modifiedQuestion.duration = question.duration;
-          return modifiedQuestion;
-        })
-      );
+      .pipe(switchMap((question) => this.getQuestion(question)));
   }
   updateQuestion(
     questionId: string,
@@ -616,18 +428,7 @@ export class QuizService {
           headers: headers,
         }
       )
-      .pipe(
-        map((question: IQuestionResponse) => {
-          const modifiedQuestion = {} as IQuestionResponse;
-          modifiedQuestion.questionId = question.questionId;
-          modifiedQuestion.title = question.title;
-          modifiedQuestion.label = question.label;
-          modifiedQuestion.comment = question.comment;
-          modifiedQuestion.level = question.level;
-          modifiedQuestion.duration = question.duration;
-          return modifiedQuestion;
-        })
-      );
+      .pipe(switchMap((question) => this.getQuestion(question)));
   }
   deleteQuestion(questionId: string): Observable<IQuestionResponse> {
     return this.httpClient.delete<IQuestionResponse>(
@@ -647,7 +448,49 @@ export class QuizService {
           ...question,
           questionUserId: questionPayload.questionUserId,
           quizUserId: questionPayload.quizUserId,
-        }))
+        })),
+        switchMap((newQuestion: IQuestionResponse) => {
+          const observables = [
+            of(newQuestion),
+            this.getElementDomain(
+              { id: newQuestion.questionId },
+              ElementTypes.QUESTION
+            ),
+            this.getElementSubDomain(
+              { id: newQuestion.questionId },
+              ElementTypes.QUESTION
+            ),
+          ];
+          return forkJoin(observables);
+        }),
+        map((compositions) => {
+          const quiz: IQuestionResponse = compositions[0] as IQuestionResponse;
+          const domains = compositions[1] as any;
+          const subDomains = compositions[2] as any;
+          return {
+            ...quiz,
+            quizDomainComposeId: domains.domainComposeId,
+            domains: domains.domainNames.map(
+              (domainName: string, index: number) => {
+                return {
+                  domainId: domains.domainId[index],
+                  name: domainName,
+                  domainComposeId: domains.domainComposeId[index],
+                } as IDomain;
+              }
+            ),
+            quizsubDomainComposeId: subDomains.subDomaComposeId,
+            subDomains: subDomains.subDomainNames.map(
+              (subDomainName: string, index: number) => {
+                return {
+                  domainId: subDomains.subDomainId[index],
+                  name: subDomainName,
+                  subDomainComposeId: subDomains.subDomaComposeId[index],
+                } as IDomain;
+              }
+            ),
+          };
+        })
       );
   }
   getUserQuestions(quizUserId: string): Observable<any> {
@@ -662,33 +505,33 @@ export class QuizService {
       `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.base}`
     );
   }
-  addCategories(payload: any): Observable<any> {
+  addCategories(payload: any): Observable<ITestResponse> {
     return this.httpClient
-      .post<any>(
+      .post<ITestResponse>(
         `${environment.baseUrl}${environment.apiVersion}${environment.testPaths.testCategories}`,
         payload,
         {
           headers: headers,
         }
       )
-      .pipe();
+      .pipe(switchMap((test) => this.getTest(test.testId)));
   }
 
-  updateCategories(id: string, payload: Patch[]): Observable<any> {
+  updateCategories(id: string, payload: Patch[]): Observable<ITestResponse> {
     return this.httpClient
-      .patch<any>(
+      .patch<ITestResponse>(
         `${environment.baseUrl}${environment.apiVersion}${environment.testPaths.testCategories}/${id}`,
         payload,
         {
           headers: patchHeaders,
         }
       )
-      .pipe();
+      .pipe(switchMap((test) => this.getTest(test.testId)));
   }
   updateQuizDomains(id: string, payload: Patch[]): Observable<any> {
     return this.httpClient
       .patch<any>(
-        `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}/${id}?type=${ElementTypes.QUIZ}`,
+        `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}/${id}`,
         payload,
         {
           headers: patchHeaders,
@@ -699,7 +542,7 @@ export class QuizService {
   addQuizDomains(payload: any): Observable<any> {
     return this.httpClient
       .post<any>(
-        `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}?type=${ElementTypes.QUIZ}`,
+        `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}`,
         payload,
         {
           headers: patchHeaders,
@@ -711,7 +554,7 @@ export class QuizService {
   updateQuestionDomains(id: string, payload: Patch[]): Observable<any> {
     return this.httpClient
       .patch<any>(
-        `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}/${id}?type=${ElementTypes.QUESTION}`,
+        `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}/${id}`,
         payload,
         {
           headers: patchHeaders,
@@ -723,7 +566,7 @@ export class QuizService {
   addQuestionDomains(payload: any): Observable<any> {
     return this.httpClient
       .post<any>(
-        `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}?type=${ElementTypes.QUESTION}`,
+        `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}`,
         payload,
         {
           headers: patchHeaders,
@@ -735,6 +578,14 @@ export class QuizService {
     return this.httpClient
       .get<any[]>(
         `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}/${element.id}`,
+        { params: new HttpParams().set('type', type) }
+      )
+      .pipe();
+  }
+  getElementSubDomain(element: any, type: string): Observable<any[]> {
+    return this.httpClient
+      .get<any[]>(
+        `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.subDomainCompose}/${element.id}`,
         { params: new HttpParams().set('type', type) }
       )
       .pipe();

@@ -5,39 +5,44 @@
     <i class="fas fa-plus" aria-hidden="true"> </i>&nbsp;&nbsp;Add Question
   </button>
 </div>
-<div class="grid grid-cols-2  gap-2 px-2 py-3  place-content-center mx-auto w-10/12">
-  <app-question  *ngFor="let question of questions" [data]="question"></app-question>
-
+<div
+  class="grid grid-cols-2 gap-2 px-2 py-3 place-content-center mx-auto w-10/12"
+>
+  <app-question
+    *ngFor="let question of questions"
+    [data]="question"
+  ></app-question>
 </div>
-<app-modal (onSave)="createQuestion($event)" [data]="questionForm" [id]="'questionModal'">
+<app-modal
+  (onSave)="createQuestion($event)"
+  [data]="questionForm"
+  [id]="'questionModal'"
+>
   <h3 header class="text-xl font-medium text-gray-900 dark:text-white">
     New Question
   </h3>
 
   <div content class="col-span-2 max-h-full">
     <div class="flex flex-col">
-      <form
-        class="w-1/2 max-w-lg mx-auto"
-        [formGroup]="questionForm"
-      >
-      <div class="flex flex-wrap -mx-3 mb-6">
-        <div class="w-full md:w-full px-3 mb-6 md:mb-0">
-          <label
-            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-            for="grid-first-name"
-          >
-            Title
-          </label>
-          <input
-            formControlName="title"
-            class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-            id="grid-first-name"
-            type="text"
-            placeholder="Question Title"
-          />
-          <!-- <p class="text-red-500 text-xs italic">Please fill out this field.</p> -->
+      <form class="w-1/2 max-w-lg mx-auto" [formGroup]="questionForm">
+        <div class="flex flex-wrap -mx-3 mb-6">
+          <div class="w-full md:w-full px-3 mb-6 md:mb-0">
+            <label
+              class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              for="grid-first-name"
+            >
+              Title
+            </label>
+            <input
+              formControlName="title"
+              class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+              id="grid-first-name"
+              type="text"
+              placeholder="Question Title"
+            />
+            <!-- <p class="text-red-500 text-xs italic">Please fill out this field.</p> -->
+          </div>
         </div>
-      </div>
         <div class="flex flex-wrap -mx-3 mb-6">
           <div class="w-full md:w-full px-3 mb-6 md:mb-0">
             <label
@@ -107,21 +112,57 @@
               </div>
             </div>
           </div>
-          <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-            <label
-              class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-              for="category"
+          <div class="flex w-full md:w-full gap-2 justify-center items-center">
+            <div class="w-full md:w-full px-0 mb-6 md:mb-0">
+              <label
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                for="category"
+              >
+                Availaible Domains
+              </label>
+              <select
+                formControlName="categories"
+                multiple
+                id="category"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option
+                  *ngFor="let category of categories | async"
+                  [ngValue]="category.domainId"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+            <div
+              class="flex flex-col w-full md:w-full gap-4 justify-center items-center cursor-pointer"
             >
-              Category
-            </label>
-            <select
-              formControlName="categories"
-              multiple
-              id="category"
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            >
-              <option *ngFor="let category of categories | async" [ngValue]="category.domainId">{{category.name}}</option>
-            </select>
+              <i class="fa-solid fa-right-long fa-xl px-2"></i>
+              <i class="fa-solid fa-left-long fa-xl px-2"></i>
+            </div>
+
+            <div *ngIf="data" class="w-full md:w-full px-0 mb-6 md:mb-0">
+              <label
+                class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                for="category"
+              >
+                Assigned Domains
+              </label>
+              <select
+                formControlName="categories"
+                multiple
+                id="category"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option
+                  disabled
+                  *ngFor="let category of assignedCategories"
+                  [ngValue]="category.domainId"
+                >
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
           </div>
           <div class="w-full md:w-full px-3 mb-6 md:mb-0">
             <label
@@ -162,35 +203,36 @@
     </div>
   </div>
 </app-modal>
-<app-modal (onSave)="updateQuestion($event)" [data]="updateQuestionForm" [id]="'updateQuestionModal'">
+<app-modal
+  (onSave)="updateQuestion($event)"
+  [data]="updateQuestionForm"
+  [id]="'updateQuestionModal'"
+>
   <h3 header class="text-xl font-medium text-gray-900 dark:text-white">
     New Question
   </h3>
 
   <div content class="col-span-2 max-h-full">
     <div class="flex flex-col">
-      <form
-        class="w-1/2 max-w-lg mx-auto"
-        [formGroup]="updateQuestionForm"
-      >
-      <div class="flex flex-wrap -mx-3 mb-6">
-        <div class="w-full md:w-full px-3 mb-6 md:mb-0">
-          <label
-            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-            for="grid-first-name"
-          >
-            Title
-          </label>
-          <input
-            formControlName="title"
-            class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-            id="grid-first-name"
-            type="text"
-            placeholder="Question Title"
-          />
-          <!-- <p class="text-red-500 text-xs italic">Please fill out this field.</p> -->
+      <form class="w-1/2 max-w-lg mx-auto" [formGroup]="updateQuestionForm">
+        <div class="flex flex-wrap -mx-3 mb-6">
+          <div class="w-full md:w-full px-3 mb-6 md:mb-0">
+            <label
+              class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              for="grid-first-name"
+            >
+              Title
+            </label>
+            <input
+              formControlName="title"
+              class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+              id="grid-first-name"
+              type="text"
+              placeholder="Question Title"
+            />
+            <!-- <p class="text-red-500 text-xs italic">Please fill out this field.</p> -->
+          </div>
         </div>
-      </div>
         <div class="flex flex-wrap -mx-3 mb-6">
           <div class="w-full md:w-full px-3 mb-6 md:mb-0">
             <label
@@ -273,7 +315,12 @@
               id="category"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             >
-              <option *ngFor="let category of categories | async" [ngValue]="category.domainId">{{category.name}}</option>
+              <option
+                *ngFor="let category of categories | async"
+                [ngValue]="category.domainId"
+              >
+                {{ category.name }}
+              </option>
             </select>
           </div>
           <div class="w-full md:w-full px-3 mb-6 md:mb-0">

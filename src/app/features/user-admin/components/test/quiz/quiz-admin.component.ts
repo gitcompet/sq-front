@@ -9,6 +9,7 @@ import {
 import {
   finalize,
   forkJoin,
+  map,
   Observable,
   of,
   Subscription,
@@ -55,6 +56,7 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
   ];
   categories: Observable<IDomain[]> = new Observable();
   _subscriptions: Subscription[] = [];
+  assignedCategories: IDomain[] = [];
   constructor(
     private _formBuilder: FormBuilder,
     private modalService: ModalService,
@@ -86,6 +88,17 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
           this.data = data;
           this.updateQuizForm.patchValue(data);
           this.updateQuizForm.updateValueAndValidity();
+          this.assignedCategories = this.data.domains;
+          this.categories = this.quizService.getCategories().pipe(
+            map((value, index) => {
+              return value.filter(
+                (category) =>
+                  this.data.domains.find(
+                    (vl) => vl.domainId === category.domainId
+                  ) === undefined
+              );
+            })
+          );
         }
       })
     );
@@ -98,7 +111,6 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
           }
         })
     );
-    this.categories = this.quizService.getCategories();
   }
 
   onAddQuiz() {
@@ -172,7 +184,7 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
           return entry[1].value.map(
             (value: string) =>
               ({
-                path: `/quizCategoryId`,
+                path: `/domainId`,
                 op: OperationType.REPLACE,
                 value: value,
               } as Patch)

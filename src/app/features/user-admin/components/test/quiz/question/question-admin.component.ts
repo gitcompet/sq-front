@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Observable, Subscription, finalize, forkJoin } from 'rxjs';
+import { Observable, Subscription, finalize, forkJoin, map } from 'rxjs';
 import { IDomain } from 'src/app/core/models/domain.model';
 import { Patch, OperationType } from 'src/app/core/models/patch.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
@@ -20,6 +20,7 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
   showModal: boolean = false;
   categories: Observable<IDomain[]> = new Observable();
   _subscriptions: Subscription[] = [];
+  assignedCategories: IDomain[] =[];
 
   constructor(
     private quizService: QuizService,
@@ -52,6 +53,17 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
           this.data = data;
           this.updateQuestionForm.patchValue(data);
           this.updateQuestionForm.updateValueAndValidity();
+          this.assignedCategories = this.data.domains;
+          this.categories = this.quizService.getCategories().pipe(
+            map((value, index) => {
+              return value.filter(
+                (category) =>
+                  this.data.domains.find(
+                    (vl) => vl.domainId === category.domainId
+                  ) === undefined
+              );
+            })
+          );
         }
       })
     );
@@ -62,7 +74,6 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
           this.questions = questions;
         })
     );
-    this.categories = this.quizService.getCategories();
   }
   onAddQuestion() {
     this.showModal = !this.showModal;
@@ -107,7 +118,7 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
           return entry[1].value.map(
             (value: string) =>
               ({
-                path: `/questionCategoryId`,
+                path: `/domainId`,
                 op: OperationType.REPLACE,
                 value: value,
               } as Patch)

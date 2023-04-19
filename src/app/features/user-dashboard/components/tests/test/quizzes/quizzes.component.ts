@@ -38,8 +38,6 @@ export class QuizzesComponent implements OnInit, OnChanges {
           this.quizzes = this.quizzes.map((qz) =>
             qz.quizId === quiz.quizId ? quiz : qz
           );
-          console.log(this.quizzes);
-
         }
       })
     );
