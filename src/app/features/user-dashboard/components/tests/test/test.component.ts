@@ -3,8 +3,6 @@ import {
   Input,
   OnInit,
   OnDestroy,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
 } from '@angular/core';
 import { ITestResponse } from 'src/app/core/models/test-response.model';
 import { extractName } from 'src/app/core/constants/settings';
@@ -41,48 +39,61 @@ export class TestComponent implements OnInit, OnDestroy {
   toggle() {
     this.isExpanded = !this.isExpanded;
     if (this.isExpanded) {
-      if(this.isAdmin){
-      this.quizzes = this.quizService
-        .getAsssignedTestQuizzes(this.data.testId)
-        .pipe(
-          switchMap((compositions: ITestQuiz[]) => {
-            const filtredComposition = compositions.map(
-              (testQuiz) => testQuiz.quizId
-            );
-            return forkJoin(
-              filtredComposition.map((quizId) =>
-                this.quizService.getQuiz({
-                  quizId: quizId,
-                  testUserId: this.data.testUserId
-                } as IQuizResponse)
-              )
-            );
-          })
-        )
-        .pipe(
-          map((quizzesRes) => {
-            this.data = {
-              ...this.data,
-              quizzes: quizzesRes,
-            };
-
-            return this.data.quizzes;
-          })
-        );
-      }else{
+      if (this.isAdmin) {
         this.quizzes = this.quizService
-        .getUserQuizzes(this.data.testUserId)
-        .pipe(
-          map((quizzesRes) => {
+          .getAsssignedTestQuizzes(this.data.testId)
+          .pipe(
+            switchMap((compositions: ITestQuiz[]) => {
+              const filtredComposition = compositions.map(
+                (testQuiz) => testQuiz.quizId
+              );
+              const quizzesObs = forkJoin(
+                filtredComposition.map((quizId) =>
+                  this.quizService.getQuiz({
+                    quizId: quizId,
+                    testUserId: this.data.testUserId,
+                  } as IQuizResponse)
+                )
+              );
+              const observables = [quizzesObs, of(compositions)];
+              return forkJoin(observables);
+            })
+          )
+          .pipe(
+            map((quizzesRes) => {
+              const qzs = quizzesRes[0] as IQuizResponse[];
+              const compose = quizzesRes[1] as ITestQuiz[];
+              const updateQuizzes = qzs.map((quiz) => {
+                const currentQuiz = compose.find(
+                  (testQuiz) => testQuiz.quizId === quiz.quizId
+                );
+                return {
+                  ...quiz,
+                  isClosed: currentQuiz? currentQuiz.isClosed : false,
+                  hasTimer: currentQuiz? currentQuiz.timer: false,
+                };
+              });
+              this.data = {
+                ...this.data,
+                quizzes: updateQuizzes,
+              };
 
-            this.data = {
-              ...this.data,
-              quizzes: quizzesRes,
-            };
+              return this.data.quizzes;
+            })
+          );
+      } else {
+        this.quizzes = this.quizService
+          .getUserQuizzes(this.data.testUserId)
+          .pipe(
+            map((quizzesRes) => {
+              this.data = {
+                ...this.data,
+                quizzes: quizzesRes,
+              };
 
-            return this.data.quizzes;
-          })
-        );
+              return this.data.quizzes;
+            })
+          );
       }
     }
   }

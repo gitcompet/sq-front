@@ -4,37 +4,41 @@ import { IQuizResponse } from "./quiz-response.model";
 export interface ITestResponse {
     testId: string,
     testUserId: string,
+    testCategoryComposeId: string[];
     categories: IDomain[];
     comment: string;
+    quizzes: IQuizResponse[];
     isActive?: boolean;
     isDeleted?: boolean;
-    quizzes?: IQuizResponse[];
     title?: string;
     label?: string;
 }
 export class TestResponse implements ITestResponse{
   testId: string;
   testUserId: string;
+  testCategoryComposeId: string[];
   categories: IDomain[];
   comment: string;
   isActive: boolean;
   isDeleted: boolean;
-  quizzes?: IQuizResponse[];
+  quizzes: IQuizResponse[];
   title?: string;
   label?: string;
   constructor(
     testId: string,
     testUserId:string,
+    testCategoryComposeId:string[],
     categories: IDomain[],
     comment: string,
     isActive: boolean,
     isDeleted: boolean,
-    quizzes?: IQuizResponse[],
+    quizzes: IQuizResponse[],
     title?: string,
     label?: string
   ) {
     this.testId = testId;
     this.testUserId = testUserId;
+    this.testCategoryComposeId = testCategoryComposeId;
     this.categories = categories;
     this.comment = comment;
     this.isActive = isActive;

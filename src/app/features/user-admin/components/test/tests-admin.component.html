@@ -13,10 +13,7 @@
 
   <div content class="col-span-2 max-h-full">
     <div class="flex flex-col">
-      <form
-        class="w-1/2 max-w-lg mx-auto"
-        [formGroup]="testForm"
-      >
+      <form class="w-1/2 max-w-lg mx-auto" [formGroup]="testForm">
         <div class="flex flex-wrap -mx-3 mb-6">
           <div class="w-full md:w-full px-3 mb-6 md:mb-0">
             <label
@@ -35,6 +32,24 @@
             <!-- <p class="text-red-500 text-xs italic">Please fill out this field.</p> -->
           </div>
         </div>
+        <div class="flex flex-wrap -mx-3 mb-6">
+          <div class="w-full md:w-full px-3 mb-6 md:mb-0">
+            <label
+              class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              for="grid-first-name"
+            >
+              Label
+            </label>
+            <input
+              formControlName="label"
+              class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+              id="grid-first-name"
+              type="text"
+              placeholder="Test Label"
+            />
+            <!-- <p class="text-red-500 text-xs italic">Please fill out this field.</p> -->
+          </div>
+        </div>
         <div class="w-full md:w-full px-0 mb-6 md:mb-0">
           <label
             class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -48,10 +63,14 @@
             id="category"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
-            <option *ngFor="let category of categories" [ngValue]="category.domainId">{{category.name}}</option>
+            <option
+              *ngFor="let category of categories | async"
+              [ngValue]="category.domainId"
+            >
+              {{ category.name }}
+            </option>
           </select>
         </div>
-
       </form>
 
       <ng-container class="w-1/2">
@@ -68,100 +87,137 @@
             Quizzes
           </h3>
           <app-table
-            [actions]="quizActions"
             content
             [data]="testQuizzes"
-            [headers]="quizHeaders"
+            [headers]="headers"
             [title]="'Quizzes'"
           >
-          <ng-template let-item>
-            <app-checkbox [id]="item" (change)="onChecked($event)"></app-checkbox>
-          </ng-template>
-        </app-table>
+            <ng-template let-item>
+              <app-checkbox
+                [id]="item"
+                (change)="onChecked($event)"
+              ></app-checkbox>
+            </ng-template>
+          </app-table>
         </app-modal>
       </ng-container>
     </div>
   </div>
 </app-modal>
 <app-modal
-(onSave)="updateTest($event)"
-[id]="'updateTestModal'"
-[data]="testUpdateForm"
+  (onSave)="updateTest($event)"
+  [id]="'updateTestModal'"
+  [data]="testUpdateForm"
 >
-<h3 header class="text-xl font-medium text-gray-900 dark:text-white">
-  Update Test
-</h3>
+  <h3 header class="text-xl font-medium text-gray-900 dark:text-white">
+    Update Test
+  </h3>
 
-<div content class="col-span-2 max-h-full">
-  <div class="flex flex-col">
-    <form
-      class="w-1/2 max-w-lg mx-auto"
-      [formGroup]="testUpdateForm"
-    >
-      <div class="flex flex-wrap -mx-3 mb-6">
-        <div class="w-full md:w-full px-3 mb-6 md:mb-0">
-          <label
-            class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-            for="grid-first-name"
-          >
-            Title
-          </label>
-          <input
-            formControlName="title"
-            class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-            id="grid-first-name"
-            type="text"
-            placeholder="Test Name"
-          />
-          <!-- <p class="text-red-500 text-xs italic">Please fill out this field.</p> -->
+  <div content class="col-span-2 max-h-full">
+    <div class="flex flex-col">
+      <form class="w-1/2 max-w-lg mx-auto" [formGroup]="testUpdateForm">
+        <div class="flex flex-wrap -mx-3 mb-6">
+          <div class="w-full md:w-full px-3 mb-6 md:mb-0">
+            <label
+              class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              for="grid-first-name"
+            >
+              Title
+            </label>
+            <input
+              formControlName="title"
+              class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+              id="grid-first-name"
+              type="text"
+              placeholder="Test Name"
+            />
+            <!-- <p class="text-red-500 text-xs italic">Please fill out this field.</p> -->
+          </div>
         </div>
-      </div>
-      <div class="w-full md:w-full px-0 mb-6 md:mb-0">
-        <label
-          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-          for="category"
-        >
-          Category
-        </label>
-        <select
-          formControlName="categories"
-          multiple
-          id="category"
-          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        >
-          <option *ngFor="let category of categories" [ngValue]="category.domainId">{{category.name}}</option>
-        </select>
-      </div>
 
-    </form>
+        <div class="flex w-full md:w-full gap-2 justify-center items-center">
+          <div class="w-full md:w-full px-0 mb-6 md:mb-0">
+            <label
+              class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              for="category"
+            >
+              Availaible Categories
+            </label>
+            <select
+              formControlName="categories"
+              multiple
+              id="category"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option
+                *ngFor="let category of categories | async"
+                [ngValue]="category.domainId"
+              >
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+          <div
+            class="flex flex-col w-full md:w-full gap-4 justify-center items-center cursor-pointer"
+          >
+           <i (click)="assign()" class="fa-solid fa-right-long fa-xl px-2"></i>
+            <i (click)="unAssign()" class="fa-solid fa-left-long fa-xl px-2"></i>
 
-    <ng-container class="w-1/2">
-      <button
-        (click)="selectQuizzes()"
-        href="#"
-        class="block uppercase tracking-wide text-gray-400 hover:text-purple-300 text-xl font-bold my-2 mx-auto"
-      >
-        Select quizzes
-      </button>
-      <!-- <app-table [data]="quizQuestions" [headers]="headers" [title]="'Questions'" ></app-table> -->
-      <app-modal (onSave)="assignQuizzes()" [id]="'quizModal'">
-        <h3 header class="text-xl font-medium text-gray-900 dark:text-white">
-          Quizzes
-        </h3>
-        <app-table
-          [actions]="quizActions"
-          content
-          [data]="testQuizzes"
-          [headers]="quizHeaders"
-          [title]="'Quizzes'"
+          </div>
+
+          <div *ngIf="data" class="w-full md:w-full px-0 mb-6 md:mb-0">
+            <label
+              class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+              for="assignedCategories"
+            >
+              Assigned Categories
+            </label>
+            <select
+              formControlName="assignedCategories"
+              multiple
+              id="assignedCategories"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option
+                *ngFor="let category of assignedCategories"
+                [ngValue]="category.domainId"
+              >
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </form>
+
+      <ng-container class="w-1/2">
+        <button
+          (click)="selectQuizzes()"
+          href="#"
+          class="block uppercase tracking-wide text-gray-400 hover:text-purple-300 text-xl font-bold my-2 mx-auto"
         >
-        <ng-template let-item>
-          <app-checkbox [id]="item" (change)="onChecked($event)"></app-checkbox>
-        </ng-template>
-      </app-table>
-      </app-modal>
-    </ng-container>
+          Select quizzes
+        </button>
+        <!-- <app-table [data]="quizQuestions" [headers]="headers" [title]="'Questions'" ></app-table> -->
+        <app-modal (onSave)="assignQuizzes()" [id]="'quizModal'">
+          <h3 header class="text-xl font-medium text-gray-900 dark:text-white">
+            Quizzes
+          </h3>
+          <app-table
+            content
+            [data]="testQuizzes"
+            [headers]="headers"
+            [title]="'Quizzes'"
+          >
+            <ng-template let-item>
+              <app-checkbox
+                [id]="item"
+                (change)="onChecked($event)"
+              ></app-checkbox>
+            </ng-template>
+          </app-table>
+        </app-modal>
+      </ng-container>
+    </div>
   </div>
-</div>
 </app-modal>
-<app-confirmation-modal   (onSave)="deleteTest()"></app-confirmation-modal>
+<app-confirmation-modal (onSave)="deleteTest()"></app-confirmation-modal>

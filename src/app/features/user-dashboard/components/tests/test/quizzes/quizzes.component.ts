@@ -6,9 +6,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, of, Subscription, switchMap } from 'rxjs';
-import { IQuestionResponse } from 'src/app/core/models/question-response.model';
-import { IQuizQuestion } from 'src/app/core/models/quiz-question-assign.model copy';
+import { Subscription } from 'rxjs';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -33,9 +31,18 @@ export class QuizzesComponent implements OnInit, OnChanges {
   ) {}
   ngOnInit(): void {
     this.isAdmin = this.authService.isAdmin();
-    this._subscriptions.push(this.modalService.getDataExchange().subscribe());
-    if(this.isAdmin){
-      this.quizService.getAvailableQuizzes(this.authService.getId()).subscribe();
+    this._subscriptions.push(
+      this.modalService.getDataExchange().subscribe((data) => {
+        if (data && Object.hasOwn(data, 'quizId')) {
+          const quiz = data as IQuizResponse;
+          this.quizzes = this.quizzes.map((qz) =>
+            qz.quizId === quiz.quizId ? quiz : qz
+          );
+        }
+      })
+    );
+    if (this.isAdmin) {
+      this.quizService.getAvailableQuizzes().subscribe();
     }
   }
   ngOnChanges(changes: SimpleChanges) {

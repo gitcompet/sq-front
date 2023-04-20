@@ -1,6 +1,8 @@
 export interface IDomain {
   domainId: string;
   subDomainId: string,
+  domainComposeId: string;
+  subDomainComposeId: string;
   isActive: boolean;
   isDeleted: boolean;
   name: string;
@@ -11,6 +13,8 @@ export interface IDomain {
 export class Domain implements IDomain {
   domainId: string;
   subDomainId: string;
+  domainComposeId: string;
+  subDomainComposeId: string;
   isActive: boolean;
   isDeleted: boolean;
   name: string;
@@ -20,6 +24,8 @@ export class Domain implements IDomain {
   constructor(
     domainId: string,
     subDomainId: string,
+    domainComposeId: string,
+    subDomainComposeId: string,
     isActive: boolean,
     isDeleted: boolean,
     name: string,
@@ -29,6 +35,8 @@ export class Domain implements IDomain {
   ) {
     this.domainId = domainId;
     this.subDomainId = subDomainId;
+    this.domainComposeId = domainComposeId;
+    this.subDomainComposeId = subDomainComposeId;
     this.isActive = isActive;
     this.isDeleted = isDeleted;
     this.title = title;

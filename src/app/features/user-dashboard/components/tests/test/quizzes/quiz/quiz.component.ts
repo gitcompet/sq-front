@@ -43,7 +43,7 @@ export class QuizComponent implements OnInit, OnDestroy {
         if (element) {
           element.scrollIntoView({ block: 'end', behavior: 'smooth' });
           const elementContent = document.querySelector('#el-content' + f);
-          elementContent?.classList.add('max-h-40');
+          elementContent?.classList.add('max-h-max');
         }
       });
     }
@@ -52,34 +52,16 @@ export class QuizComponent implements OnInit, OnDestroy {
   toggle() {
     this.isExpanded = !this.isExpanded;
 
-    if (this.isExpanded) {
+    if (this.isExpanded && this.isAdmin) {
       this._subscriptions.push(
         this.quizService
-
           .getAsssignedQuizQuestions(this.data.quizId)
-          .pipe(
-            switchMap((compositions: IQuizQuestion[]) => {
-              const filtredComposition = compositions.map(
-                (quizQuestion) => quizQuestion.questionId
-              );
-
-              return forkJoin(
-                filtredComposition.map((questionId) =>
-                  this.quizService.getQuestion({
-                    questionId: questionId,
-                  } as IQuestionResponse)
-                )
-              );
-            }),
-
-            map((questionRes) => {
-              this.data = {
-                ...this.data,
-                questions: questionRes,
+          .subscribe((questions)=>{
+            this.data = {
+                     ...this.data,
+                     questions: questions,
               };
-            })
-          )
-          .subscribe()
+          })
       );
     }
   }

@@ -1,6 +1,6 @@
 <div
   *ngIf="quizzes && quizzes.length > 0"
-  class="grid grid-cols-2 gap-2 px-2 py-3 justify-center items-start"
+  class="grid grid-cols-2 mx-auto gap-2 px-2 py-3 place-content-center place-items-center w-10/12"
 >
   <app-quiz
     (click)="quizDetails(quiz.quizId)"

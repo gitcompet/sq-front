@@ -7,7 +7,11 @@ import { TokenResponse } from 'src/app/core/models/token-response.model';
 import { IUser, User } from 'src/app/core/models/user.model';
 import { environment } from 'src/environments/environment.development';
 import { JWTHelperService } from './jwt-helper.service';
-import { formUrlEncodedHeaders, headers } from 'src/app/core/constants/settings';
+import {
+  formUrlEncodedHeaders,
+  headers,
+} from 'src/app/core/constants/settings';
+import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +20,8 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private jwtService: JWTHelperService
+    private jwtService: JWTHelperService,
+    private localStorageService: LocalStorageService
   ) {}
 
   isLoggedin: boolean = false;
@@ -46,7 +51,7 @@ export class AuthService {
     );
   }
   refreshToken(payload: any): Observable<TokenResponse> {
-     return this.http.post<TokenResponse>(
+    return this.http.post<TokenResponse>(
       `${environment.baseUrl}${environment.apiVersion}${environment.authPaths.base}${environment.authPaths.refresh}`,
 
       payload,
@@ -58,9 +63,12 @@ export class AuthService {
     this.isLoggedin = false;
     this.router.navigateByUrl('/');
   }
-  hasTokenExpired():boolean{
+  hasTokenExpired(): boolean {
     const token = this.getToken();
-    return (token === undefined || token === null) && this.jwtService.hasTokenExpired(token);
+    return (
+      (token === undefined || token === null) &&
+      this.jwtService.hasTokenExpired(token)
+    );
   }
   isLoggedIn(): boolean {
     const token = this.getToken();
@@ -70,10 +78,10 @@ export class AuthService {
     return true;
   }
   getToken(): string {
-    return localStorage.getItem('token') as string;
+    return this.localStorageService.getData('token') as string;
   }
   getRefreshToken(): string {
-    return localStorage.getItem('refresh') as string;
+    return this.localStorageService.getData('refresh') as string;
   }
 
   getId(): string {
@@ -86,18 +94,21 @@ export class AuthService {
     return id;
   }
   setToken(response: TokenResponse) {
-    localStorage.setItem('token', response.accessToken);
-    localStorage.setItem('refresh', response.refreshToken);
+    this.localStorageService.saveData('token', response.accessToken);
+    this.localStorageService.saveData('refresh', response.refreshToken);
   }
   removeToken() {
-    localStorage.clear();
+    this.localStorageService.clearData();
   }
   getRoles(): string[] {
     const decodedToken: any = this.jwtService.decode(this.getToken());
     const properties: string[] = Object.getOwnPropertyNames(decodedToken);
     const key: string = properties.filter((value) => value.includes('role'))[0];
     const roles = decodedToken[key] as string[];
-    return roles;
+    const activatedRoles: string[] = [];
+    if (Array.isArray(roles)) return roles;
+    activatedRoles.push(roles);
+    return activatedRoles;
   }
   isAdmin() {
     return this.getRoles().includes('admin'.toUpperCase());
