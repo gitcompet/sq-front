@@ -61,10 +61,9 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
   tick() {
     this.duration -= 1;
     this.elapsedTime = this.parseTime();
-    if (this.duration === 0) console.log('done');
-    // if (this.duration === 0) {
-    //   this.validateQuiz();
-    // }
+    if (this.duration === 0) {
+      this.validateQuiz();
+    }
   }
   parseTime() {
     let mins: string | number = Math.floor(this.duration / 60);
@@ -83,7 +82,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     return 1;
   }
   nextQuestion(): void {
-    this.currentIdx = this.currentIdx + 1;
+
     if (this.currentIdx === this.questionsLength) {
       this.router.navigate(['/summary'], {
         relativeTo: this.route,
@@ -148,6 +147,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
       .pipe(userQuestionObs)
       .subscribe({
         next: (result: any) => {
+          console.log(result);
           this.currentQuestion = this.userQuestions
             .filter(
               (question: IQuestionResponse) =>
@@ -176,6 +176,8 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
             } else {
               this.duration = this.currentQuestion.duration * 60;
             }
+
+
             if (this.duration === 0) {
               this.nextQuestion();
             }

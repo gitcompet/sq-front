@@ -356,13 +356,13 @@ export class QuizService {
                 } as IDomain;
               }
             ),
-            quizsubDomainComposeId: subDomains.subDomaComposeinId,
+            quizsubDomainComposeId: subDomains.subDomainComposeId,
             subDomains: subDomains.subDomainNames.map(
               (subDomainName: string, index: number) => {
                 return {
                   domainId: subDomains.subDomainId[index],
                   name: subDomainName,
-                  subDomainComposeId: subDomains.subDomaComposeinId[index],
+                  subDomainComposeId: subDomains.subDomainComposeId[index],
                 } as IDomain;
               }
             ),
@@ -479,13 +479,13 @@ export class QuizService {
                 } as IDomain;
               }
             ),
-            quizsubDomainComposeId: subDomains.subDomaComposeId,
+            quizsubDomainComposeId: subDomains.subDomainComposeId,
             subDomains: subDomains.subDomainNames.map(
               (subDomainName: string, index: number) => {
                 return {
                   domainId: subDomains.subDomainId[index],
                   name: subDomainName,
-                  subDomainComposeId: subDomains.subDomaComposeId[index],
+                  subDomainComposeId: subDomains.subDomainComposeId[index],
                 } as IDomain;
               }
             ),
