@@ -10,7 +10,7 @@
         [ngClass]="['devicon-' + extractName(domain.name) + '-plain colored']"
       ></i>
     </div>
-    <div class="text-center">
+    <div *ngIf="totalDuration" class="text-center">
       Duration: {{ quiz.hasTimer ? totalDuration + '&nbsp;min' : 'Unlimited' }}
     </div>
     <div class="text-center leading-6">Description: {{quiz.comment}}</div>

@@ -57,6 +57,9 @@ export class QuizIntroductionComponent
   }
 
   ngAfterViewInit(): void {
+
+  }
+  ngOnInit(): void {
     this._subscriptions.push(
       this.quizService
         .getUserQuestions(this.quiz.quizUserId!)
@@ -67,8 +70,6 @@ export class QuizIntroductionComponent
             .reduce((acc: number, current: number) => current + acc);
         })
     );
-  }
-  ngOnInit(): void {
     this.languages = this.languagesService.getLanguage(this.langId).pipe(
       switchMap((res) => {
         return this.languagesService.getLanguages();
