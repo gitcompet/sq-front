@@ -37,7 +37,8 @@ export const environment = {
   },
   categoryPaths: {
     base: '/Domain',
-    domainCompose: '/DomainCompose'
+    domainCompose: '/DomainCompose',
+    subDomainCompose: '/SubDomainCompose'
   },
   languagesPaths: {
     base: '/Language'
