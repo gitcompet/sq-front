@@ -1,5 +1,5 @@
 export const environment = {
-  baseUrl: 'https://localhost:5001',
+  baseUrl: 'http://localhost:5001',
   apiVersion: '/api/v1',
   authPaths: {
     base: '/Auth',
@@ -12,6 +12,10 @@ export const environment = {
   },
   quizPaths: {
     base: '/Quiz',
+  },
+  dashboardPaths:{
+    base: "/Dashboard",
+    latestQuizzes: "/LastQuiz"
   },
   testPaths: {
     base: '/Test',

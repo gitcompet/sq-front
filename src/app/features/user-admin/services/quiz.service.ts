@@ -1,26 +1,48 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { forkJoin, map, mergeMap, Observable, of, switchMap, tap } from 'rxjs';
+import {
+  catchError,
+  forkJoin,
+  map,
+  mergeMap,
+  Observable,
+  of,
+  switchMap,
+  tap,
+  throwError,
+  zip,
+} from 'rxjs';
 import { headers, patchHeaders } from 'src/app/core/constants/settings';
 import { IQuestion } from 'src/app/core/models/question.model';
 import { IQuiz } from 'src/app/core/models/quiz.model';
 import { ITest } from 'src/app/core/models/test.model';
 import { ITestResponse } from 'src/app/core/models/test-response.model';
 import { environment } from 'src/environments/environment.development';
-import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
+import {
+  IQuizDashboard,
+  IQuizResponse,
+} from 'src/app/core/models/quiz-response.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { ITestUserResponse } from 'src/app/core/models/test-user-response.model';
 import { ITestQuiz } from 'src/app/core/models/test-quiz-assign.model';
 import { IQuizQuestion } from 'src/app/core/models/quiz-question-assign.model copy';
-import { ElementTypes, IDomain } from 'src/app/core/models/domain.model';
+import {
+  ElementTypes,
+  IDomain,
+  QuizStatus,
+} from 'src/app/core/models/domain.model';
 import { Patch } from 'src/app/core/models/patch.model';
+import { UserService } from '../../user-profile/services/user.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class QuizService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    private userService: UserService
+  ) {}
 
   // TESTS SECTION
   getAvailableTests(): Observable<ITestResponse[]> {
@@ -88,29 +110,27 @@ export class QuizService {
     );
   }
 
-  getUserTests(userId: string): Observable<ITestResponse[]> {
+  getUserTests(userId: string, isParent?:boolean): Observable<ITestResponse[]> {
     return this.httpClient
       .get<ITestUserResponse[]>(
-        `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.base}/${userId}?isParentURL=true`
+        `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.base}/${userId}?${isParent ?'isParentURL='+ isParent : 'true'}`
       )
       .pipe(
         switchMap((userTests: ITestUserResponse[]) => {
+          if(!Array.isArray(userTests)) userTests = [userTests];
           const testIds = userTests.map(
             (userTest: ITestUserResponse) => userTest.testId
           );
-          const userTestIds = userTests.map(
-            (userTest: ITestUserResponse) => userTest.testUserId
-          );
           const observables = [
             forkJoin(testIds.map((id: string) => this.getTest(id))),
-            of(userTestIds),
+            of(userTests),
           ];
           return forkJoin(observables);
         }),
 
         switchMap((newTests) => {
           const tests = newTests[0] as ITestResponse[];
-          const userTestIds = newTests[1] as string[];
+          const userTest = newTests[1] as unknown;
 
           const testsObervables: Observable<ITestResponse>[] = tests.map(
             (newTest: ITestResponse) => this.getTestCategories(newTest.testId)
@@ -118,15 +138,16 @@ export class QuizService {
           const observables = [
             of(tests),
             forkJoin(testsObervables),
-            of(userTestIds),
+            of(userTest),
           ];
           return forkJoin(observables);
         }),
         switchMap((tests) => {
           const ts = tests[0] as ITestResponse[];
           const categories = tests[1] as ITestResponse[];
-          const userTestIds = tests[2] as string[];
-
+          const userTests = tests[2] as any;
+          
+          
           return of(
             ts.map((test, index) => {
               const testCatgories: any = categories.filter(
@@ -134,7 +155,10 @@ export class QuizService {
               )[0];
               return {
                 ...test,
-                testUserId: userTestIds[index],
+                userId: userTests.map((test: any) => test.loginId)[index],
+                testUserId: userTests.map((test: any) => test.testUserId)[
+                  index
+                ],
                 categories: testCatgories.categoryNames.map(
                   (categoryName: string, index: number) => {
                     return {
@@ -309,6 +333,65 @@ export class QuizService {
           quizQuestionAssignation.questionId = composedTest.questionId;
           quizQuestionAssignation.quizId = composedTest.quizId;
           return quizQuestionAssignation;
+        })
+      );
+  }
+
+  getLastestQuizzes(
+    status: QuizStatus,
+    amount?: number
+  ): Observable<IQuizDashboard[]> {
+    return this.httpClient
+      .get<any>(
+        `${environment.baseUrl}${environment.apiVersion}${
+          environment.dashboardPaths.base
+        }${environment.dashboardPaths.latestQuizzes}?done=${status}${
+          amount ? '&amount=' + amount : ''
+        }`
+      )
+      .pipe(
+        switchMap((quizzes) =>
+          forkJoin([
+            forkJoin(quizzes.map((quiz: IQuizResponse) => this.getQuiz(quiz))),
+            forkJoin(
+              quizzes.flatMap((quiz: IQuizResponse) =>
+                this.getUserTests(quiz.testUserId!,false)
+              )
+            ),
+            of(quizzes),
+          ])
+        ),
+        switchMap((response) => {
+          let tests = response[1] as ITestResponse[];
+          tests = tests.flat(1)
+          const usrObs = forkJoin(
+            tests.flatMap((test: any) =>
+              this.userService.getProfile(test.userId)
+            )
+          );
+          return zip(of(response[0]), of(response[1]), of(response[2]), usrObs);
+        }),
+        map((response) => {
+          const quizzes = response[0] as IQuizResponse[];
+          const tests = response[1] as ITestResponse[];
+          const latestQuizzes = response[2];
+          const users = response[3];
+         
+          
+          return quizzes.map(
+            (quiz, index) =>
+              ({
+                title: quiz.title,
+                comment: quiz.comment,
+                userName: users[index].lastName,
+                score: (latestQuizzes[index].score / 100) * 10,                
+                testName: tests.find((test) =>
+                  latestQuizzes.findIndex(
+                    (ts: ITestResponse) => ts.testUserId === test.testUserId
+                  )
+                )?.title,
+              } as IQuizDashboard)
+          );
         })
       );
   }

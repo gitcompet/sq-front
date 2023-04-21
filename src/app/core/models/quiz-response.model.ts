@@ -20,6 +20,13 @@ export interface IQuizResponse {
     quizUserId?:string;
     timer?: boolean;
 }
+export interface IQuizDashboard{
+   title: string;
+   comment: string;
+   testName: string;
+   userName:string;
+   score: number;
+}
 export class QuizResponse implements IQuizResponse{
   quizId: string;
   weight: number ;

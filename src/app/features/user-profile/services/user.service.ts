@@ -30,6 +30,23 @@ export class UserService {
         )
       );
   }
+  getProfile(id: string): Observable<IUser> {
+    return this.http
+      .get<IUser>(
+        `${environment.baseUrl}${environment.apiVersion}${environment.userPaths.base}/${id}`
+      )
+      .pipe(
+        map((user) => {
+          const modifiedUser = {} as IUser;
+          modifiedUser.loginId = user.loginId;
+          modifiedUser.email = user.email;
+          modifiedUser.firstName = user.firstName;
+          modifiedUser.lastName = user.lastName;
+          modifiedUser.login = user.login;
+          return modifiedUser;
+        })
+      );
+  }
   updateUser(payload: IUser): Observable<IUser> {
     return this.http
       .put<IUser>(

@@ -9,6 +9,7 @@ import { NavbarSettingsComponent } from './components/navbar-settings/navbar-set
 import { CheckBoxComponent } from './components/checkbox/checkbox.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ConfirmationModalComponent } from './components/modal/confirmation-modal/confirmation-modal.component';
+import { StatsModule } from './modules/stats/stats.module';
 
 export function tokenGetter() {
   return localStorage.getItem('access_token');
@@ -29,7 +30,8 @@ export function tokenGetter() {
     ModalComponent,
     ConfirmationModalComponent,
     NavbarSettingsComponent,
-    CheckBoxComponent
+    CheckBoxComponent,
+    StatsModule
   ],
   imports: [
     CommonModule,

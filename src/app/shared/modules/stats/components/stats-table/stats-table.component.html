@@ -1,0 +1,39 @@
+
+<h2 class="text-xl inline-block text-purple-400  font-bold leading-2 text-left ">{{title}}:</h2>
+
+<div
+  *ngIf="data && headers && data.length > 0 && headers.length > 0; else noRecentQuizzes" 
+  class="container max-h-min mr-5 ml-2 mx-auto bg-white shadow-xl"
+>
+
+  <div class="w-full mx-auto">
+    <div class="bg-white my-3">
+      <table class="text-left w-full border-collapse">
+        <!--Border collapse doesn't work on this site yet but it's available in newer tailwind versions -->
+        <thead>
+          <tr>
+            <th
+              *ngFor="let header of headers"
+              class="py-4 px-6 bg-purple-400 font-bold uppercase text-sm text-white border-b border-grey-light"
+            >
+              {{ header | uppercase }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of data" class="hover:bg-grey-lighter">
+            <td
+              *ngFor="let property of item | keyvalue : originalOrder"
+              class="py-4 px-6 border-b border-grey-light"
+            >
+              {{ property.value }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<ng-template #noRecentQuizzes>
+    <h2 class="text-lg text-center font-bold leading-5 text-red-500 py-4">There is recent quiz</h2>
+</ng-template>
