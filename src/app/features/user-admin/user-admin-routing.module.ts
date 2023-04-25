@@ -11,6 +11,7 @@ import { QuizComponent } from '../user-dashboard/components/tests/test/quizzes/q
 import { QuestionAdminComponent } from './components/test/quiz/question/question-admin.component';
 import { LanguageComponent } from './components/languages/language/language.component';
 import { LanguagesComponent } from './components/languages/languages.component';
+import { SettingsPageComponent } from 'src/app/shared/components/settings-page/settings-page.component';
 
 const routes: Routes = [
   {
@@ -19,6 +20,13 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     children: [
+      {
+        path: 'settings',
+        component: SettingsPageComponent,
+        data: {
+          roles: ['ADMIN'],
+        },
+      },
       {
         path: 'dashboard',
         component: MainContentComponent,

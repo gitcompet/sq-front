@@ -110,10 +110,10 @@ export class QuizService {
     );
   }
 
-  getUserTests(userId: string, isParent?:boolean): Observable<ITestResponse[]> {
+  getUserTests(userId: string, isParent:boolean=false): Observable<ITestResponse[]> {
     return this.httpClient
       .get<ITestUserResponse[]>(
-        `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.base}/${userId}?${isParent ?'isParentURL='+ isParent : 'true'}`
+        `${environment.baseUrl}${environment.apiVersion}${environment.testUserPaths.base}/${userId}?${'isParentURL='+isParent}`
       )
       .pipe(
         switchMap((userTests: ITestUserResponse[]) => {
@@ -146,8 +146,8 @@ export class QuizService {
           const ts = tests[0] as ITestResponse[];
           const categories = tests[1] as ITestResponse[];
           const userTests = tests[2] as any;
-          
-          
+
+
           return of(
             ts.map((test, index) => {
               const testCatgories: any = categories.filter(
@@ -376,15 +376,15 @@ export class QuizService {
           const tests = response[1] as ITestResponse[];
           const latestQuizzes = response[2];
           const users = response[3];
-         
-          
+
+
           return quizzes.map(
             (quiz, index) =>
               ({
                 title: quiz.title,
                 comment: quiz.comment,
                 userName: users[index].lastName,
-                score: (latestQuizzes[index].score / 100) * 10,                
+                score: (latestQuizzes[index].score / 100) * 10,
                 testName: tests.find((test) =>
                   latestQuizzes.findIndex(
                     (ts: ITestResponse) => ts.testUserId === test.testUserId
@@ -413,6 +413,7 @@ export class QuizService {
             modifiedQuiz.testUserId = quizPayload.testUserId;
           if (quizPayload.quizUserId)
             modifiedQuiz.quizUserId = quizPayload.quizUserId;
+          modifiedQuiz.score = quizPayload.score
           return modifiedQuiz;
         }),
         switchMap((newQuiz: IQuizResponse) => {
@@ -628,7 +629,7 @@ export class QuizService {
         `${environment.baseUrl}${environment.apiVersion}${environment.categoryPaths.domainCompose}`,
         payload,
         {
-          headers: patchHeaders,
+          headers: headers,
         }
       )
       .pipe();

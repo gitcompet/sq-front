@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { UserService } from 'src/app/features/user-profile/services/user.service';
 import { IUser } from 'src/app/core/models/user.model';
 import { ModalService } from 'src/app/shared/services/modal.service';
@@ -13,12 +19,15 @@ import {
 import { passwordMatchingValidator } from 'src/app/core/constants/settings';
 import { OperationType, Patch } from 'src/app/core/models/patch.model';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { TableComponent } from 'src/app/shared/components/table/table.component';
 @Component({
   selector: 'app-profiles',
   templateUrl: './profiles.component.html',
   styleUrls: ['./profiles.component.css'],
 })
-export class ProfilesComponent implements OnInit, OnDestroy {
+export class ProfilesComponent implements OnInit, AfterViewInit, OnDestroy {
   users: IUser[] = [];
   headers: string[] = [
     'Id',
@@ -32,11 +41,14 @@ export class ProfilesComponent implements OnInit, OnDestroy {
   signUpForm: FormGroup;
   updateForm: FormGroup;
   _subscriptions: Subscription[] = [];
+  isUrl: boolean = false;
   constructor(
     public authService: AuthService,
     private _formBuilder: FormBuilder,
     private userService: UserService,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.signUpForm = this._formBuilder.group({
       login: new FormControl('', [
@@ -75,8 +87,10 @@ export class ProfilesComponent implements OnInit, OnDestroy {
       lastName: new FormControl('', [Validators.minLength(3)]),
     });
   }
+  ngAfterViewInit(): void {}
 
   ngOnInit() {
+    this.isUrl = /profiles\d+/.test(this.router.url);
     this._subscriptions.push(
       this.userService.getProfiles().subscribe((res: IUser[]) => {
         this.users = res;
@@ -106,6 +120,16 @@ export class ProfilesComponent implements OnInit, OnDestroy {
       isShown: this.showModal,
     });
   }
+
+  moreInfo(user: IUser) {
+    const selectedUserUrl = this.router.createUrlTree([user.loginId], {
+      relativeTo: this.route,
+    });
+    this.router.navigateByUrl(selectedUserUrl);
+    this.router.routerState.snapshot.root.data = user;
+    this.isUrl = !this.isUrl;
+  }
+
   createUser(form: any) {
     if (!form.valid) return;
     this._subscriptions.push(

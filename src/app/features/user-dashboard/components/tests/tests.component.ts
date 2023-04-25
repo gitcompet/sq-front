@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import {
   ITestResponse,
-  TestResponse,
 } from 'src/app/core/models/test-response.model';
 import { QuizService } from 'src/app/features/user-admin/services/quiz.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -26,8 +25,9 @@ export class TestsComponent implements OnInit {
       this.modalService.getDataExchange().subscribe((data) => {
         if (data && Object.hasOwn(data, 'testId')) {
           const test = data as ITestResponse;
-          this.tests= this.tests.map((tst) => tst.testId === test.testId ? test: tst);
-
+          this.tests = this.tests.map((tst) =>
+            tst.testId === test.testId ? test : tst
+          );
         }
       })
     );
@@ -35,7 +35,7 @@ export class TestsComponent implements OnInit {
     if (!this.authService.isAdmin()) {
       this._subscriptions.push(
         this.quizService
-          .getUserTests(this.authService.getId())
+          .getUserTests(this.authService.getId(), true)
           .subscribe((res: ITestResponse[]) => {
             this.tests = res;
           })

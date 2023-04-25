@@ -1,11 +1,14 @@
-
-<h2 class="text-xl inline-block text-purple-400  font-bold leading-2 text-left ">{{title}}:</h2>
+<h2 class="text-xl inline-block text-purple-400 font-bold leading-2 text-left">
+  {{ title }}:
+</h2>
 
 <div
-  *ngIf="data && headers && data.length > 0 && headers.length > 0; else noRecentQuizzes" 
+  *ngIf="
+    data && headers && data.length > 0 && headers.length > 0;
+    else noRecentQuizzes
+  "
   class="container max-h-min mr-5 ml-2 mx-auto bg-white shadow-xl"
 >
-
   <div class="w-full mx-auto">
     <div class="bg-white my-3">
       <table class="text-left w-full border-collapse">
@@ -26,7 +29,18 @@
               *ngFor="let property of item | keyvalue : originalOrder"
               class="py-4 px-6 border-b border-grey-light"
             >
-              {{ property.value }}
+              <p
+                class="mb-0 text-center leading-normal text-sm p-2 bg-transparent border-b whitespace-nowrap break-words"
+              >
+                <ng-container *ngIf="!isObject(property.value); else nested">
+                  {{ property.value }}
+                </ng-container>
+                <ng-template #nested>
+                  <span *ngFor="let prop of property.value; let idx = index"
+                    >&nbsp;{{ prop.name }}</span
+                  >
+                </ng-template>
+              </p>
             </td>
           </tr>
         </tbody>
@@ -35,5 +49,7 @@
   </div>
 </div>
 <ng-template #noRecentQuizzes>
-    <h2 class="text-lg text-center font-bold leading-5 text-red-500 py-4">There is recent quiz</h2>
+  <h2 class="text-lg text-center font-bold leading-5 text-red-500 py-4">
+    There is no recent quiz
+  </h2>
 </ng-template>

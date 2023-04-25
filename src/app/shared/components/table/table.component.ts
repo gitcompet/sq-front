@@ -20,7 +20,7 @@ import { ModalService } from '../../services/modal.service';
   styleUrls: ['./table.component.css'],
 })
 export class TableComponent implements OnInit {
-  @Input() data: IUser[] | IQuestion[] | any[] = [];
+  @Input() data: IUser[] | IQuestion[] | any = [];
   @Input() title: string = '';
   @Input() headers: string[] = [];
   @Output('onSave') dataEmitter: EventEmitter<any> = new EventEmitter<any>();

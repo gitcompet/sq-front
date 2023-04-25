@@ -19,6 +19,7 @@ export interface IQuizResponse {
     testUserId?:string;
     quizUserId?:string;
     timer?: boolean;
+    score?: number;
 }
 export interface IQuizDashboard{
    title: string;
@@ -26,6 +27,8 @@ export interface IQuizDashboard{
    testName: string;
    userName:string;
    score: number;
+   domains?: IDomain[];
+   subDomains?: IDomain[];
 }
 export class QuizResponse implements IQuizResponse{
   quizId: string;

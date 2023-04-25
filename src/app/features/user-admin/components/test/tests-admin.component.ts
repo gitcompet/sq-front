@@ -45,6 +45,7 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
   categories: Observable<IDomain[]> = new Observable();
   assignedCategories: IDomain[] = [];
   private unAssignedCategories: IDomain[] = [];
+  categoryIds: string[] = [];
   _subscriptions: Subscription[] = [];
   newTest: ITest = {} as ITest;
   constructor(
@@ -87,6 +88,7 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
         }
       })
     );
+    this.categories = this.quizService.getCategories();
   }
   onAddTest() {
     this.showModal = !this.showModal;
@@ -157,29 +159,17 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
   updateTest(form: FormGroup) {
     if (!form.valid) return;
     if (this.unAssignedCategories.length > 0) {
-      console.log(
-        this.unAssignedCategories,
-        this.data.categories
-        .map((category) => category.domainComposeId)
-        .filter((cat) =>
-          this.unAssignedCategories
-            .map((ct) => ct.domainComposeId)
-            .includes(cat)
-        )
-      );
-      return;
       forkJoin(
         this.data.categories
           .map((category) => category.domainComposeId)
           .filter((cat) =>
-            this.unAssignedCategories
-              .map((ct) => ct.domainId)
-              .includes(cat)
-          ).map((id)=> this.quizService.unAssignCategoriesTest(id))
+            this.unAssignedCategories.map((ct) => ct.domainId).includes(cat)
+          )
+          .map((id) => this.quizService.unAssignCategoriesTest(id))
       ).subscribe((removedCategories) => console.log(removedCategories));
       return;
     }
-    return;
+
     const controls: any = form.controls;
 
     const {
@@ -260,6 +250,8 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
     }
   }
   private setUpPatches(controls: AbstractControl<any>) {
+    this.testUpdateForm.get('categories')?.patchValue(this.categoryIds);
+    this.testUpdateForm.updateValueAndValidity();
     const patches: Patch[] = Object.entries(controls)
       .map((entry) => {
         if (entry[1].value && (!entry[1].pristine || entry[1].dirty)) {
@@ -298,7 +290,6 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
     const assigned = this.testUpdateForm.get('assignedCategories');
     const available = this.testUpdateForm.get('categories');
     if (assigned && available) {
-
       const categoryToRemove = this.assignedCategories.filter((category) =>
         assigned.value.find((ct: string) => category.domainId === ct)
       );
@@ -307,7 +298,10 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
           !categoryToRemove.map((category) => category.domainId).includes(cat)
       );
       available.patchValue(this.unAssignedCategories);
-
+      this.categoryIds = [
+        ...this.categoryIds,
+        ...categoryToRemove.map((domain) => domain.domainId),
+      ].filter((item, pos, self) => self.indexOf(item) == pos);
       this.testUpdateForm.updateValueAndValidity();
       this.categories = this.categories.pipe(
         map((categories) => [...categories, ...categoryToRemove]),
@@ -335,6 +329,9 @@ export class TestsAdminComponent implements OnInit, OnDestroy {
           ];
           available.patchValue(
             categoryToRemove.map((category) => category.domainId)
+          );
+          this.categoryIds.push(
+            ...categoryToRemove.map((category) => category.domainId)
           );
           this.testUpdateForm.updateValueAndValidity();
           return categories.filter(

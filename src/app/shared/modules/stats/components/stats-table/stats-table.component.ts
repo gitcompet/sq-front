@@ -17,5 +17,8 @@ export class StatsTableComponent {
   ): number => {
     return 0;
   };
+  isObject(value: any) {
+    return typeof value === 'object';
+  }
 
 }

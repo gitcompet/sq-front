@@ -1,1 +1,139 @@
-<p>profile works!</p>
+<div class="grid grid-cols-8 w-full">
+  <div
+    class="col-span-5 w-full my-3 max-w-2xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-white-800 dark:border-white-700"
+  >
+    <div class="flex flex-col">
+      <div class="flex gap-2 mx-2 my-2 justify-start">
+        <div class="w-full flex items-center justify-start">
+          <div class="mx-4 w-full flex-1">
+            <form [formGroup]="updateForm">
+              <div class="mb-2 p-3">
+                <label
+                  class="block text-grey-darker text-sm font-bold mb-2"
+                  for="username"
+                >
+                  Username
+                </label>
+                <input
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                  id="username"
+                  type="text"
+                  placeholder="Username"
+                  formControlName="login"
+                />
+                <ng-container
+                  *ngIf="
+                    updateForm.controls['username']?.invalid &&
+                    (updateForm.controls['username']?.dirty ||
+                      updateForm.controls['username']?.touched)
+                  "
+                >
+                  <div
+                    class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 mt-2 text-red-700"
+                  >
+                    <p>Wrong username.</p>
+                  </div></ng-container
+                >
+              </div>
+              <div class="mb-2 p-3">
+                <label
+                  class="block text-grey-darker text-sm font-bold mb-2"
+                  for="firstName"
+                >
+                  First Name
+                </label>
+                <input
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                  id="firstName"
+                  type="text"
+                  placeholder="First Name"
+                  formControlName="firstName"
+                />
+              </div>
+              <div class="mb-2 p-3">
+                <label
+                  class="block text-grey-darker text-sm font-bold mb-2"
+                  for="lastName"
+                >
+                  Last Name
+                </label>
+                <input
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                  id="lastName"
+                  type="text"
+                  placeholder="Last Name"
+                  formControlName="lastName"
+                />
+              </div>
+              <div class="mb-2 p-3">
+                <label
+                  class="block text-grey-darker text-sm font-bold mb-2"
+                  for="email"
+                >
+                  Email
+                </label>
+                <input
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                  id="email"
+                  type="email"
+                  placeholder="Email address"
+                  formControlName="email"
+                />
+                <ng-container
+                  *ngIf="
+                    updateForm.controls['email']?.invalid &&
+                    (updateForm.controls['email']?.dirty ||
+                      updateForm.controls['email']?.touched)
+                  "
+                >
+                  <div
+                    class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 mt-2 text-red-700"
+                  >
+                    <p>Wrong email.</p>
+                  </div></ng-container
+                >
+              </div>
+              <div class="mb-2 p-3">
+                <button
+                  class="bg-emerald-500 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                  type="button"
+                  (click)="save()"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-span-3">
+    <div class="flex flex-col gap-9 h-1/2 justify-between">
+      <app-stats-table
+        [title]="'Recent Completed Quizzes'"
+        [headers]="headers"
+        [data]="latestCompletedQuizzes | async"
+      ></app-stats-table>
+
+      <app-stats-table
+        [title]="'Recent Pending Quizzes'"
+        [headers]="headers"
+        [data]="latestPendingQuizzes | async"
+      ></app-stats-table>
+    </div>
+  </div>
+</div>
+<app-table [headers]="tableHeaders" [data]="testsToAssign | async">
+  <ng-template let-item>
+    <div class="mb-2 p-3">
+      <button
+        class="bg-blue-500 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+        type="button"
+        (click)="assignTestToUser()"
+      >
+        Assign
+      </button>
+    </div>
+  </ng-template>
+</app-table>

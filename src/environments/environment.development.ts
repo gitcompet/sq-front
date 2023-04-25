@@ -1,5 +1,5 @@
 export const environment = {
-  baseUrl: 'http://localhost:5001',
+  baseUrl: 'https://localhost:5001',
   apiVersion: '/api/v1',
   authPaths: {
     base: '/Auth',
