@@ -18,8 +18,13 @@ import {
 } from '@angular/forms';
 import { passwordMatchingValidator } from 'src/app/core/constants/settings';
 import { OperationType, Patch } from 'src/app/core/models/patch.model';
-import { Subscription } from 'rxjs';
-import { Router } from '@angular/router';
+import { Subscription, filter } from 'rxjs';
+import {
+  NavigationEnd,
+  NavigationStart,
+  Router,
+  RouterEvent,
+} from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { TableComponent } from 'src/app/shared/components/table/table.component';
 @Component({
@@ -90,7 +95,11 @@ export class ProfilesComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {}
 
   ngOnInit() {
-    this.isUrl = /profiles\d+/.test(this.router.url);
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationStart)
+        this.isUrl = /profiles\d+/.test(this.router.url);
+    });
+
     this._subscriptions.push(
       this.userService.getProfiles().subscribe((res: IUser[]) => {
         this.users = res;
@@ -125,8 +134,7 @@ export class ProfilesComponent implements OnInit, AfterViewInit, OnDestroy {
     const selectedUserUrl = this.router.createUrlTree([user.loginId], {
       relativeTo: this.route,
     });
-    this.router.navigateByUrl(selectedUserUrl);
-    this.router.routerState.snapshot.root.data = user;
+    this.router.navigateByUrl(selectedUserUrl,{state:{ user : user} });
     this.isUrl = !this.isUrl;
   }
 

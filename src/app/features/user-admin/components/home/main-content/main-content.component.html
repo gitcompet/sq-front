@@ -8,9 +8,12 @@
         <p>TOTAL</p>
       </div>
       <p class="py-4 text-3xl ml-5">0</p>
-      <!-- <hr > -->
+
     </div>
   </div>
-  <app-stats-table [title]="'Recent Completed Quizzes'" [headers]="quizHeaders" [data]="lastestCompletedQuizzes| async" ></app-stats-table>
-  <app-stats-table [title]="'Recent Pending Quizzes'"  [headers]="quizHeaders" [data]="lastestPendingQuizzes| async" ></app-stats-table>
+  <div class="container mx-auto">
+    <app-stats-table [title]="'Recent Completed Quizzes'" [headers]="quizHeaders" [data]="lastestCompletedQuizzes| async" ></app-stats-table>
+    <app-stats-table [title]="'Recent Pending Quizzes'"  [headers]="quizHeaders" [data]="lastestPendingQuizzes| async" ></app-stats-table>
+  </div>
+
 </div>

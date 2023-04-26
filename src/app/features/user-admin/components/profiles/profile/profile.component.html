@@ -1,3 +1,11 @@
+<button
+  type="button"
+  data-te-ripple-init
+  data-te-ripple-color="light"
+  class="place-self-start my-0 rounded inline-block px-6 pt-2.5 pb-2 text-xs font-medium uppercase leading-normal text-primary transition duration-150 ease-in-out hover:bg-neutral-100 hover:text-primary-600 focus:text-primary-600 focus:outline-none focus:ring-0 active:text-primary-700 dark:hover:bg-neutral-700"
+>
+  <a routerLinkActive="active" [routerLink]="'..'"> Back to users</a>
+</button>
 <div class="grid grid-cols-8 w-full">
   <div
     class="col-span-5 w-full my-3 max-w-2xl p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-white-800 dark:border-white-700"
@@ -126,14 +134,25 @@
 </div>
 <app-table [headers]="tableHeaders" [data]="testsToAssign | async">
   <ng-template let-item>
-    <div class="mb-2 p-3">
+    <div class="mb-2 p-3" *ngIf="isAlreadyAssgined(item); else notAssigned">
       <button
         class="bg-blue-500 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
         type="button"
-        (click)="assignTestToUser()"
+        (click)="assignTestToUser(item)"
       >
         Assign
       </button>
     </div>
+    <ng-template #notAssigned>
+      <div class="mb-2 p-3">
+        <button
+          class="bg-blue-500 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+          type="button"
+          (click)="unAssignTestFromUser(item)"
+        >
+          UnAssign
+        </button>
+      </div>
+    </ng-template>
   </ng-template>
 </app-table>

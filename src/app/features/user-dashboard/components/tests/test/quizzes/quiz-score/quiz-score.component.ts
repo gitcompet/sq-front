@@ -24,6 +24,7 @@ export class QuizScoreComponent implements OnInit {
     this.candidateService
       .getQuizScore(this.quiz.quizUserId!)
       .subscribe((result) => {
+
         const scorePercentage =
           (result.quizScore * 100) / this.quiz.questions.length;
         this.userScore = {

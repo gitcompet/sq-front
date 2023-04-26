@@ -30,6 +30,7 @@ export class QuizSummaryComponent implements OnInit {
 
     .subscribe((res) => {
       this.unansweredQuestionsIds = res;
+      this.questions = this.quiz.questions.filter((question)=> this.unansweredQuestionsIds.includes(question.questionId) )
     });
   }
   retryQuestion(selectedQuestion: IQuestionResponse){
@@ -49,7 +50,7 @@ export class QuizSummaryComponent implements OnInit {
       } as Patch
     ]
     this.candidateService.updateUserQuiz(patches, this.quiz.quizUserId!).subscribe((res)=>{
-      console.log(res);
+
       this.router.navigate(['/score'], {
         relativeTo: this.route,
         state: this.quiz,

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
-import { IUser, User } from 'src/app/core/models/user.model';
+import { IUser } from 'src/app/core/models/user.model';
 import { Patch } from 'src/app/core/models/patch.model';
 import { patchHeaders } from 'src/app/core/constants/settings';
 @Injectable({

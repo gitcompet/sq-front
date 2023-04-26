@@ -72,6 +72,7 @@ export class CandidateService {
          if (userQuiz) {
             return {
               quizScore: userQuiz.score,
+              quizId: userQuiz.quizId
             } as IQuizScore;
           }
           return {} as IQuizScore;

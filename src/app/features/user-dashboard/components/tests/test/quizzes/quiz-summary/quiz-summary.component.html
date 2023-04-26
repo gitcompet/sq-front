@@ -1,11 +1,11 @@
 <h1 class="text-center py-3 text-2xl">Quiz Summary</h1>
 <div
-  *ngIf="quiz.questions && quiz.questions.length > 0"
+  *ngIf="questions && questions.length > 0"
   class="grid grid-cols-2 gap-2 px-2 py-3 justify-center items-start"
 >
   <app-question
     (click)="retryQuestion(question)"
-    *ngFor="let question of this.quiz.questions"
+    *ngFor="let question of questions"
     [data]="question"
   ></app-question>
 </div>
