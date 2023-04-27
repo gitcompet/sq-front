@@ -7,11 +7,11 @@
     data && headers && data.length > 0 && headers.length > 0;
     else noRecentQuizzes
   "
-  class="container max-h-min mr-5 ml-2 mx-auto bg-white shadow-xl"
+  class="max-h-min ml-4 bg-white shadow-xl"
 >
   <div class="w-full mx-auto">
     <div class="bg-white my-3">
-      <table class="text-left w-full border-collapse">
+      <table class="text-center w-full border-collapse">
         <!--Border collapse doesn't work on this site yet but it's available in newer tailwind versions -->
         <thead>
           <tr>
@@ -27,7 +27,7 @@
           <tr *ngFor="let item of data" class="hover:bg-grey-lighter">
             <td
               *ngFor="let property of item | keyvalue : originalOrder"
-              class="py-4 px-6 border-b border-grey-light"
+              class="py-2 px-3 border-b border-grey-light"
             >
               <p
                 class="mb-0 text-center leading-normal text-sm p-2 bg-transparent border-b whitespace-nowrap break-words"
