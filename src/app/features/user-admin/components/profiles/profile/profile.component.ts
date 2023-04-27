@@ -88,17 +88,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
         })
     );
   }
-  isAlreadyAssgined(item: any): boolean {
-    return (
-      this.assignedTests.find((test) => test.testId === item) === undefined
-    );
-  }
-  assignTestToUser(testId: string) {
+
+  assignTestToUser(test: ITestResponse) {
     this._subscriptions.push(
       this.quizService
         .assignTestToUser({
           loginId: this.id,
-          testId: testId,
+          testId: test.testId,
         })
         .pipe(
           tap((res) => {
@@ -116,14 +112,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
         .subscribe()
     );
   }
-  unAssignTestFromUser(testId: any) {
+  unAssignTestFromUser(test: ITestResponse) {
     this._subscriptions.push(
       this.quizService
         .getUserTests(this.id, true)
         .pipe(
           switchMap((res: ITestResponse[]) => {
             const testUserId = res.find(
-              (test) => test.testId === testId
+              (ts) => ts.testId === test.testId
             )?.testUserId;
 
             if (testUserId)
@@ -147,9 +143,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
         .subscribe((res) => {})
     );
   }
+  isAlreadyAssigned(item: ITestResponse){
+    return this.assignedTests.find((test)=> test.testId === item.testId) !== undefined;
+  }
   private init() {
     const quizzes = this.quizService.getUserTests(this.id, true).pipe(
       switchMap((tests) => {
+        this.assignedTests = [...tests].map((test)=>({...test,isAssigned:true}));
         return forkJoin([
           of(tests),
           forkJoin(
@@ -206,24 +206,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
       map((res) => {
         const tests = res[0];
         const userTests = res[1][0];
-        this.assignedTests = tests
-          .filter((test) => {
-            return userTests === undefined
-              ? test
-              : userTests.some((ts) => ts.testId === test.testId);
-          })
-          .map((test) => {
-            return {
-              testId: test.testId,
-              title: test.title,
-              categories: test.categories,
-            } as ITestResponse;
-          });
         return tests.map((test) => {
           return {
             testId: test.testId,
             title: test.title,
-            categories: test.categories,
+            categories: test.categories
           } as ITestResponse;
         });
       })

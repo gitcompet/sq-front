@@ -116,7 +116,7 @@
       </div>
     </div>
   </div>
-  <div class="col-span-5 ">
+  <div class="col-span-5">
     <div class="flex w-max flex-col gap-9 h-1/2 justify-between">
       <app-stats-table
         [title]="'Recent Completed Quizzes'"
@@ -133,16 +133,19 @@
   </div>
 </div>
 <app-table [headers]="tableHeaders" [data]="testsToAssign | async">
-  <ng-template let-item>
-    <div class="mb-2 p-3" *ngIf="isAlreadyAssgined(item); else notAssigned">
-      <button
-        class="bg-blue-500 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-        type="button"
-        (click)="assignTestToUser(item)"
-      >
-        Assign
-      </button>
-    </div>
+  <ng-template let-item="data">
+
+    <ng-template #assigned>
+      <div class="mb-2 p-3">
+        <button
+          class="bg-blue-500 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+          type="button"
+          (click)="assignTestToUser(item)"
+        >
+          Assign
+        </button>
+      </div>
+    </ng-template>
     <ng-template #notAssigned>
       <div class="mb-2 p-3">
         <button
@@ -154,5 +157,7 @@
         </button>
       </div>
     </ng-template>
+   <div *ngIf="!isAlreadyAssigned(item)" ><ng-container *ngTemplateOutlet="assigned"></ng-container></div>
+   <div *ngIf="isAlreadyAssigned(item)" > <ng-container *ngTemplateOutlet="notAssigned"></ng-container> </div>
   </ng-template>
 </app-table>
