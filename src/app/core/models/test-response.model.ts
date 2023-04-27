@@ -13,6 +13,7 @@ export interface ITestResponse {
     isDeleted?: boolean;
     title?: string;
     label?: string;
+    isAssigned?:boolean;
 }
 export class TestResponse implements ITestResponse{
   testId: string;
