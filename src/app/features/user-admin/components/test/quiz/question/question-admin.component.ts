@@ -74,6 +74,7 @@ export class QuestionAdminComponent implements OnInit, OnDestroy {
           this.questions = questions;
         })
     );
+    this.categories = this.quizService.getCategories();
   }
   onAddQuestion() {
     this.showModal = !this.showModal;

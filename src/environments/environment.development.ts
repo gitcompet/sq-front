@@ -13,6 +13,10 @@ export const environment = {
   quizPaths: {
     base: '/Quiz',
   },
+  dashboardPaths:{
+    base: "/Dashboard",
+    latestQuizzes: "/LastQuiz"
+  },
   testPaths: {
     base: '/Test',
     testCategories: '/TestCategoryCompose',

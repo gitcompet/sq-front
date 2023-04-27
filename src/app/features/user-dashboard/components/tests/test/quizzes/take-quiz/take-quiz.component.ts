@@ -46,8 +46,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     private router: Router,
     private quizService: QuizService,
     private candiateService: CandidateService,
-    private route: ActivatedRoute,
-    private localStorageService: LocalStorageService
+    private route: ActivatedRoute
   ) {
     this.questionAnswers = this.candiateService.answers$;
     this.quiz = this.router.getCurrentNavigation()?.extras
@@ -55,16 +54,16 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
     this.route.params.subscribe((params) => {});
   }
   ngOnInit(): void {
+    this.quiz.questions = [] as IQuestionResponse[];
     this._subscriptions.push(this.getQuestions());
   }
 
   tick() {
     this.duration -= 1;
     this.elapsedTime = this.parseTime();
-    if (this.duration === 0) console.log('done');
-    // if (this.duration === 0) {
-    //   this.validateQuiz();
-    // }
+    if (this.duration === 0) {
+      this.validateQuiz();
+    }
   }
   parseTime() {
     let mins: string | number = Math.floor(this.duration / 60);
@@ -84,6 +83,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
   }
   nextQuestion(): void {
     this.currentIdx = this.currentIdx + 1;
+    clearInterval(this.timer);
     if (this.currentIdx === this.questionsLength) {
       this.router.navigate(['/summary'], {
         relativeTo: this.route,
@@ -159,11 +159,9 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
                 maxValidationDate: question.maxValidationDate,
               } as IQuestionResponse;
             })[0];
-          this.quiz.questions = [] as IQuestionResponse[];
+
           if (this.currentQuestion) {
             this.quiz.questions.push(this.currentQuestion);
-            this.currentIdx =
-              this.quiz.questions.indexOf(this.currentQuestion) + 1;
             this.questionAnswers = this.candiateService.getQuestionAnswers(
               this.currentQuestion
             );
@@ -176,6 +174,7 @@ export class TakeQuizComponent implements OnInit, OnDestroy {
             } else {
               this.duration = this.currentQuestion.duration * 60;
             }
+
             if (this.duration === 0) {
               this.nextQuestion();
             }

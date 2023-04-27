@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormControl,
@@ -12,10 +13,12 @@ import {
   map,
   Observable,
   of,
+  shareReplay,
   Subscription,
   switchMap,
+  tap,
 } from 'rxjs';
-import { IDomain } from 'src/app/core/models/domain.model';
+import { ElementTypes, IDomain } from 'src/app/core/models/domain.model';
 import { IQuestionResponse } from 'src/app/core/models/question-response.model';
 import { IQuestion } from 'src/app/core/models/question.model';
 import { IQuizResponse } from 'src/app/core/models/quiz-response.model';
@@ -39,7 +42,6 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
   showModal: boolean = false;
   quizzes: IQuizResponse[] = [];
   questionsIds: string[] = [];
-
   quizQuestions: IQuestionResponse[] = [];
   headers: string[] = [
     'Id',
@@ -57,6 +59,8 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
   categories: Observable<IDomain[]> = new Observable();
   _subscriptions: Subscription[] = [];
   assignedCategories: IDomain[] = [];
+  domainIds: string[] = [];
+  private unAssignedCategories: IDomain[] = [];
   constructor(
     private _formBuilder: FormBuilder,
     private modalService: ModalService,
@@ -65,8 +69,6 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
     this.quizForm = this._formBuilder.group({
       title: this._formBuilder.control('', [Validators.required]),
       comment: this._formBuilder.control('', [Validators.required]),
-      label: this._formBuilder.control('', [Validators.required]),
-      role: this._formBuilder.control('', [Validators.required]),
       weight: this._formBuilder.control(0, [Validators.required]),
       categories: this._formBuilder.control('', [Validators.required]),
       questions: this._formBuilder.array([]),
@@ -74,10 +76,9 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
     this.updateQuizForm = this._formBuilder.group({
       title: this._formBuilder.control(''),
       comment: this._formBuilder.control(''),
-      label: this._formBuilder.control(''),
-      role: this._formBuilder.control(''),
       weight: this._formBuilder.control(0),
       categories: this._formBuilder.control(''),
+      assignedCategories: this._formBuilder.control(''),
       questions: this._formBuilder.array([]),
     });
   }
@@ -111,6 +112,7 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
           }
         })
     );
+    this.categories = this.quizService.getCategories();
   }
 
   onAddQuiz() {
@@ -128,11 +130,10 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
   createQuiz(form: FormGroup) {
     const newQuiz = {
       title: form.get('title')?.value,
-      subDomainId: form.get('role')?.value,
+      subDomainId: form.get('categories')?.value,
       domainId: form.get('categories')?.value,
       weight: form.get('weight')?.value,
       comment: form.get('description')?.value,
-      label: form.get('label')?.value,
     } as IQuiz;
 
     this.quizService
@@ -160,8 +161,115 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
       });
   }
   updateQuiz(form: FormGroup) {
-    if (!form.valid) return;
-    const controls = form.controls;
+   if (!form.valid) return;
+    const controls: any = form.controls;
+    const {
+      patches,
+      categoryPathes,
+    }: { patches: Patch[]; categoryPathes: Patch[] } =
+      this.setUpPatches(controls);
+    if (patches.length > 0 && this.data) {
+      this._subscriptions.push(
+        this.quizService
+          .updateQuiz(this.data.quizId as string, patches)
+          .pipe(
+            switchMap((newQuiz: IQuizResponse) => {
+              this.data = { ...newQuiz };
+              this.modalService.updateData(this.data);
+              return forkJoin(
+                this.questionsIds.map((questionId) =>
+                  this.quizService.assignQuesion({
+                    quizId: newQuiz.quizId,
+                    questionId: questionId,
+                  } as IQuizQuestion)
+                )
+              );
+            }),
+            finalize(() =>
+              this.modalService.closeModal({
+                id: 'updateQuizModal',
+                isShown: this.showModal,
+              })
+            )
+          )
+          .subscribe()
+      );
+    }
+
+    if (categoryPathes.length > 0 && this.data) {
+      const result =
+        this.data.quizDomainComposeId.length > 0 &&
+        this.data.domains
+          .map((cat) => cat.domainId)
+          .every((val, index) => categoryPathes[index].value === val)
+          ? this.data.quizDomainComposeId
+              .filter((value, index) => {
+                return categoryPathes[index];
+              })
+              .map((value, index) => {
+                return this.quizService.updateQuizDomains(value, [
+                  categoryPathes[index],
+                ]);
+              })
+          : categoryPathes.map((patch) =>
+              this.quizService.addQuizDomains({
+                elementId: this.data.quizId,
+                elementType: ElementTypes.QUIZ,
+                domainId: patch.value,
+              })
+            );
+      this._subscriptions.push(
+        forkJoin(result)
+          .pipe(
+            switchMap(() => this.quizService.getQuiz(this.data)),
+            finalize(() => {
+              this.modalService.closeModal({
+                id: 'updateQuizModal',
+                isShown: this.showModal,
+              });
+            })
+          )
+          .subscribe((res) => {
+            this.data = { ...res };
+            this.modalService.updateData(this.data);
+          })
+      );
+    }
+  }
+  unAssign() {
+    const assigned = this.updateQuizForm.get('assignedCategories');
+    const available = this.updateQuizForm.get('categories');
+    if (assigned && available) {
+      const categoryToRemove = this.assignedCategories.filter((category) =>
+        assigned.value.find((ct: string) => category.domainId === ct)
+      );
+      this.unAssignedCategories = assigned.value.filter(
+        (cat: string) =>
+          !categoryToRemove.map((category) => category.domainId).includes(cat)
+      );
+
+      this.domainIds = [
+        ...this.domainIds,
+        ...categoryToRemove.map((domain) => domain.domainId),
+      ].filter((item, pos, self) => self.indexOf(item) == pos);
+      available.patchValue(this.unAssignedCategories);
+
+      this.updateQuizForm.updateValueAndValidity();
+      this.categories = this.categories.pipe(
+        map((categories) => [...categories, ...categoryToRemove]),
+        tap(
+          () =>
+            (this.assignedCategories = this.assignedCategories.filter(
+              (category) =>
+                !assigned.value.find((ct: string) => category.domainId === ct)
+            ))
+        )
+      );
+    }
+  }
+  private setUpPatches(controls: AbstractControl<any>) {
+    this.updateQuizForm.get('categories')?.patchValue(this.domainIds);
+    this.updateQuizForm.updateValueAndValidity();
     const patches: Patch[] = Object.entries(controls)
       .map((entry) => {
         if (entry[1].value && (!entry[1].pristine || entry[1].dirty)) {
@@ -193,71 +301,37 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
         return undefined as unknown as Patch;
       })
       .filter((patch) => patch !== undefined);
-
-    if (patches.length > 0 && this.data) {
-      this._subscriptions.push(
-        this.quizService
-          .updateQuiz(this.data.quizId as string, patches)
-          .pipe(
-            switchMap((newQuiz: IQuizResponse) => {
-              this.data = { ...newQuiz };
-              this.modalService.updateData(this.data);
-              return forkJoin(
-                this.questionsIds.map((questionId) =>
-                  this.quizService.assignQuesion({
-                    quizId: newQuiz.quizId,
-                    questionId: questionId,
-                  } as IQuizQuestion)
-                )
-              );
-            }),
-            finalize(() =>
-              this.modalService.closeModal({
-                id: 'updateQuizModal',
-                isShown: this.showModal,
-              })
-            )
-          )
-          .subscribe()
-      );
-    }
-
-    if (categoryPathes.length > 0 && this.data) {
-      const result =
-        this.data.quizDomainComposeId.length > 0
-          ? this.data.quizDomainComposeId
-              .filter((value, index) => {
-                return categoryPathes[index];
-              })
-              .map((value, index) => {
-                return this.quizService.updateQuizDomains(value, [
-                  categoryPathes[index],
-                ]);
-              })
-          : categoryPathes.map((patch) =>
-              this.quizService.addQuizDomains({
-                quizId: this.data.quizId,
-                quizCategoryId: patch.value,
-              })
-            );
-      this._subscriptions.push(
-        forkJoin(result)
-          .pipe(
-            switchMap(() => this.quizService.getQuiz(this.data)),
-            finalize(() => {
-              this.modalService.closeModal({
-                id: 'updateQuizModal',
-                isShown: this.showModal,
-              });
-            })
-          )
-          .subscribe((res) => {
-            this.data = { ...res };
-            this.modalService.updateData(this.data);
-          })
+    return { patches, categoryPathes };
+  }
+  assign() {
+    const available = this.updateQuizForm.get('categories');
+    if (available) {
+      this.categories = this.categories.pipe(
+        map((categories) => {
+          const categoryToRemove = categories.filter((category) =>
+            available.value.find((ct: string) => category.domainId === ct)
+          );
+          this.assignedCategories = [
+            ...this.assignedCategories,
+            ...categoryToRemove,
+          ];
+          this.domainIds.push(
+            ...categoryToRemove.map((domain) => domain.domainId)
+          );
+          available.patchValue(
+            categoryToRemove.map((category) => category.domainId)
+          );
+          this.updateQuizForm.updateValueAndValidity();
+          return categories.filter(
+            (category) =>
+              !available.value.find((ct: string) => category.domainId === ct)
+          );
+        }),
+        shareReplay()
       );
     }
   }
+
   deleteQuiz() {
     if (this.data) {
       this.quizService
@@ -303,13 +377,30 @@ export class QuizAdminComponent implements OnInit, OnDestroy {
     this.options(index).push(this.createOption());
   }
   selectQuestions() {
-    this.quizService.getAvailableQuestions().subscribe((questions) => {
-      if (questions && questions.length > 0) {
-        this.quizQuestions = questions;
-        this.modalService.updateData(this.quizQuestions);
-        this.modalService.openModal({ id: 'questionsModal', isShown: true });
-      }
-    });
+    this.quizService
+      .getAvailableQuestions()
+      .pipe(
+        map((res) =>
+          res.map((question) => {
+            return {
+              questionId: question.questionId,
+              label: question.label,
+              title: question.title,
+              comment: question.comment,
+              level: question.level,
+              duration: question.duration,
+              domains: question.domains,
+            } as IQuestionResponse;
+          })
+        )
+      )
+      .subscribe((questions) => {
+        if (questions && questions.length > 0) {
+          this.quizQuestions = questions;
+          this.modalService.updateData(this.quizQuestions);
+          this.modalService.openModal({ id: 'questionsModal', isShown: true });
+        }
+      });
   }
 
   ngOnDestroy(): void {

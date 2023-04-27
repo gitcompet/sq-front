@@ -7,7 +7,7 @@ import {
   HttpErrorResponse,
   HttpHeaders,
 } from '@angular/common/http';
-import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { catchError, EMPTY, Observable, switchMap, throwError } from 'rxjs';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { Router } from '@angular/router';
 import { ErrorHandlerComponent } from '../exceptions/error-handler/error-handler.component';
@@ -34,8 +34,9 @@ export class TokenInterceptor implements HttpInterceptor {
       catchError((err) => {
         if (err instanceof HttpErrorResponse) {
           if (err.status === 401) this.handle401Error(request, next);
+          if (err.status === 404) return EMPTY;
         }
-        //this._errorHandler.handleError(err);
+        //
         return throwError(() => err);
       })
     );

@@ -48,3 +48,8 @@ export enum ElementTypes {
   QUESTION= 'QUESTION',
   QUIZ= 'QUIZ'
 }
+export enum QuizStatus {
+  COMPLETED= 'true',
+  PENDING= 'false'
+}
+

@@ -5,6 +5,7 @@ import { ContactComponent } from './components/contact/contact.component';
 import { UserHomeComponent } from './components/home/user-home.component';
 import { TestComponent } from './components/tests/test/test.component';
 import { TestsComponent } from './components/tests/tests.component';
+import { SettingsPageComponent } from 'src/app/shared/components/settings-page/settings-page.component';
 
 const routes: Routes = [
   {
@@ -13,6 +14,13 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     canActivateChild: [AuthGuard],
     children: [
+      {
+        path: 'settings',
+        component: SettingsPageComponent,
+        data: {
+          roles: ['USER'],
+        },
+      },
       {
         path: 'tests',
         component: TestsComponent,

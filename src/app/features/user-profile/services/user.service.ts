@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment.development';
-import { IUser, User } from 'src/app/core/models/user.model';
+import { IUser } from 'src/app/core/models/user.model';
 import { Patch } from 'src/app/core/models/patch.model';
 import { patchHeaders } from 'src/app/core/constants/settings';
 @Injectable({
@@ -28,6 +28,23 @@ export class UserService {
             return modifiedUser;
           })
         )
+      );
+  }
+  getProfile(id: string): Observable<IUser> {
+    return this.http
+      .get<IUser>(
+        `${environment.baseUrl}${environment.apiVersion}${environment.userPaths.base}/${id}`
+      )
+      .pipe(
+        map((user) => {
+          const modifiedUser = {} as IUser;
+          modifiedUser.loginId = user.loginId;
+          modifiedUser.email = user.email;
+          modifiedUser.firstName = user.firstName;
+          modifiedUser.lastName = user.lastName;
+          modifiedUser.login = user.login;
+          return modifiedUser;
+        })
       );
   }
   updateUser(payload: IUser): Observable<IUser> {
