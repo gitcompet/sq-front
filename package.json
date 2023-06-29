@@ -22,7 +22,7 @@
     "@auth0/angular-jwt": "^5.1.2",
     "ngx-loading": "^15.0.0",
     "ngx-spinner": "^15.0.1",
-    "rxjs": "~7.8.0",
+    "rxjs": "~7.8.1",
     "source-map-explorer": "^2.5.3",
     "tslib": "^2.3.0",
     "zone.js": "~0.12.0"
